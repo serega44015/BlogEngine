@@ -1,10 +1,12 @@
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
-        int a = 5;
-        int b = 6;
-        System.out.println( a + b);
-
-        String a1 = "Javaa";
-        String b1 = "Seerrgp";
+        String testBranch = "Тест на слияние веток";
+        ArrayList<String> s = new ArrayList<>();
+        for (int a = 0; a < 50; a++){
+            s.add(testBranch);
+        }
+        s.stream().forEach(q -> System.out.println(q));
     }
 }
