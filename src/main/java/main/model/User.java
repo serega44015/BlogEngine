@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -39,6 +40,14 @@ public class User {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String photo;
+
+    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
+    private List<Posts> userPosts;
+
+    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
+    private List<PostComments> postCommentsUser;
+
+
 
 
 }

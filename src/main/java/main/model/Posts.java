@@ -6,12 +6,13 @@ import main.model.enums.ModerationStatus;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "posts")
-public class Post {
+public class Posts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -43,7 +44,16 @@ public class Post {
     @Column(name = "view_count", nullable = false, columnDefinition = "INT")
     private int viewCount;
 
+    @OneToMany(mappedBy = "postsId", cascade = CascadeType.ALL)
+    private List<PostVotes> postVotesList;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "tags2post",
+            joinColumns = {@JoinColumn(name = "post_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
+    )
+    private List<Tags> tagsList;
 
 
 }

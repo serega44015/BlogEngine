@@ -8,7 +8,7 @@ public class DefaultController {
 
     @RequestMapping("/")
     public String defaultController() {
-        return "index";
+        return "index.html";
     }
 
 }

@@ -1,7 +1,8 @@
 package main.model.repositories;
 
-import main.model.Post;
+import main.model.Tags;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PostRepository extends JpaRepository<Post, Integer> {
+public interface TagsRepository extends JpaRepository<Tags, Integer> {
+
 }
