@@ -6,10 +6,10 @@ spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
 server.port: ${PORT:8080}
 
 blog.title: DevPub
-blog.subtitle: ???????? ?????????????
+blog.subtitle: Сказки о МичГАУ
 blog.phone: +7 903 666-44-55
 blog.email: mail@mail.ru
-blog.copyright: ??????? ???????
+blog.copyright: Сергей Хорошков
 blog.copyrightFrom: 2005
 
 
