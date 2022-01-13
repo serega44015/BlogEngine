@@ -5,11 +5,11 @@ spring.jpa.hibernate.ddl-auto: update
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
 server.port: ${PORT:8080}
 
-blog.title: DevPub
-blog.subtitle: Сказки о МичГАУ
-blog.phone: +7 903 666-44-55
-blog.email: mail@mail.ru
-blog.copyright: Сергей Хорошков
-blog.copyrightFrom: 2005
+blog.title: QuietCorner
+blog.subtitle: Blog
+blog.phone: +7 915 871-59-39
+blog.email: s.khoroshkov@mail.ru
+blog.copyright: Serg Alternative
+blog.copyrightFrom: 2021
 
 

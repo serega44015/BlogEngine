@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class UserLoginDTO {
+
     private int id;
     private String name;
     private String photo;
@@ -11,5 +12,5 @@ public class UserLoginDTO {
     private boolean moderation;
     private int moderationCount;
     private boolean settings;
-}
 
+}
