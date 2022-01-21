@@ -16,8 +16,8 @@ public class PostComments {
     @Column(nullable = false)
     private int id;
 
-    @Column(name = "parent_id", columnDefinition = "INT")
-    private int parentId;
+    @Column(name = "parent_id", columnDefinition = "INT", nullable = true)
+    private Integer parentId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -25,7 +25,7 @@ public class PostComments {
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
-    private Posts postId;
+    private Post postId;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
     private Date time;

@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "posts")
-public class Posts {
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -26,7 +26,7 @@ public class Posts {
     private ModerationStatus moderationStatus = ModerationStatus.NEW;
 
     @Column(name = "moderator_id", columnDefinition = "INT")
-    private int moderatorId;
+    private Integer moderatorId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -44,8 +44,11 @@ public class Posts {
     @Column(name = "view_count", nullable = false, columnDefinition = "INT")
     private int viewCount;
 
-    @OneToMany(mappedBy = "postsId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostVotes> postVotesList;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    private List<PostComments> postCommentsList;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -53,7 +56,7 @@ public class Posts {
             joinColumns = {@JoinColumn(name = "post_id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
-    private List<Tags> tagsList;
+    private List<Tag> tagList;
 
 
 }

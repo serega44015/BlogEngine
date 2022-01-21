@@ -31,47 +31,7 @@ public class PostsService {
     }
 
 
-    /*public PostsResponse getPosts(int offset, int limit, String mode){
-        List<PostsDTO> postsDTOList = new ArrayList<>();
-        PostsResponse postsResponse = new PostsResponse();
-
-        //Optional<Posts> postsOptional = postsRepository.findAllByUserId(1);
-        List<Posts> postsList = postsRepository.findAll();
-//        if(mode.equals("recent")){
-//
-//        }
-        PostsDTO postsDTO = new PostsDTO();
-        postsDTO.setId(345);
-        postsDTO.setTimeStamp(1592338706);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName("Дмитрий Петров");
-        userDTO.setId(123);
-
-        postsDTO.setUserDTO(userDTO);
-        postsDTO.setTitle("Title");
-        postsDTO.setAnnounce("Announce");
-        postsDTO.setLikeCount(455);
-        postsDTO.setDislikeCount(233);
-        postsDTO.setCommentCount(555);
-        postsDTO.setViewCount(111);
-
-        postsDTOList.add(postsDTO);
-
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);
-
-
-
-        return postsResponse;
-    }*/
-
-
-
-
     public PostsResponse getPosts(int offset, int limit, String mode){
-    ///////РАБОЧИЙ
-
         List<PostsDTO> postsDTOList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
 

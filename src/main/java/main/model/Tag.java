@@ -10,7 +10,7 @@ import java.util.List;
 @Table(name = "tags")
 @Data
 @NoArgsConstructor
-public class Tags {
+public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -19,6 +19,6 @@ public class Tags {
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String name;
 
-    @ManyToMany(mappedBy = "tagsList")
-    private List<Posts> postsWithTags;
+    @ManyToMany(mappedBy = "tagList")
+    private List<Post> postWithTags;
 }

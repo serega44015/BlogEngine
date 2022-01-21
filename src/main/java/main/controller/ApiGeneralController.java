@@ -1,8 +1,8 @@
 package main.controller;
 
-import main.api.response.InitResponse;
-import main.api.response.SettingsResponse;
-import main.api.response.TagsResponse;
+import main.dto.api.response.InitResponse;
+import main.dto.api.response.SettingsResponse;
+import main.dto.api.response.TagsResponse;
 import main.service.SettingsService;
 import main.service.TagsService;
 import org.springframework.beans.factory.annotation.Autowired;

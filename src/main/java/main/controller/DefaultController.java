@@ -1,6 +1,6 @@
 package main.controller;
 
-import main.api.response.InitResponse;
+import main.dto.api.response.InitResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -12,12 +12,6 @@ public class DefaultController {
     public DefaultController(InitResponse initResponse){
         this.initResponse = initResponse;
     }
-
-//    @RequestMapping("/")
-//    public String defaultController() {
-//        System.out.println("serega " + initResponse.getTitle());
-//        return "index";
-//    }
 
     @RequestMapping("/")
     public String defaultController() {

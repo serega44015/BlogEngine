@@ -1,6 +1,6 @@
 package main.service;
 
-import main.api.response.SettingsResponse;
+import main.dto.api.response.SettingsResponse;
 import org.springframework.stereotype.Service;
 
 @Service
