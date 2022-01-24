@@ -1,6 +1,17 @@
 spring.datasource.url: jdbc:${JAWSDB_BROWN_URL:mysql://localhost:3306/site?useSSL=false&serverTimezone=UTC}
 spring.datasource.username: root
-spring.datasource.password: r54Sk1Hk
-spring.jpa.hibernate.ddl-auto: create-drop
+spring.datasource.password: root
+spring.jpa.hibernate.ddl-auto: validate
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
 server.port: ${PORT:8080}
+
+blog.title: QuietCorner
+blog.subtitle: Blog
+blog.phone: +7 915 871-59-39
+blog.email: s.khoroshkov@mail.ru
+blog.copyright: Serg Alternative
+blog.copyrightFrom: 2021
+spring:
+  jpa:
+    show-sql: true
+
