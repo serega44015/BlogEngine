@@ -23,14 +23,14 @@ public class CheckService {
 
 
         UserLoginDTO userLoginDTO = new UserLoginDTO();
-        Optional<User> userOptional = userRepository.findByEmail("sergev123@gmail.com");
+        Optional<User> userOptional = userRepository.findByEmail("serega44015@gmail.com");
 
 
 
         userLoginDTO.setId(userOptional.get().getId());
         userLoginDTO.setName(userOptional.get().getName());
         userLoginDTO.setPhoto(userOptional.get().getPhoto());
-        userLoginDTO.setEmail(userOptional.get().getPhoto());
+        userLoginDTO.setEmail(userOptional.get().getEmail());
         userLoginDTO.setModeration(false);
         userLoginDTO.setModerationCount(userOptional.get().getIsModerator());
         userLoginDTO.setSettings(true);

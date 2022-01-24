@@ -26,7 +26,7 @@ public class ApiGeneralController {
 
     @GetMapping("/settings")
     private SettingsResponse settings(){
-        return settingsService.getInitGlobalSettins();
+        return settingsService.getInitGlobalSettings();
     }
 
     @GetMapping("/init")
