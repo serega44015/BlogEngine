@@ -7,8 +7,11 @@ import main.model.Posts;
 import main.model.User;
 import main.model.repositories.PostsRepository;
 import main.model.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +40,12 @@ public class PostsService {
 //        if(mode.equals("recent")){
 //
 //        }
+
+        Page<Posts> postsPage = postsRepository.findAll(PageRequest.of(1,5));
+
+        System.out.println("Размер пагинации" + postsPage.getSize());
+
+
         postsList.stream().forEach(el -> {
             System.out.println(el.getId() + "айди и " + el.getText());
         });

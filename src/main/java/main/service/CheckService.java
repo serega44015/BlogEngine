@@ -25,8 +25,6 @@ public class CheckService {
         UserLoginDTO userLoginDTO = new UserLoginDTO();
         Optional<User> userOptional = userRepository.findByEmail("serega44015@gmail.com");
 
-
-
         userLoginDTO.setId(userOptional.get().getId());
         userLoginDTO.setName(userOptional.get().getName());
         userLoginDTO.setPhoto(userOptional.get().getPhoto());
