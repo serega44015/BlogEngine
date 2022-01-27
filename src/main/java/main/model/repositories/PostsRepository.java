@@ -16,4 +16,7 @@ public interface PostsRepository extends JpaRepository<Posts, Integer> {
    // Page<Posts> findAllByUserId(Pageable pageable);
     Page<Posts> findAll(Pageable pageable);
 
+    //Page<Posts> findPostsOrderByLikes(Pageable pageable); тут наверное нужно Query искать как пишется
+    //findPostsOrderByLikes
+
 }

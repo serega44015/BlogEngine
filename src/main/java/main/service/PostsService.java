@@ -9,9 +9,10 @@ import main.model.repositories.PostsRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ public class PostsService {
 
     private final PostsRepository postsRepository;
     private final UserRepository userRepository;
+    private Sort sort;
 
 //    private Sort sort;
 //    private int countPosts;
@@ -31,39 +33,74 @@ public class PostsService {
     }
 
 
-    public PostsResponse getPosts(int offset, int limit, String mode){
-        List<PostsDTO> postsDTOList = new ArrayList<>();
+    public PostsResponse getPosts(int offset, int limit, String mode) {
         PostsResponse postsResponse = new PostsResponse();
+        List<PostsDTO> postsDTOList = new ArrayList<>();
 
-        //Optional<Posts> postsOptional = postsRepository.findAllByUserId(1);
-        List<Posts> postsList = postsRepository.findAll();
-//        if(mode.equals("recent")){
-//
-//        }
+        if (mode.equals("recent")) {
+            sort = Sort.by("time").descending();
+            Page<Posts> postsPage = postsRepository.findAll(getSortedPaging(offset, limit, sort));
+            List<Posts> listPostsRepository = postsPage.toList();
+            postsDTOList = getListPostsDTO(listPostsRepository);
 
-        Page<Posts> postsPage = postsRepository.findAll(PageRequest.of(1,5));
+        }
 
-        System.out.println("Размер пагинации" + postsPage.getSize());
+        /*if (mode.equals("popular")){
+            //sort = Sort.by("time").descending();
+            Page<Posts> postsPage = postsRepository.findPostsOrderByLikes(getPaging(offset, limit)); похоже нужно через Query вытаскивать
+            List<Posts> listPostsRepository = postsPage.toList();
+            postsDTOList = getListPostsDTO(listPostsRepository);
+        }*/
 
+        if (mode.equals("best")){
 
-        postsList.stream().forEach(el -> {
-            System.out.println(el.getId() + "айди и " + el.getText());
-        });
+        }
 
-        for (int a = 0; a < postsList.size(); a++){
+        if (mode.equals("early")){
+            sort = Sort.by("time").ascending();
+            Page<Posts> postsPage = postsRepository.findAll(getSortedPaging(offset, limit, sort));
+            postsDTOList = getListPostsDTO(postsPage.toList());
+        }
+
+        postsResponse.setCount(390);
+        postsResponse.setPostsDTO(postsDTOList);
+        return postsResponse;
+    }
+
+    private Pageable getPaging(int offset, int limit) {
+        //https://stackoverflow.com/questions/25008472/pagination-in-spring-data-jpa-limit-and-offset
+        Pageable sortedPaging;
+        int pageNumber = offset / limit;
+        sortedPaging = PageRequest.of(pageNumber, limit);
+
+        return sortedPaging;
+    }
+
+    private Pageable getSortedPaging(int offset, int limit, Sort sort) {
+        //https://stackoverflow.com/questions/25008472/pagination-in-spring-data-jpa-limit-and-offset
+        Pageable sortedPaging;
+        int pageNumber = offset / limit;
+        sortedPaging = PageRequest.of(pageNumber, limit, sort);
+
+        return sortedPaging;
+    }
+
+    private List<PostsDTO> getListPostsDTO(List<Posts> listPostsRepository) {
+        List<PostsDTO> postsDTOList = new ArrayList<>();
+        for (int a = 0; a < listPostsRepository.size(); a++) {
             PostsDTO postsDTO = new PostsDTO();
-            postsDTO.setId(postsList.get(a).getId());
+            postsDTO.setId(listPostsRepository.get(a).getId());
             postsDTO.setTimeStamp(1592338706); //потом взять из базы, переконвертировать время в секунды
 
             UserDTO userDTO = new UserDTO();
-            Optional<User> optionalUser = userRepository.findUserById(postsList.get(a).getUserId().getId());
+            Optional<User> optionalUser = userRepository.findUserById(listPostsRepository.get(a).getUserId().getId());
 
             userDTO.setName(optionalUser.get().getName());
             userDTO.setId(optionalUser.get().getId());
             postsDTO.setUserDTO(userDTO);
 
-            postsDTO.setTitle(postsList.get(a).getTitle());
-            postsDTO.setAnnounce(postsList.get(a).getText());
+            postsDTO.setTitle(listPostsRepository.get(a).getTitle());
+            postsDTO.setAnnounce(listPostsRepository.get(a).getText());
             postsDTO.setLikeCount(455);
             postsDTO.setDislikeCount(233);
             postsDTO.setCommentCount(555);
@@ -72,32 +109,6 @@ public class PostsService {
             postsDTOList.add(postsDTO);
 
         }
-
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);
-        return postsResponse;
+        return postsDTOList;
     }
 }
-
-
-
-/* PostsDTO postsDTO = new PostsDTO();
-        postsDTO.setId(345);
-        postsDTO.setTimeStamp(1592338706);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName("Дмитрий Петров");
-        userDTO.setId(123);
-
-        postsDTO.setUserDTO(userDTO);
-        postsDTO.setTitle("Title");
-        postsDTO.setAnnounce("Announce");
-        postsDTO.setLikeCount(455);
-        postsDTO.setDislikeCount(233);
-        postsDTO.setCommentCount(555);
-        postsDTO.setViewCount(111);
-
-        postsDTOList.add(postsDTO);
-
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);*/
