@@ -52,15 +52,17 @@ public class PostsService {
             postsDTOList = getListPostsDTO(listPostsRepository);
         }*/
 
-        if (mode.equals("best")){
+//        if (mode.equals("best")){
+//
+//        }
 
-        }
-
-        if (mode.equals("early")){
+        /*if (mode.equals("early")){
+            //early
             sort = Sort.by("time").ascending();
             Page<Posts> postsPage = postsRepository.findAll(getSortedPaging(offset, limit, sort));
-            postsDTOList = getListPostsDTO(postsPage.toList());
-        }
+            List<Posts> listPostsRepository = postsPage.toList();
+            postsDTOList = getListPostsDTO(listPostsRepository);
+        }*/
 
         postsResponse.setCount(390);
         postsResponse.setPostsDTO(postsDTOList);
@@ -90,8 +92,8 @@ public class PostsService {
         for (int a = 0; a < listPostsRepository.size(); a++) {
             PostsDTO postsDTO = new PostsDTO();
             postsDTO.setId(listPostsRepository.get(a).getId());
-            postsDTO.setTimeStamp(1592338706); //потом взять из базы, переконвертировать время в секунды
-
+            postsDTO.setTimeStamp(listPostsRepository.get(a).getTime().getTime()); //потом взять из базы, переконвертировать время в секунды
+            long timer = listPostsRepository.get(a).getTime().getTime();
             UserDTO userDTO = new UserDTO();
             Optional<User> optionalUser = userRepository.findUserById(listPostsRepository.get(a).getUserId().getId());
 
@@ -101,10 +103,10 @@ public class PostsService {
 
             postsDTO.setTitle(listPostsRepository.get(a).getTitle());
             postsDTO.setAnnounce(listPostsRepository.get(a).getText());
-            postsDTO.setLikeCount(455);
-            postsDTO.setDislikeCount(233);
-            postsDTO.setCommentCount(555);
-            postsDTO.setViewCount(111);
+            postsDTO.setLikeCount((int) (Math.random() * 1000) );
+            postsDTO.setDislikeCount((int) (Math.random() * 1000) );
+            postsDTO.setCommentCount((int) (Math.random() * 1000) );
+            postsDTO.setViewCount((int) (Math.random() * 1000) );
 
             postsDTOList.add(postsDTO);
 
