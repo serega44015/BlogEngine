@@ -48,6 +48,7 @@ public class PostsService {
         }*/ //METHOD COMPLETED
 
         /*if (mode.equals("popular")){
+            //popular
             //sort = Sort.by("time").descending();
             Page<Posts> postsPage = postsRepository.findPostsOrderByLikes(getPaging(offset, limit)); похоже нужно через Query вытаскивать
             List<Posts> listPostsRepository = postsPage.toList();
