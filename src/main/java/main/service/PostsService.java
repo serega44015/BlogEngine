@@ -3,6 +3,7 @@ package main.service;
 import main.api.response.PostsResponse;
 import main.dto.PostsDTO;
 import main.dto.UserDTO;
+import main.model.PostVotes;
 import main.model.Posts;
 import main.model.User;
 import main.model.repositories.PostsRepository;
@@ -37,13 +38,14 @@ public class PostsService {
         PostsResponse postsResponse = new PostsResponse();
         List<PostsDTO> postsDTOList = new ArrayList<>();
 
-        if (mode.equals("recent")) {
+        /*if (mode.equals("recent")) {
             sort = Sort.by("time").descending();
-            Page<Posts> postsPage = postsRepository.findAll(getSortedPaging(offset, limit, sort));
+            Page<Posts> postsPage = postsRepository.findAllPostsSortedByRecent(getSortedPaging(offset, limit, sort));
             List<Posts> listPostsRepository = postsPage.toList();
-            postsDTOList = getListPostsDTO(listPostsRepository);
-
-        }
+            postsDTOList = toPostsDTO(listPostsRepository);
+            postsResponse.setCount((int) postsPage.getTotalElements());
+            postsResponse.setPostsDTO(postsDTOList);
+        }*/ //METHOD COMPLETED
 
         /*if (mode.equals("popular")){
             //sort = Sort.by("time").descending();
@@ -52,20 +54,26 @@ public class PostsService {
             postsDTOList = getListPostsDTO(listPostsRepository);
         }*/
 
-//        if (mode.equals("best")){
-//
-//        }
+        if (mode.equals("best")) {
+            //best
+            Page<Posts> postsPage = postsRepository.findAllPostOrderByLikes(getPaging(offset, limit));
+            List<Posts> listPostsRepository = postsPage.toList();
+            postsDTOList = toPostsDTO(listPostsRepository);
+            postsResponse.setCount((int) postsPage.getTotalElements());
+            postsResponse.setPostsDTO(postsDTOList);
 
-        /*if (mode.equals("early")){
+        }
+
+        if (mode.equals("early")) {
             //early
             sort = Sort.by("time").ascending();
-            Page<Posts> postsPage = postsRepository.findAll(getSortedPaging(offset, limit, sort));
+            Page<Posts> postsPage = postsRepository.findAllPostsSortedByEarly(getSortedPaging(offset, limit, sort));
             List<Posts> listPostsRepository = postsPage.toList();
-            postsDTOList = getListPostsDTO(listPostsRepository);
-        }*/
+            postsDTOList = toPostsDTO(listPostsRepository);
+            postsResponse.setCount((int) postsPage.getTotalElements());
+            postsResponse.setPostsDTO(postsDTOList);
+        }
 
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);
         return postsResponse;
     }
 
@@ -87,13 +95,12 @@ public class PostsService {
         return sortedPaging;
     }
 
-    private List<PostsDTO> getListPostsDTO(List<Posts> listPostsRepository) {
+    private List<PostsDTO> toPostsDTO(List<Posts> listPostsRepository) {
         List<PostsDTO> postsDTOList = new ArrayList<>();
         for (int a = 0; a < listPostsRepository.size(); a++) {
             PostsDTO postsDTO = new PostsDTO();
             postsDTO.setId(listPostsRepository.get(a).getId());
-            postsDTO.setTimeStamp(listPostsRepository.get(a).getTime().getTime()); //потом взять из базы, переконвертировать время в секунды
-            long timer = listPostsRepository.get(a).getTime().getTime();
+            postsDTO.setTimeStamp(listPostsRepository.get(a).getTime().getTime());
             UserDTO userDTO = new UserDTO();
             Optional<User> optionalUser = userRepository.findUserById(listPostsRepository.get(a).getUserId().getId());
 
@@ -103,14 +110,34 @@ public class PostsService {
 
             postsDTO.setTitle(listPostsRepository.get(a).getTitle());
             postsDTO.setAnnounce(listPostsRepository.get(a).getText());
-            postsDTO.setLikeCount((int) (Math.random() * 1000) );
-            postsDTO.setDislikeCount((int) (Math.random() * 1000) );
-            postsDTO.setCommentCount((int) (Math.random() * 1000) );
-            postsDTO.setViewCount((int) (Math.random() * 1000) );
+
+            int likePosts = 0;
+            int disLikePosts = 0;
+            for (PostVotes pv : listPostsRepository.get(a).getPostVotesList()) {
+                if (pv.getPostsId().getId() == listPostsRepository.get(a).getId()) {
+                    int value = pv.getValue();
+                    if (value == 1) {
+                        likePosts++;
+                    }
+
+                    if (value == -1) {
+                        disLikePosts++;
+                    }
+                }
+            }
+
+            postsDTO.setLikeCount(likePosts);
+            postsDTO.setDislikeCount(disLikePosts);
+//            postsDTO.setLikeCount((int) (Math.random() * 1000) );
+//            postsDTO.setDislikeCount((int) (Math.random() * 1000) );
+            postsDTO.setCommentCount((int) (Math.random() * 1000));
+            postsDTO.setViewCount((int) (Math.random() * 1000));
 
             postsDTOList.add(postsDTO);
 
         }
         return postsDTOList;
     }
+
+
 }

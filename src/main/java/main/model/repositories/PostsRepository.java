@@ -6,28 +6,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PostsRepository extends JpaRepository<Posts, Integer> {
 
+    @Query(value = "SELECT p FROM Posts p " +
+            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= current_time")
+    Page<Posts> findAllPostsSortedByRecent(Pageable pageable);
 
-    Optional<Posts> findAllById(int id);
+    @Query(value = "SELECT p FROM Posts p " +
+            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= current_time")
+    Page<Posts> findAllPostsSortedByEarly(Pageable pageable);
 
-    //Page<Posts> findAll(Pageable pageable);
-   // Page<Posts> findAllByUserId(Pageable pageable);
 
-//    @Query(value = "SELECT * FROM posts " +
-//            "LEFT JOIN users ON users.id = posts.user_id" +
-//            "WHERE posts.is_active = 1 AND posts.moderation_status = 'ACCEPTED' AND posts.time <= CURRENT_TIME() GROUP BY posts.id",
-//            nativeQuery = true)
-    Page<Posts> findAll(Pageable pageable);
+    @Query(value = "SELECT p FROM Posts p " +
+            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "LEFT JOIN PostVotes pv1 ON p.id = pv1.postsId.id AND pv1.value = 1 " +
+            "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 " +
+            "GROUP BY p.id " +
+            "ORDER BY COUNT(pv1.value) DESC")
+    Page<Posts> findAllPostOrderByLikes(Pageable pageable); //AND p.time <= current_time проблемма с проверкой по времени, из-за этого не сортирует по лайкам
 
-    //Page<Posts> findPostsOrderByLikes(Pageable pageable); тут наверное нужно Query искать как пишется
-    //findPostsOrderByLikes
-    /*
-    * SELECT * FROM posts
-    LEFT JOIN users ON users.id = posts.user_id
-    WHERE posts.is_active = 1 AND posts.moderation_status = 'ACCEPTED' AND posts.time <= current_time()
-    GROUP BY posts.id;
-* */
+
+
 }
