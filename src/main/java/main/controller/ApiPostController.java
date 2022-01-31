@@ -21,7 +21,7 @@ public class ApiPostController {
     private PostsResponse posts(
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "limit", defaultValue = "10") int limit,
-            @RequestParam(value = "mode", defaultValue = "recept") String mode)
+            @RequestParam(value = "mode", defaultValue = "recent") String mode)
     {
         return postsService.getPosts(offset, limit, mode);
     }
