@@ -13,20 +13,6 @@ public class DefaultController {
         this.initResponse = initResponse;
     }
 
-//    @RequestMapping("/")
-//    public String defaultController() {
-//        System.out.println("serega " + initResponse.getTitle());
-//        return "index";
-//    }
-
-
-
-//    @RequestMapping("/")
-//    public String defaultController() {
-//        System.out.println("serega " + initResponse.getTitle());
-//        return "index";
-//    }
-
     @RequestMapping("/")
     public String defaultController() {
         System.out.println("serega " + initResponse.getTitle());
