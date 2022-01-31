@@ -36,6 +36,7 @@ public class PostsService {
         List<PostsDTO> postsDTOList = new ArrayList<>();
 
         if (mode.equals("recent")) {
+            //recent
             sort = Sort.by("time").descending();
             Page<Posts> postsPage = postsRepository.findAllPostsSortedByRecent(getSortedPaging(offset, limit, sort));
             postsDTOList = toPostsDTO(postsPage.toList());

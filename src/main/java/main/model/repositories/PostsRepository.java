@@ -21,11 +21,11 @@ public interface PostsRepository extends JpaRepository<Posts, Integer> {
 
     @Query(value = "SELECT p FROM Posts p " +
             "LEFT JOIN User u ON p.userId.id = u.id " +
-            "LEFT JOIN PostVotes pv1 ON p.id = pv1.postsId.id AND pv1.value = 1 " +
-            "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 " +
+            "LEFT JOIN PostVotes pv1 ON  pv1.postsId.id = p.id AND pv1.value = 1 " +
+            "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(pv1.value) DESC")
-    Page<Posts> findAllPostOrderByLikes(Pageable pageable); //AND p.time <= current_time проблемма с проверкой по времени, из-за этого не сортирует по лайкам
+    Page<Posts> findAllPostOrderByLikes(Pageable pageable);
 
 
     @Query(value = "SELECT p FROM Posts p " +
