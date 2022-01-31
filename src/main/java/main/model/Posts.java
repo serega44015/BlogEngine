@@ -26,7 +26,7 @@ public class Posts {
     private ModerationStatus moderationStatus = ModerationStatus.NEW;
 
     @Column(name = "moderator_id", columnDefinition = "INT")
-    private int moderatorId;
+    private Integer moderatorId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -46,6 +46,9 @@ public class Posts {
 
     @OneToMany(mappedBy = "postsId", cascade = CascadeType.ALL)
     private List<PostVotes> postVotesList;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    private List<PostComments> postCommentsList;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(

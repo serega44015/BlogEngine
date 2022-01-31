@@ -25,9 +25,6 @@ public class PostsService {
     private final UserRepository userRepository;
     private Sort sort;
 
-//    private Sort sort;
-//    private int countPosts;
-
     public PostsService(PostsRepository postsRepository, UserRepository userRepository) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
@@ -38,28 +35,26 @@ public class PostsService {
         PostsResponse postsResponse = new PostsResponse();
         List<PostsDTO> postsDTOList = new ArrayList<>();
 
-        /*if (mode.equals("recent")) {
+        if (mode.equals("recent")) {
             sort = Sort.by("time").descending();
             Page<Posts> postsPage = postsRepository.findAllPostsSortedByRecent(getSortedPaging(offset, limit, sort));
-            List<Posts> listPostsRepository = postsPage.toList();
-            postsDTOList = toPostsDTO(listPostsRepository);
+            postsDTOList = toPostsDTO(postsPage.toList());
             postsResponse.setCount((int) postsPage.getTotalElements());
             postsResponse.setPostsDTO(postsDTOList);
-        }*/ //METHOD COMPLETED
+        }
 
-        /*if (mode.equals("popular")){
+        if (mode.equals("popular")) {
             //popular
-            //sort = Sort.by("time").descending();
-            Page<Posts> postsPage = postsRepository.findPostsOrderByLikes(getPaging(offset, limit)); похоже нужно через Query вытаскивать
-            List<Posts> listPostsRepository = postsPage.toList();
-            postsDTOList = getListPostsDTO(listPostsRepository);
-        }*/
+            Page<Posts> postsPage = postsRepository.findAllPostOrderByComments(getPaging(offset, limit));
+            postsDTOList = toPostsDTO(postsPage.toList());
+            postsResponse.setCount((int) postsPage.getTotalElements());
+            postsResponse.setPostsDTO(postsDTOList);
+        }
 
         if (mode.equals("best")) {
             //best
             Page<Posts> postsPage = postsRepository.findAllPostOrderByLikes(getPaging(offset, limit));
-            List<Posts> listPostsRepository = postsPage.toList();
-            postsDTOList = toPostsDTO(listPostsRepository);
+            postsDTOList = toPostsDTO(postsPage.toList());
             postsResponse.setCount((int) postsPage.getTotalElements());
             postsResponse.setPostsDTO(postsDTOList);
 
@@ -69,8 +64,7 @@ public class PostsService {
             //early
             sort = Sort.by("time").ascending();
             Page<Posts> postsPage = postsRepository.findAllPostsSortedByEarly(getSortedPaging(offset, limit, sort));
-            List<Posts> listPostsRepository = postsPage.toList();
-            postsDTOList = toPostsDTO(listPostsRepository);
+            postsDTOList = toPostsDTO(postsPage.toList());
             postsResponse.setCount((int) postsPage.getTotalElements());
             postsResponse.setPostsDTO(postsDTOList);
         }
@@ -96,26 +90,27 @@ public class PostsService {
         return sortedPaging;
     }
 
-    private List<PostsDTO> toPostsDTO(List<Posts> listPostsRepository) {
+    private List<PostsDTO> toPostsDTO(List<Posts> currentsPostsList) {
         List<PostsDTO> postsDTOList = new ArrayList<>();
-        for (int a = 0; a < listPostsRepository.size(); a++) {
+        for (int a = 0; a < currentsPostsList.size(); a++) {
+            Posts currentPost = currentsPostsList.get(a);
             PostsDTO postsDTO = new PostsDTO();
-            postsDTO.setId(listPostsRepository.get(a).getId());
-            postsDTO.setTimeStamp(listPostsRepository.get(a).getTime().getTime());
+            postsDTO.setId(currentPost.getId());
+            postsDTO.setTimeStamp(currentPost.getTime().getTime());
             UserDTO userDTO = new UserDTO();
-            Optional<User> optionalUser = userRepository.findUserById(listPostsRepository.get(a).getUserId().getId());
+            Optional<User> optionalUser = userRepository.findUserById(currentPost.getUserId().getId());
 
             userDTO.setName(optionalUser.get().getName());
             userDTO.setId(optionalUser.get().getId());
             postsDTO.setUserDTO(userDTO);
 
-            postsDTO.setTitle(listPostsRepository.get(a).getTitle());
-            postsDTO.setAnnounce(listPostsRepository.get(a).getText());
+            postsDTO.setTitle(currentPost.getTitle());
+            postsDTO.setAnnounce(currentPost.getText());
 
             int likePosts = 0;
             int disLikePosts = 0;
-            for (PostVotes pv : listPostsRepository.get(a).getPostVotesList()) {
-                if (pv.getPostsId().getId() == listPostsRepository.get(a).getId()) {
+            for (PostVotes pv : currentPost.getPostVotesList()) {
+                if (pv.getPostsId().getId() == currentPost.getId()) {
                     int value = pv.getValue();
                     if (value == 1) {
                         likePosts++;
@@ -129,9 +124,7 @@ public class PostsService {
 
             postsDTO.setLikeCount(likePosts);
             postsDTO.setDislikeCount(disLikePosts);
-//            postsDTO.setLikeCount((int) (Math.random() * 1000) );
-//            postsDTO.setDislikeCount((int) (Math.random() * 1000) );
-            postsDTO.setCommentCount((int) (Math.random() * 1000));
+            postsDTO.setCommentCount(currentPost.getPostCommentsList().size());
             postsDTO.setViewCount((int) (Math.random() * 1000));
 
             postsDTOList.add(postsDTO);
