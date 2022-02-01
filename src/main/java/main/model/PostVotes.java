@@ -22,7 +22,7 @@ public class PostVotes {
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
-    private Posts postsId;
+    private Post postId;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
     private Date time;

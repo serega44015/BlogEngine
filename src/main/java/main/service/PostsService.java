@@ -1,12 +1,12 @@
 package main.service;
 
-import main.api.response.PostsResponse;
+import main.dto.api.response.PostsResponse;
 import main.dto.PostsDTO;
 import main.dto.UserDTO;
 import main.model.PostVotes;
-import main.model.Posts;
+import main.model.Post;
 import main.model.User;
-import main.model.repositories.PostsRepository;
+import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,12 +21,16 @@ import java.util.Optional;
 @Service
 public class PostsService {
 
-    private final PostsRepository postsRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final String recent = "recent";
+    private final String popular = "popular";
+    private final String best = "best";
+    private final String early = "early";
     private Sort sort;
 
-    public PostsService(PostsRepository postsRepository, UserRepository userRepository) {
-        this.postsRepository = postsRepository;
+    public PostsService(PostRepository postRepository, UserRepository userRepository) {
+        this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
 
@@ -35,36 +39,36 @@ public class PostsService {
         PostsResponse postsResponse = new PostsResponse();
         List<PostsDTO> postsDTOList = new ArrayList<>();
 
-        if (mode.equals("recent")) {
+        if (recent.equals(mode)) {
             //recent
             sort = Sort.by("time").descending();
-            Page<Posts> postsPage = postsRepository.findAllPostsSortedByRecent(getSortedPaging(offset, limit, sort));
+            Page<Post> postsPage = postRepository.findAllPostsSortedByRecent(getSortedPaging(offset, limit, sort));
             postsDTOList = toPostsDTO(postsPage.toList());
             postsResponse.setCount((int) postsPage.getTotalElements());
             postsResponse.setPostsDTO(postsDTOList);
         }
 
-        if (mode.equals("popular")) {
+        if (popular.equals(mode)) {
             //popular
-            Page<Posts> postsPage = postsRepository.findAllPostOrderByComments(getPaging(offset, limit));
+            Page<Post> postsPage = postRepository.findAllPostOrderByComments(getPaging(offset, limit));
             postsDTOList = toPostsDTO(postsPage.toList());
             postsResponse.setCount((int) postsPage.getTotalElements());
             postsResponse.setPostsDTO(postsDTOList);
         }
 
-        if (mode.equals("best")) {
+        if (best.equals(mode)) {
             //best
-            Page<Posts> postsPage = postsRepository.findAllPostOrderByLikes(getPaging(offset, limit));
+            Page<Post> postsPage = postRepository.findAllPostOrderByLikes(getPaging(offset, limit));
             postsDTOList = toPostsDTO(postsPage.toList());
             postsResponse.setCount((int) postsPage.getTotalElements());
             postsResponse.setPostsDTO(postsDTOList);
 
         }
 
-        if (mode.equals("early")) {
+        if (early.equals(mode)) {
             //early
             sort = Sort.by("time").ascending();
-            Page<Posts> postsPage = postsRepository.findAllPostsSortedByEarly(getSortedPaging(offset, limit, sort));
+            Page<Post> postsPage = postRepository.findAllPostsSortedByEarly(getSortedPaging(offset, limit, sort));
             postsDTOList = toPostsDTO(postsPage.toList());
             postsResponse.setCount((int) postsPage.getTotalElements());
             postsResponse.setPostsDTO(postsDTOList);
@@ -91,13 +95,14 @@ public class PostsService {
         return sortedPaging;
     }
 
-    private List<PostsDTO> toPostsDTO(List<Posts> currentsPostsList) {
+    private List<PostsDTO> toPostsDTO(List<Post> currentsPostList) {
         List<PostsDTO> postsDTOList = new ArrayList<>();
-        for (int a = 0; a < currentsPostsList.size(); a++) {
-            Posts currentPost = currentsPostsList.get(a);
+        for (int a = 0; a < currentsPostList.size(); a++) {
+            Post currentPost = currentsPostList.get(a);
             PostsDTO postsDTO = new PostsDTO();
             postsDTO.setId(currentPost.getId());
             postsDTO.setTimeStamp(currentPost.getTime().getTime());
+
             UserDTO userDTO = new UserDTO();
             Optional<User> optionalUser = userRepository.findUserById(currentPost.getUserId().getId());
 
@@ -111,7 +116,7 @@ public class PostsService {
             int likePosts = 0;
             int disLikePosts = 0;
             for (PostVotes pv : currentPost.getPostVotesList()) {
-                if (pv.getPostsId().getId() == currentPost.getId()) {
+                if (pv.getPostId().getId() == currentPost.getId()) {
                     int value = pv.getValue();
                     if (value == 1) {
                         likePosts++;

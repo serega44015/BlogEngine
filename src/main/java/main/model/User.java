@@ -3,7 +3,6 @@ package main.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Controller;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -42,7 +41,7 @@ public class User {
     private String photo;
 
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
-    private List<Posts> userPosts;
+    private List<Post> userPosts;
 
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
     private List<PostComments> postCommentsUser;

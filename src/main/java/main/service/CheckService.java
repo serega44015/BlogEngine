@@ -1,6 +1,6 @@
 package main.service;
 
-import main.api.response.CheckResponse;
+import main.dto.api.response.CheckResponse;
 import main.dto.UserLoginDTO;
 import main.model.User;
 import main.model.repositories.UserRepository;

@@ -1,6 +1,6 @@
 package main.controller;
 
-import main.api.response.PostsResponse;
+import main.dto.api.response.PostsResponse;
 import main.service.PostsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

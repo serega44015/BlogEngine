@@ -1,6 +1,6 @@
 package main.service;
 
-import main.api.response.TagsResponse;
+import main.dto.api.response.TagsResponse;
 import main.dto.TagsDTO;
 import org.springframework.stereotype.Service;
 
