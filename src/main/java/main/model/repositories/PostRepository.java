@@ -36,4 +36,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "ORDER BY COUNT(pc1.id) DESC")
     Page<Post> findAllPostOrderByComments(Pageable pageable);
 
+    @Query(value = "SELECT COUNT(p.id) FROM Post p")
+    Integer countPosts();
+
 }
