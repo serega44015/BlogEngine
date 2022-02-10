@@ -1,7 +1,7 @@
 INSERT INTO tags2post (id, post_id, tag_id)
 VALUES (1, 1, 1),
        (2, 1, 9),
-       (3, 1, 3),
+       (3, 1, 9),
        (4, 1, 7),
        (5, 1, 9),
 
