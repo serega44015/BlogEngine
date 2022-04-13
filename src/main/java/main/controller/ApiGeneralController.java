@@ -5,6 +5,7 @@ import main.api.response.SettingsResponse;
 import main.api.response.TagsResponse;
 import main.service.SettingsService;
 import main.service.TagsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ public class ApiGeneralController {
     private final InitResponse initResponse;
     private final TagsService tagsService;
 
+    @Autowired
     public ApiGeneralController(SettingsService settingsService, InitResponse initResponse, TagsService tagsService) {
         this.settingsService = settingsService;
         this.initResponse = initResponse;
