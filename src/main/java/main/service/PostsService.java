@@ -1,17 +1,16 @@
 package main.service;
 
-import main.api.response.PostsResponse;
 import main.dto.PostsDTO;
 import main.dto.UserDTO;
-import main.model.Posts;
+import main.dto.api.response.PostsResponse;
+import main.model.Post;
 import main.model.User;
-import main.model.repositories.PostsRepository;
+import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,13 +18,13 @@ import java.util.Optional;
 @Service
 public class PostsService {
 
-    private final PostsRepository postsRepository;
+    private final PostRepository postsRepository;
     private final UserRepository userRepository;
 
 //    private Sort sort;
 //    private int countPosts;
 
-    public PostsService(PostsRepository postsRepository, UserRepository userRepository) {
+    public PostsService(PostRepository postsRepository, UserRepository userRepository) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
     }
@@ -36,12 +35,12 @@ public class PostsService {
         PostsResponse postsResponse = new PostsResponse();
 
         //Optional<Posts> postsOptional = postsRepository.findAllByUserId(1);
-        List<Posts> postsList = postsRepository.findAll();
+        List<Post> postsList = postsRepository.findAll();
 //        if(mode.equals("recent")){
 //
 //        }
 
-        Page<Posts> postsPage = postsRepository.findAll(PageRequest.of(1,5));
+        Page<Post> postsPage = postsRepository.findAll(PageRequest.of(1,5));
 
         System.out.println("Размер пагинации" + postsPage.getSize());
 
