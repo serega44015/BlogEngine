@@ -31,7 +31,7 @@ public class PostsService {
     }
 
 
-    public PostsResponse getPosts(int offset, int limit, String mode){
+    /*public PostsResponse getPosts(int offset, int limit, String mode){
         List<PostsDTO> postsDTOList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
 
@@ -62,13 +62,14 @@ public class PostsService {
         postsResponse.setPostsDTO(postsDTOList);
 
 
+
         return postsResponse;
-    }
+    }*/
 
 
 
 
-    /*public PostsResponse getPosts(int offset, int limit, String mode){
+    public PostsResponse getPosts(int offset, int limit, String mode){
     ///////РАБОЧИЙ
 
         List<PostsDTO> postsDTOList = new ArrayList<>();
@@ -115,7 +116,7 @@ public class PostsService {
         postsResponse.setCount(390);
         postsResponse.setPostsDTO(postsDTOList);
         return postsResponse;
-    }*/
+    }
 }
 
 

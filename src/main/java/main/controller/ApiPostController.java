@@ -32,7 +32,8 @@ public class ApiPostController {
 //        return postsService.getPosts(offset, limit, mode);
 //    }
 
-    @GetMapping("/post")
+    //@GetMapping("/post")
+    @GetMapping
     public ResponseEntity<PostsResponse> posts(
             @RequestParam(defaultValue = "0", required = false) Integer offset,
             @RequestParam(defaultValue = "10", required = false) Integer limit,
