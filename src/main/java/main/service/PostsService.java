@@ -12,8 +12,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PostsService {
@@ -30,26 +32,45 @@ public class PostsService {
     }
 
 
-    public PostsResponse getPosts(int offset, int limit, String mode){
+    public PostsResponse getPosts(int offset, int limit, String mode) {
         List<PostsDTO> postsDTOList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
 
         //Optional<Posts> postsOptional = postsRepository.findAllByUserId(1);
-        List<Post> postsList = postsRepository.findAll();
-//        if(mode.equals("recent")){
-//
-//        }
 
-        Page<Post> postsPage = postsRepository.findAll(PageRequest.of(1,5));
+        List<Post> postsList = new ArrayList<>();
+        //List<Post> postsList = postsRepository.findAll();
+
+        //List<Post> postsList = ;
+
+//        recent - сортировать по дате публикации, выводить сначала новые (если mode не задан,
+//                использовать это значение по умолчанию)
+        System.out.println("А тут бываем?");
+
+        if (mode.equals("recent")) {
+            System.out.println("Мы хоть зайдём сюда?");
+            postsList.addAll(
+                    postsRepository.findAll().stream()
+                            .sorted(Collections.reverseOrder())
+                            .collect(Collectors.toList())
+            );
+
+
+//            postsRepository.findAll().stream()
+//                    .sorted(Collections.reverseOrder())
+//                    .collect(Collectors.toList());
+        }
+
+        Page<Post> postsPage = postsRepository.findAll(PageRequest.of(1, 5));
 
         System.out.println("Размер пагинации" + postsPage.getSize());
 
 
-        postsList.stream().forEach(el -> {
-            System.out.println(el.getId() + "айди и " + el.getText());
-        });
+//        postsList.stream().forEach(el -> {
+//            System.out.println(el.getId() + "айди и " + el.getText());
+//        });
 
-        for (int a = 0; a < postsList.size(); a++){
+        for (int a = 0; a < postsList.size(); a++) {
             PostsDTO postsDTO = new PostsDTO();
             postsDTO.setId(postsList.get(a).getId());
             postsDTO.setTimeStamp(1592338706); //потом взять из базы, переконвертировать время в секунды
