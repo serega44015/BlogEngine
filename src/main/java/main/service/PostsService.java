@@ -7,24 +7,18 @@ import main.model.Post;
 import main.model.User;
 import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class PostsService {
 
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
-
-//    private Sort sort;
-//    private int countPosts;
 
     public PostsService(PostRepository postsRepository, UserRepository userRepository) {
         this.postsRepository = postsRepository;
@@ -35,40 +29,39 @@ public class PostsService {
     public PostsResponse getPosts(int offset, int limit, String mode) {
         List<PostsDTO> postsDTOList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
-
-        //Optional<Posts> postsOptional = postsRepository.findAllByUserId(1);
-
         List<Post> postsList = new ArrayList<>();
-        //List<Post> postsList = postsRepository.findAll();
-
-        //List<Post> postsList = ;
-
-//        recent - сортировать по дате публикации, выводить сначала новые (если mode не задан,
-//                использовать это значение по умолчанию)
-        System.out.println("А тут бываем?");
 
         if (mode.equals("recent")) {
-            System.out.println("Мы хоть зайдём сюда?");
             postsList.addAll(
-                    postsRepository.findAll().stream()
-                            .sorted(Collections.reverseOrder())
-                            .collect(Collectors.toList())
+                    postsRepository.findAllPostsSortedByRecent(
+                            getSortedPaging(offset, limit, Sort.by("time").descending())
+                    ).toList()
             );
-
-
-//            postsRepository.findAll().stream()
-//                    .sorted(Collections.reverseOrder())
-//                    .collect(Collectors.toList());
         }
 
-        Page<Post> postsPage = postsRepository.findAll(PageRequest.of(1, 5));
+        if (mode.equals("early")){
+            postsList.addAll(
+                    postsRepository.findAllPostsSortedByRecent(
+                            getSortedPaging(offset, limit, Sort.by("time").ascending())
+                    ).toList()
+            );
+        }
 
-        System.out.println("Размер пагинации" + postsPage.getSize());
+        if (mode.equals("popular")) {
+            postsList.addAll(
+                    postsRepository.findAllPostOrderByComments(
+                            getPaging(offset, limit)).toList()
+            );
+        }
 
+        if (mode.equals("best")){
+            postsList.addAll(
+              postsRepository.findAllPostOrderByLikes(
+                      getPaging(offset, limit)
+              ).toList()
+            );
+        }
 
-//        postsList.stream().forEach(el -> {
-//            System.out.println(el.getId() + "айди и " + el.getText());
-//        });
 
         for (int a = 0; a < postsList.size(); a++) {
             PostsDTO postsDTO = new PostsDTO();
@@ -97,27 +90,25 @@ public class PostsService {
         postsResponse.setPostsDTO(postsDTOList);
         return postsResponse;
     }
+
+    public Pageable getPaging(int offset, int limit) {
+
+        // limit = itemPerPage
+        // offset - это отступ от начала, с какого поста мы смотреть будем
+        Pageable paging;
+        int pageNumber = offset / limit;
+        paging = PageRequest.of(pageNumber, limit);
+
+        return paging;
+    }
+
+    public Pageable getSortedPaging(int offset, int limit, Sort sort) {
+        Pageable sortedPaging;
+        int pageNumber = offset / limit;
+        sortedPaging = PageRequest.of(pageNumber, limit, sort);
+
+        return sortedPaging;
+    }
 }
 
 
-
-/* PostsDTO postsDTO = new PostsDTO();
-        postsDTO.setId(345);
-        postsDTO.setTimeStamp(1592338706);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setName("Дмитрий Петров");
-        userDTO.setId(123);
-
-        postsDTO.setUserDTO(userDTO);
-        postsDTO.setTitle("Title");
-        postsDTO.setAnnounce("Announce");
-        postsDTO.setLikeCount(455);
-        postsDTO.setDislikeCount(233);
-        postsDTO.setCommentCount(555);
-        postsDTO.setViewCount(111);
-
-        postsDTOList.add(postsDTO);
-
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);*/
