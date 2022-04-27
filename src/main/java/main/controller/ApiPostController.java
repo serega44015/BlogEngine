@@ -22,25 +22,21 @@ public class ApiPostController {
         this.postsService = postsService;
     }
 
-//    @GetMapping
-//    private PostsResponse posts(
-//            @RequestParam(value = "offset", defaultValue = "0") int offset,
-//            @RequestParam(value = "limit", defaultValue = "10") int limit,
-//            @RequestParam(value = "mode", defaultValue = "recent") String mode)
-//    {
-//        ResponseEntity
-//        return postsService.getPosts(offset, limit, mode);
-//    }
 
-    //@GetMapping("/post")
     @GetMapping
     public ResponseEntity<PostsResponse> posts(
             @RequestParam(defaultValue = "0", required = false) Integer offset,
             @RequestParam(defaultValue = "10", required = false) Integer limit,
             @RequestParam(defaultValue = "recent", required = false) String mode) {
-        //return new ResponseEntity<>(postsService.getPost(offset, limit, mode), HttpStatus.OK);
         return new ResponseEntity<>(postsService.getPosts(offset, limit, mode), HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<PostsResponse> postSearch(
+            @RequestParam(defaultValue = "0", required = false) Integer offset,
+            @RequestParam(defaultValue = "10", required = false) Integer limit,
+            @RequestParam(defaultValue = "", required = false) String query) {
+        return new ResponseEntity<>(postsService.getPostBySearch(offset, limit, query), HttpStatus.OK);
+    }
 
 }

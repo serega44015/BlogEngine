@@ -26,8 +26,35 @@ public class PostsService {
     }
 
 
+    public PostsResponse getPostBySearch(int offset, int limit, String query) {
+
+        List<Post> postsList = new ArrayList<>();
+        PostsResponse postsResponse = new PostsResponse();
+
+        if (query.isEmpty()) {
+            postsList.addAll(
+                    postsRepository.findAllPostsSortedByRecent(
+                            getSortedPaging(offset, limit, Sort.by("time").descending())
+                    ).toList()
+            );
+        } else {
+            postsList.addAll(postsRepository.findPostsBySearch(
+                    getPaging(offset, limit), query)
+                    .toList()
+            );
+        }
+
+        List<PostsDTO> postsDTOList = toPostDTOList(postsList);
+
+        postsResponse.setCount(390);
+        postsResponse.setPostsDTO(postsDTOList);
+
+        return postsResponse;
+    }
+
+
     public PostsResponse getPosts(int offset, int limit, String mode) {
-        List<PostsDTO> postsDTOList = new ArrayList<>();
+        //List<PostsDTO> postsDTOList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
         List<Post> postsList = new ArrayList<>();
 
@@ -39,7 +66,7 @@ public class PostsService {
             );
         }
 
-        if (mode.equals("early")){
+        if (mode.equals("early")) {
             postsList.addAll(
                     postsRepository.findAllPostsSortedByRecent(
                             getSortedPaging(offset, limit, Sort.by("time").ascending())
@@ -54,19 +81,29 @@ public class PostsService {
             );
         }
 
-        if (mode.equals("best")){
+        if (mode.equals("best")) {
             postsList.addAll(
-              postsRepository.findAllPostOrderByLikes(
-                      getPaging(offset, limit)
-              ).toList()
+                    postsRepository.findAllPostOrderByLikes(
+                            getPaging(offset, limit)
+                    ).toList()
             );
         }
 
+        List<PostsDTO> postsDTOList = toPostDTOList(postsList);
+
+        postsResponse.setCount(390);
+        postsResponse.setPostsDTO(postsDTOList);
+        return postsResponse;
+    }
+
+    private List<PostsDTO> toPostDTOList(List<Post> postsList){
+
+        List<PostsDTO> postsDTOList = new ArrayList<>();
 
         for (int a = 0; a < postsList.size(); a++) {
             PostsDTO postsDTO = new PostsDTO();
             postsDTO.setId(postsList.get(a).getId());
-            postsDTO.setTimeStamp(1592338706); //потом взять из базы, переконвертировать время в секунды
+            postsDTO.setTimeStamp(postsList.get(a).getTime().getTime()); //потом взять из базы, переконвертировать время в секунды
 
             UserDTO userDTO = new UserDTO();
             Optional<User> optionalUser = userRepository.findUserById(postsList.get(a).getUserId().getId());
@@ -77,18 +114,23 @@ public class PostsService {
 
             postsDTO.setTitle(postsList.get(a).getTitle());
             postsDTO.setAnnounce(postsList.get(a).getText());
-            postsDTO.setLikeCount(455);
+
+
+            try {
+                System.out.println("Лукойл " + postsDTOList.get(a).getLikeCount());
+                postsDTO.setLikeCount(postsDTOList.get(a).getLikeCount());
+            } catch (IndexOutOfBoundsException exception) {
+                postsDTO.setLikeCount(333);
+            }
+
             postsDTO.setDislikeCount(233);
             postsDTO.setCommentCount(555);
             postsDTO.setViewCount(111);
 
             postsDTOList.add(postsDTO);
-
         }
 
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);
-        return postsResponse;
+        return postsDTOList;
     }
 
     public Pageable getPaging(int offset, int limit) {

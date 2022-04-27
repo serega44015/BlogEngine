@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
@@ -35,6 +36,13 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "GROUP BY p.id " +
             "ORDER BY COUNT(pc1.id) DESC")
     Page<Post> findAllPostOrderByComments(Pageable pageable);
+
+
+    @Query(value = "SELECT p FROM Post p " +
+            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
+            "AND p.text LIKE %:query%")
+    Page<Post> findPostsBySearch(Pageable pageable, @Param("query") String query);
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p")
     Integer countPosts();
