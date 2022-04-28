@@ -102,9 +102,12 @@ public class PostsService {
         List<PostsDTO> postsDTOList = new ArrayList<>();
 
         for (int a = 0; a < postsList.size(); a++) {
+
+            int postId = postsList.get(a).getId();
+
             PostsDTO postsDTO = new PostsDTO();
-            System.out.println("Айди поста: " + postsList.get(a).getId() + " И текст " + postsList.get(a).getText());
-            postsDTO.setId(postsList.get(a).getId());
+
+            postsDTO.setId(postId);
             postsDTO.setTimeStamp(postsList.get(a).getTime().getTime()); //потом взять из базы, переконвертировать время в секунды
 
             UserDTO userDTO = new UserDTO();
@@ -118,30 +121,16 @@ public class PostsService {
             postsDTO.setAnnounce(postsList.get(a).getText());
 
 
-//            postsDTO.setLikeCount(postsDTOList.get(a).getLikeCount());
+            Integer likes = postsRepository.countOfLikesPerPost(postId);
+            Integer disLikes = postsRepository.countOfDisLikesPerPost(postId);
+            Integer commentsCount = postsRepository.countOfCommentsPerComments(postId);
 
-            try {
-                Integer likes = postsRepository.countOfLikesPerPost(postsList.get(a).getId());
-                Integer disLikes = postsRepository.countOfDisLikesPerPost(postsList.get(a).getId());
+            postsDTO.setLikeCount(likes != null ? likes : 0);
+            postsDTO.setDislikeCount(disLikes != null ? disLikes : 0);
+            postsDTO.setCommentCount(commentsCount != null ? commentsCount : 0);
 
-                postsDTO.setLikeCount(likes);
-                postsDTO.setDislikeCount(disLikes);
 
-            } catch (NullPointerException ex) {
-                System.out.println(ex.getMessage());
-                postsDTO.setLikeCount(0);
-                postsDTO.setDislikeCount(0);
 
-            }
-
-            try {
-
-                Integer commentsCount = postsRepository.countOfCommentsPerComments(postsList.get(a).getId());
-                postsDTO.setCommentCount(commentsCount);
-
-            } catch (NullPointerException ex) {
-                postsDTO.setCommentCount(0);
-            }
 
             postsDTO.setViewCount(111);
 

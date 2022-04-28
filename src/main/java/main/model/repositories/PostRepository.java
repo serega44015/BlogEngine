@@ -1,5 +1,6 @@
 package main.model.repositories;
 
+import lombok.NonNull;
 import main.model.Post;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.domain.Page;
