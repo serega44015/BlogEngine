@@ -75,6 +75,12 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 //    WHERE post_id = 3
 //    group by posts_comments.post_id
 
+
+//    @Query(value = "SELECT COUNT(Post.id) FROM Post p INNER JOIN PostVotes pv ON p.id = pv.postId.id WHERE pv.value = 1 GROUP BY p.id")
+//    Integer findByPostIdCountLikes(Integer pId);
+
+
+
     @Query(value = "SELECT COUNT(p.id) FROM Post p")
     Integer countPosts();
 

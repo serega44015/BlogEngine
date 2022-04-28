@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import main.model.enums.ModerationStatus;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class Post {
     private User userId;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
-    private Date time;
+    private Calendar time;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String title;

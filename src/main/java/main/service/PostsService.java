@@ -54,7 +54,6 @@ public class PostsService {
 
 
     public PostsResponse getPosts(int offset, int limit, String mode) {
-        //List<PostsDTO> postsDTOList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
         List<Post> postsList = new ArrayList<>();
 
@@ -102,24 +101,23 @@ public class PostsService {
         List<PostsDTO> postsDTOList = new ArrayList<>();
 
         for (int a = 0; a < postsList.size(); a++) {
-
-            int postId = postsList.get(a).getId();
-
+            Post post = postsList.get(a);
+            int postId = post.getId();
             PostsDTO postsDTO = new PostsDTO();
 
             postsDTO.setId(postId);
-            postsDTO.setTimeStamp(postsList.get(a).getTime().getTime()); //потом взять из базы, переконвертировать время в секунды
+            long times = post.getTime().getTime().getTime() / 1000; //на 3 часа отстают, потом додумать
+            postsDTO.setTimeStamp(times);
 
             UserDTO userDTO = new UserDTO();
-            Optional<User> optionalUser = userRepository.findUserById(postsList.get(a).getUserId().getId());
+            Optional<User> optionalUser = userRepository.findUserById(post.getUserId().getId());
 
             userDTO.setName(optionalUser.get().getName());
             userDTO.setId(optionalUser.get().getId());
             postsDTO.setUserDTO(userDTO);
 
-            postsDTO.setTitle(postsList.get(a).getTitle());
-            postsDTO.setAnnounce(postsList.get(a).getText());
-
+            postsDTO.setTitle(post.getTitle());
+            postsDTO.setAnnounce(post.getText());
 
             Integer likes = postsRepository.countOfLikesPerPost(postId);
             Integer disLikes = postsRepository.countOfDisLikesPerPost(postId);
@@ -128,11 +126,7 @@ public class PostsService {
             postsDTO.setLikeCount(likes != null ? likes : 0);
             postsDTO.setDislikeCount(disLikes != null ? disLikes : 0);
             postsDTO.setCommentCount(commentsCount != null ? commentsCount : 0);
-
-
-
-
-            postsDTO.setViewCount(111);
+            postsDTO.setViewCount(post.getViewCount());
 
             postsDTOList.add(postsDTO);
         }
