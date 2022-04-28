@@ -58,6 +58,7 @@ public class PostsService {
         PostsResponse postsResponse = new PostsResponse();
         List<Post> postsList = new ArrayList<>();
 
+
         if (mode.equals("recent")) {
             postsList.addAll(
                     postsRepository.findAllPostsSortedByRecent(
@@ -96,12 +97,13 @@ public class PostsService {
         return postsResponse;
     }
 
-    private List<PostsDTO> toPostDTOList(List<Post> postsList){
+    private List<PostsDTO> toPostDTOList(List<Post> postsList) {
 
         List<PostsDTO> postsDTOList = new ArrayList<>();
 
         for (int a = 0; a < postsList.size(); a++) {
             PostsDTO postsDTO = new PostsDTO();
+            System.out.println("Айди поста: " + postsList.get(a).getId() + " И текст " + postsList.get(a).getText());
             postsDTO.setId(postsList.get(a).getId());
             postsDTO.setTimeStamp(postsList.get(a).getTime().getTime()); //потом взять из базы, переконвертировать время в секунды
 
@@ -116,15 +118,31 @@ public class PostsService {
             postsDTO.setAnnounce(postsList.get(a).getText());
 
 
+//            postsDTO.setLikeCount(postsDTOList.get(a).getLikeCount());
+
             try {
-                System.out.println("Лукойл " + postsDTOList.get(a).getLikeCount());
-                postsDTO.setLikeCount(postsDTOList.get(a).getLikeCount());
-            } catch (IndexOutOfBoundsException exception) {
-                postsDTO.setLikeCount(333);
+                Integer likes = postsRepository.countOfLikesPerPost(postsList.get(a).getId());
+                Integer disLikes = postsRepository.countOfDisLikesPerPost(postsList.get(a).getId());
+
+                postsDTO.setLikeCount(likes);
+                postsDTO.setDislikeCount(disLikes);
+
+            } catch (NullPointerException ex) {
+                System.out.println(ex.getMessage());
+                postsDTO.setLikeCount(0);
+                postsDTO.setDislikeCount(0);
+
             }
 
-            postsDTO.setDislikeCount(233);
-            postsDTO.setCommentCount(555);
+            try {
+
+                Integer commentsCount = postsRepository.countOfCommentsPerComments(postsList.get(a).getId());
+                postsDTO.setCommentCount(commentsCount);
+
+            } catch (NullPointerException ex) {
+                postsDTO.setCommentCount(0);
+            }
+
             postsDTO.setViewCount(111);
 
             postsDTOList.add(postsDTO);

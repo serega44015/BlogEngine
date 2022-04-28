@@ -27,7 +27,7 @@ public class ApiPostController {
     public ResponseEntity<PostsResponse> posts(
             @RequestParam(defaultValue = "0", required = false) Integer offset,
             @RequestParam(defaultValue = "10", required = false) Integer limit,
-            @RequestParam(defaultValue = "recent", required = false) String mode) {
+            @RequestParam(defaultValue = "popular", required = false) String mode) {
         return new ResponseEntity<>(postsService.getPosts(offset, limit, mode), HttpStatus.OK);
     }
 
