@@ -1,9 +1,8 @@
 package main.service;
 
-import main.dto.api.response.TagsResponse;
 import main.dto.TagsDTO;
+import main.dto.api.response.TagsResponse;
 import main.model.Tag;
-import main.model.Tags2Post;
 import main.model.repositories.PostRepository;
 import main.model.repositories.Tag2PostRepository;
 import main.model.repositories.TagRepository;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TagsService {

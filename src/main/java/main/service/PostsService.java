@@ -2,6 +2,7 @@ package main.service;
 
 import main.dto.PostsDTO;
 import main.dto.UserDTO;
+import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsResponse;
 import main.model.Post;
 import main.model.User;
@@ -50,6 +51,30 @@ public class PostsService {
         postsResponse.setPostsDTO(postsDTOList);
 
         return postsResponse;
+    }
+
+    public CalendarResponse getPostByYear(String year){
+
+        CalendarResponse calendarResponse = new CalendarResponse();
+        TreeSet<Integer> years = postsRepository.getSetYearsByAllPosts();
+        //Map<String, Integer> posts = new HashMap<>();
+        //Map<String, Integer> posts = postsRepository.getCountPostsSortByDate();
+        //List<Map<String, Integer>> posts = postsRepository.getCountPostsSortByDate();
+        //Map<String, Integer> posts = postsRepository.getCountPostsSortByDate();
+        postsRepository.getCountPostsSortByDate();
+//        List<String> posts1 = postsRepository.getIntegerDate();
+//        List<Integer> posts2 = postsRepository.getCountDate();
+
+        //years.stream().forEach(s -> System.out.println(s));
+        //posts1.stream().forEach(s -> System.out.println(s));
+//        posts2.stream().forEach(s -> System.out.println(s));
+
+//            for (String d : posts.keySet()){
+//                System.out.println(posts.get(d) + " " + d);
+//            }
+
+
+        return null;
     }
 
 
@@ -152,6 +177,8 @@ public class PostsService {
 
         return sortedPaging;
     }
+
+
 }
 
 

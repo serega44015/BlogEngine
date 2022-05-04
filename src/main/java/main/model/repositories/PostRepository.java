@@ -1,16 +1,15 @@
 package main.model.repositories;
 
-import lombok.NonNull;
+import main.helpJPA.JpaSQLHelp;
 import main.model.Post;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.lang.NonNullApi;
 
-import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.TreeSet;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
@@ -83,5 +82,31 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p")
     Integer countPosts();
+
+    @Query(value = "SELECT YEAR(time) AS year FROM Post p")
+    TreeSet<Integer> getSetYearsByAllPosts();
+
+
+//    @Query(value = "SELECT DATE(p.time), COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
+//    Map<String, Integer> getCountPostsSortByDate();
+
+
+//    @Query(value = "SELECT DATE(p.time), COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
+//    Map<String, Integer> getCountPostsSortByDate();
+
+//    @Query(value = "SELECT DATE(p.time), COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
+//    List<Map<String, Integer>> getCountPostsSortByDate();
+
+//    @Query(value = "SELECT DATE(p.time) AS dates, COUNT(DATE(p.time)) AS counts FROM Post p GROUP BY dates")
+//    Map<String, Integer> getCountPostsSortByDate();
+
+    @Query(value = "SELECT JpaSQLHelp( DATE(p.time), COUNT(DATE(p.time))) FROM Post p GROUP BY dates")
+    List<JpaSQLHelp> getCountPostsSortByDate();
+
+    @Query(value = "SELECT DATE(p.time) AS date FROM Post p GROUP BY p.time")
+    List<String> getIntegerDate();
+
+    @Query(value = "SELECT COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
+    List<Integer> getCountDate();
 
 }
