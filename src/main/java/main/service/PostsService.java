@@ -4,7 +4,9 @@ import main.dto.PostsDTO;
 import main.dto.UserDTO;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsResponse;
+import main.helpJPA.JpaSQLHelp;
 import main.model.Post;
+import main.model.PostVotes;
 import main.model.User;
 import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
@@ -13,7 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PostsService {
@@ -24,6 +30,7 @@ public class PostsService {
     public PostsService(PostRepository postsRepository, UserRepository userRepository) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
+
     }
 
 
@@ -40,7 +47,7 @@ public class PostsService {
             );
         } else {
             postsList.addAll(postsRepository.findPostsBySearch(
-                    getPaging(offset, limit), query)
+                            getPaging(offset, limit), query)
                     .toList()
             );
         }
@@ -51,30 +58,6 @@ public class PostsService {
         postsResponse.setPostsDTO(postsDTOList);
 
         return postsResponse;
-    }
-
-    public CalendarResponse getPostByYear(String year){
-
-        CalendarResponse calendarResponse = new CalendarResponse();
-        TreeSet<Integer> years = postsRepository.getSetYearsByAllPosts();
-        //Map<String, Integer> posts = new HashMap<>();
-        //Map<String, Integer> posts = postsRepository.getCountPostsSortByDate();
-        //List<Map<String, Integer>> posts = postsRepository.getCountPostsSortByDate();
-        //Map<String, Integer> posts = postsRepository.getCountPostsSortByDate();
-        postsRepository.getCountPostsSortByDate();
-//        List<String> posts1 = postsRepository.getIntegerDate();
-//        List<Integer> posts2 = postsRepository.getCountDate();
-
-        //years.stream().forEach(s -> System.out.println(s));
-        //posts1.stream().forEach(s -> System.out.println(s));
-//        posts2.stream().forEach(s -> System.out.println(s));
-
-//            for (String d : posts.keySet()){
-//                System.out.println(posts.get(d) + " " + d);
-//            }
-
-
-        return null;
     }
 
 
@@ -176,6 +159,27 @@ public class PostsService {
         sortedPaging = PageRequest.of(pageNumber, limit, sort);
 
         return sortedPaging;
+    }
+
+    public CalendarResponse getPostByYear(String year) {
+
+        CalendarResponse calendarResponse = new CalendarResponse();
+        TreeSet<Integer> years = postsRepository.getSetYearsByAllPosts();
+
+        Map<String, Integer> posts = postsRepository.getDateFromPosts()
+                .stream()
+                .distinct()
+                .collect(
+                        Collectors.toMap(
+                                date -> date,
+                                date -> postsRepository.countPostsFromDate("%" + date + "%")
+                        ));
+
+        calendarResponse.setYears(years);
+        calendarResponse.setPosts(posts);
+
+
+        return calendarResponse;
     }
 
 

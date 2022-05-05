@@ -30,4 +30,9 @@ public class PostVotes {
     @Column(nullable = false, columnDefinition = "TINYINT")
     private int value;
 
+    public PostVotes(Date time, int value) {
+        this.time = time;
+        this.value = value;
+    }
+
 }

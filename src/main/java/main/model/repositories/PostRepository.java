@@ -87,26 +87,14 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     TreeSet<Integer> getSetYearsByAllPosts();
 
 
-//    @Query(value = "SELECT DATE(p.time), COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
-//    Map<String, Integer> getCountPostsSortByDate();
+
+      @Query(value = "SELECT DATE(posts.time) FROM posts", nativeQuery = true)
+      List<String> getDateFromPosts();
 
 
-//    @Query(value = "SELECT DATE(p.time), COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
-//    Map<String, Integer> getCountPostsSortByDate();
+    @Query(value = "SELECT count(posts.time) FROM site.posts WHERE posts.time LIKE :date", nativeQuery = true)
+    Integer countPostsFromDate(@Param("date") String date);
 
-//    @Query(value = "SELECT DATE(p.time), COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
-//    List<Map<String, Integer>> getCountPostsSortByDate();
 
-//    @Query(value = "SELECT DATE(p.time) AS dates, COUNT(DATE(p.time)) AS counts FROM Post p GROUP BY dates")
-//    Map<String, Integer> getCountPostsSortByDate();
-
-    @Query(value = "SELECT JpaSQLHelp( DATE(p.time), COUNT(DATE(p.time))) FROM Post p GROUP BY dates")
-    List<JpaSQLHelp> getCountPostsSortByDate();
-
-    @Query(value = "SELECT DATE(p.time) AS date FROM Post p GROUP BY p.time")
-    List<String> getIntegerDate();
-
-    @Query(value = "SELECT COUNT(DATE(p.time)) AS date FROM Post p GROUP BY p.time")
-    List<Integer> getCountDate();
 
 }
