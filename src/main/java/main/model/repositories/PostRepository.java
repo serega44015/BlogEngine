@@ -84,5 +84,17 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "and posts.time <= current_time() and DATE(site.posts.time) = :date", nativeQuery = true)
     Page<Post> findPostsByDate(Pageable pageable, @Param("date") String date);
 
+    @Query(value = "SELECT p FROM Post p " +
+            "INNER JOIN Tags2Post tgp2 ON tgp2.postId = p.id " +
+            "WHERE p.moderationStatus = 'ACCEPTED' " +
+            "AND p.isActive = 1 " +
+            "AND p.time <= CURRENT_TIME " +
+            "AND tgp2.tagId = :tagId")
+    Page<Post> findPostsByTagId(Pageable pageable, @Param("tagId") Integer tagId);
 
+//    SELECT * FROM site.posts
+//    JOIN site.tags2post ON site.tags2post.post_id = site.posts.id
+//    WHERE site.tags2post.tag_id = 1
+
+    //WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME
 }

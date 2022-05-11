@@ -7,6 +7,7 @@ import main.dto.api.response.PostsResponse;
 import main.model.Post;
 import main.model.User;
 import main.model.repositories.PostRepository;
+import main.model.repositories.TagRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,10 +23,12 @@ public class PostsService {
 
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
+    private final TagRepository tagRepository;
 
-    public PostsService(PostRepository postsRepository, UserRepository userRepository) {
+    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
+        this.tagRepository = tagRepository;
 
     }
 
@@ -183,6 +186,22 @@ public class PostsService {
 
         List<PostsDTO> postsDTOList = toPostDTOList(
                 postsRepository.findPostsByDate(getPaging(offset, limit), date).toList()
+        );
+
+        postsResponse.setCount(postsDTOList.size());
+        postsResponse.setPostsDTO(postsDTOList);
+
+        return postsResponse;
+
+    }
+
+    public PostsResponse getPostByTag(int offset, int limit, String tag){
+        PostsResponse postsResponse = new PostsResponse();
+
+        int tagId = tagRepository.findTagIdByName(tag);
+
+        List<PostsDTO> postsDTOList = toPostDTOList(
+                postsRepository.findPostsByTagId(getPaging(offset, limit), tagId).toList()
         );
 
         postsResponse.setCount(postsDTOList.size());
