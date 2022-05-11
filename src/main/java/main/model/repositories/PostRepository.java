@@ -48,11 +48,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "AND p.text LIKE %:query%")
     Page<Post> findPostsBySearch(Pageable pageable, @Param("query") String query);
 
-//    SELECT count(posts.id) FROM posts
-//    INNER JOIN post_votes ON posts.id = post_votes.post_id
-//    WHERE post_votes.value = '1' and posts.id = '1'
-//    group by posts.id;
-
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p " +
             "INNER JOIN PostVotes pv ON p.id = pv.postId.id " +
@@ -69,17 +64,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     @Query(value = "SELECT COUNT(p.id) FROM Post p INNER JOIN PostComments pc ON p.id = pc.postId.id WHERE p.id = :postsId GROUP BY p.id")
     Integer countOfCommentsPerComments(@Param("postsId") Integer postsId);
 
-//    SELECT count(posts.id) FROM posts
-//    INNER JOIN posts_comments ON posts.id = posts_comments.post_id
-//    WHERE post_id = 3
-//    group by posts_comments.post_id
-
-
-//    @Query(value = "SELECT COUNT(Post.id) FROM Post p INNER JOIN PostVotes pv ON p.id = pv.postId.id WHERE pv.value = 1 GROUP BY p.id")
-//    Integer findByPostIdCountLikes(Integer pId);
-
-
-
     @Query(value = "SELECT COUNT(p.id) FROM Post p")
     Integer countPosts();
 
@@ -87,14 +71,18 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     TreeSet<Integer> getSetYearsByAllPosts();
 
 
-
-      @Query(value = "SELECT DATE(posts.time) FROM posts", nativeQuery = true)
-      List<String> getDateFromPosts();
+    @Query(value = "SELECT DATE(posts.time) FROM posts", nativeQuery = true)
+    List<String> getDateFromPosts();
 
 
     @Query(value = "SELECT count(posts.time) FROM site.posts WHERE posts.time LIKE :date", nativeQuery = true)
     Integer countPostsFromDate(@Param("date") String date);
 
+
+    @Query(value = "SELECT * FROM site.posts LEFT JOIN site.users ON posts.user_id = users.id " +
+            "WHERE posts.moderation_status = 'ACCEPTED' and posts.is_active = 1 " +
+            "and posts.time <= current_time() and DATE(site.posts.time) = :date", nativeQuery = true)
+    Page<Post> findPostsByDate(Pageable pageable, @Param("date") String date);
 
 
 }

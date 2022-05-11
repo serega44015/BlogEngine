@@ -4,20 +4,16 @@ import main.dto.PostsDTO;
 import main.dto.UserDTO;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsResponse;
-import main.helpJPA.JpaSQLHelp;
 import main.model.Post;
-import main.model.PostVotes;
 import main.model.User;
 import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,7 +43,7 @@ public class PostsService {
             );
         } else {
             postsList.addAll(postsRepository.findPostsBySearch(
-                            getPaging(offset, limit), query)
+                    getPaging(offset, limit), query)
                     .toList()
             );
         }
@@ -181,6 +177,22 @@ public class PostsService {
 
         return calendarResponse;
     }
+
+    public PostsResponse getPostByDate(int offset, int limit, String date) {
+        PostsResponse postsResponse = new PostsResponse();
+
+        List<PostsDTO> postsDTOList = toPostDTOList(
+                postsRepository.findPostsByDate(getPaging(offset, limit), date).toList()
+        );
+
+        postsResponse.setCount(postsDTOList.size());
+        postsResponse.setPostsDTO(postsDTOList);
+
+        return postsResponse;
+
+    }
+
+
 
 
 }
