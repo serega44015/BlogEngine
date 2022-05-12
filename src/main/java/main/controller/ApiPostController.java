@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+
 @RestController
 @RequestMapping("/api/post")
 
@@ -55,12 +57,16 @@ public class ApiPostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostsIdResponse> postById(@PathVariable("id") int id) {
+    public ResponseEntity<PostsIdResponse> postById(@PathVariable("id") int id) throws NoSuchElementException {
 
 //        if ("servicenull"){
 //            System.out.println("return, http.ok else hpppt.huk");
 //        }
+        PostsIdResponse postsIdResponse = postsService.getPostById(id);
+        if (postsIdResponse == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-        return new ResponseEntity<>(postsService.getPostById(id), HttpStatus.OK);
+        return new ResponseEntity<>(postsIdResponse, HttpStatus.OK);
     }
 }

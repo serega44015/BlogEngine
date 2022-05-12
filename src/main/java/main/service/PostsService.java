@@ -2,12 +2,14 @@ package main.service;
 
 import main.dto.CommentDTO;
 import main.dto.PostsDTO;
+import main.dto.UserCommentDTO;
 import main.dto.UserDTO;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
 import main.model.Post;
 import main.model.PostComments;
+import main.model.Tag;
 import main.model.User;
 import main.model.repositories.PostRepository;
 import main.model.repositories.TagRepository;
@@ -50,7 +52,7 @@ public class PostsService {
             );
         } else {
             postsList.addAll(postsRepository.findPostsBySearch(
-                    getPaging(offset, limit), query)
+                            getPaging(offset, limit), query)
                     .toList()
             );
         }
@@ -216,8 +218,16 @@ public class PostsService {
     }
 
     public PostsIdResponse getPostById(int id) {
+        Post post = new Post();
         PostsIdResponse postsIdResponse = new PostsIdResponse();
-        Post post = postsRepository.findPostsById(id).get();
+
+        try {
+            post = postsRepository.findPostsById(id).get();
+        } catch (NoSuchElementException n) {
+            n.getMessage();
+            return null; //Если поста с данным id не существует, то возвращаем null, и контроллер выдаст HttpStatus.NOT_FOUND
+        }
+
 
         int postId = post.getId();
         long times = post.getTime().getTime().getTime() / 1000; //на 3 часа отстают, потом додумать
@@ -229,36 +239,44 @@ public class PostsService {
         String text = post.getText();
         Integer likeCount = postsRepository.countOfLikesPerPost(postId);
         Integer disLikeCount = postsRepository.countOfDisLikesPerPost(postId);
-        Integer viewCount = post.getViewCount(); //разобраться, почему null. Походу тоже как то надо с базой играть. Да и вообще, там с просмотрами по апишки морока
+        Integer viewCount = post.getViewCount();
+        List<PostComments> commentsList = post.getPostCommentsList();
+        List<Tag> tagsList = post.getTagList();
 
-        List<PostComments> postCommentsList = post.getPostCommentsList();
-        List<CommentDTO> commentDTOList = new ArrayList<>();
-        for (int a = 0; a< postCommentsList.size(); a++){
+        /*Если модератор авторизован, то не считаем его просмотры вообще
+           Если автор авторизован, то не считаем просмотры своих же публикаций
+           Это пока не сделал*/
+        List<CommentDTO> comments = new ArrayList<>();
+        for (PostComments comment : commentsList) {
             CommentDTO commentDTO = new CommentDTO();
-            int commentId = postCommentsList.get(a).getId();
-            long timeStamp = postCommentsList.get(a).getTime().getTime() / 1000;
 
-            commentDTO.setId();
+            int commentId = comment.getId();
+            long commentTimeStamp = comment.getTime().getTime() / 1000;
+            String commentText = comment.getText();
+
+            UserCommentDTO userCommentDTO = new UserCommentDTO();
+            int userId = comment.getUserId().getId();
+            String userName = comment.getUserId().getName();
+            String userPhoto = comment.getUserId().getPhoto();
+            userCommentDTO.setId(userId);
+            userCommentDTO.setName(userName);
+            userCommentDTO.setPhoto(userPhoto);
+
+            commentDTO.setId(commentId);
+            commentDTO.setTimestamp(commentTimeStamp);
+            commentDTO.setText(commentText);
+            commentDTO.setUser(userCommentDTO);
+
+            comments.add(commentDTO);
         }
 
-//        private List<CommentDTO> comments;
-//        private List<String> tags;
 
-        System.out.println("PostID: " + postId);
-        System.out.println("Times: " + times);
-        System.out.println("isActive: " + isActive);
-        System.out.println("UserId: " + post.getUserId().getId());
-        System.out.println("UserName: " + post.getUserId().getName());
-        System.out.println("Title: " + title);
-        System.out.println("Text: " + text);
-        System.out.println("Like: " + likeCount);
-        System.out.println("Dislikes: " + disLikeCount);
-        System.out.println("View: " + disLikeCount);
+        List<String> tags = new ArrayList<>();
 
-        //        postsDTO.setLikeCount(likes != null ? likes : 0);
-//        postsDTO.setDislikeCount(disLikes != null ? disLikes : 0);
-//        postsDTO.setCommentCount(commentsCount != null ? commentsCount : 0);
-//        postsDTO.setViewCount(post.getViewCount());
+        for (Tag tag : tagsList) {
+            String tagName = tag.getName();
+            tags.add(tagName);
+        }
 
         postsIdResponse.setId(postId);
         postsIdResponse.setTimeStamp(times);
@@ -269,24 +287,12 @@ public class PostsService {
         postsIdResponse.setLikeCount(likeCount != null ? likeCount : 0);
         postsIdResponse.setDislikeCount(disLikeCount != null ? disLikeCount : 0);
         postsIdResponse.setViewCount(viewCount);
-//        private int id;
-//        private long timestamp;
-//        private boolean active;
-//        private UserDTO userDTO;
-//        private String title;
-//        private String text;
-//        private int likeCount;
-//        private int dislikeCount;
-//        private int viewCount;
-//        private List<CommentDTO> comments;
-//        private List<String> tags;
+        postsIdResponse.setComments(comments);
+        postsIdResponse.setTags(tags);
+
 
         return postsIdResponse;
     }
-
-//    private List<CommentDTO> toCommentDTO(List<>){
-//
-//    }
 
 
 }
