@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.TreeSet;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
@@ -92,9 +93,26 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "AND tgp2.tagId = :tagId")
     Page<Post> findPostsByTagId(Pageable pageable, @Param("tagId") Integer tagId);
 
-//    SELECT * FROM site.posts
-//    JOIN site.tags2post ON site.tags2post.post_id = site.posts.id
-//    WHERE site.tags2post.tag_id = 1
+    @Query(value = "SELECT p FROM Post p " +
+            "LEFT JOIN User u ON u.id = p.userId.id " +
+            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComments pc ON pc.postId.id = p.id " +
+            "LEFT JOIN Tags2Post t2p ON t2p.postId = p.id " +
+            "LEFT JOIN Tag tg ON tg.id = t2p.tagId " +
+            "WHERE p.id = :id AND p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
+            "GROUP BY p.id")
+    Optional<Post> findPostsById(@Param("id") Integer id);
 
-    //WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME
+//    @Query(value = "SELECT p FROM Post p " +
+//            "LEFT JOIN User u ON u.id = p.userId.id " +
+//            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
+//            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+//            "LEFT JOIN PostComments pc ON pc.postId.id = p.id " +
+//            "LEFT JOIN Tags2Post t2p ON t2p.postId = p.id " +
+//            "LEFT JOIN Tag tg ON tg.id = t2p.tagId " +
+//            "WHERE p.id = :id AND p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
+//            "GROUP BY p.id")
+//    Optional<Post> findPostsById(@Param("id") Integer id);
+
 }

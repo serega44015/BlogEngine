@@ -1,14 +1,13 @@
 package main.controller;
 
+import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
+import main.model.Post;
 import main.service.PostsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/post")
@@ -55,4 +54,13 @@ public class ApiPostController {
         return new ResponseEntity<>(postsService.getPostByTag(offset, limit, tag), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PostsIdResponse> postById(@PathVariable("id") int id) {
+
+//        if ("servicenull"){
+//            System.out.println("return, http.ok else hpppt.huk");
+//        }
+
+        return new ResponseEntity<>(postsService.getPostById(id), HttpStatus.OK);
+    }
 }
