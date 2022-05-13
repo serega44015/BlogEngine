@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -17,7 +19,7 @@ public class CaptchaCodes {
     private int id;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
-    private Date time;
+    private LocalDateTime time;
 
     @Column(nullable = false, columnDefinition = "TINYTEXT")
     private String code;

@@ -24,12 +24,12 @@ public class ApiAuthController {
     }
 
     @GetMapping("/check")
-    private CheckResponse check(){
+    private CheckResponse check() {
         return checkService.getResult();
     }
 
     @GetMapping("/captcha")
-    private CaptchaResponse captcha() {
+    private CaptchaResponse captcha() throws IOException{
         return captchaService.getCaptcha();
     }
 }

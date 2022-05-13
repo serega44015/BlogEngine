@@ -3,32 +3,63 @@ package main.service;
 import com.github.cage.Cage;
 import com.github.cage.GCage;
 import main.dto.api.response.CaptchaResponse;
-import org.apache.commons.io.FileUtils;
+import main.model.CaptchaCodes;
+import main.model.repositories.CaptchaCodesRepository;
 import org.springframework.stereotype.Service;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 @Service
 public class CaptchaService {
 
-    public CaptchaResponse getCaptcha() {
+    private final CaptchaCodesRepository captchaRepository;
+
+    public CaptchaService(CaptchaCodesRepository captchaRepository) {
+        this.captchaRepository = captchaRepository;
+    }
+
+    public CaptchaResponse getCaptcha() throws IOException{
+
+        captchaRepository.findAll().forEach(captcha -> {
+            if (captcha.getTime().isBefore(LocalDateTime.now().minusHours(1))) {
+                captchaRepository.delete(captcha);
+            }
+        });
+
         CaptchaResponse captchaResponse = new CaptchaResponse();
+        CaptchaCodes captchaCodes = new CaptchaCodes();
 
+        LocalDateTime time = LocalDateTime.now();
         Cage cage = new GCage();
-        String token = cage.getTokenGenerator().next();
-        byte[] byteImage = cage.draw(token);
-        String encoded = Base64
-                .getEncoder()
-                .encodeToString(byteImage);
-        String image = "data:image/png;base64, " + encoded;
-        String secret = String.valueOf(cage.getFormat().getBytes(StandardCharsets.UTF_8));
 
-        captchaResponse.setImage(image);
-        captchaResponse.setSecret(secret);
+        String captchaCode = cage.getTokenGenerator().next();
+        String secretCode = cage.getTokenGenerator().next();
+
+        OutputStream os = new FileOutputStream("captcha.jpg", false);
+        cage.draw(captchaCode, os);
+        os.flush();
+        os.close();
+
+        byte[] captcha = Files.readAllBytes(Paths.get("captcha.jpg"));
+        Files.delete(Paths.get("captcha.jpg"));
+        String encodedCaptcha = DatatypeConverter.printBase64Binary(captcha);
+        String image = "data:image/png;base64, " + encodedCaptcha;
+
+        captchaCodes.setTime(time);
+        captchaCodes.setCode(captchaCode);
+        captchaCodes.setSecretCode(secretCode);
+        captchaRepository.save(captchaCodes);// не знаю, будет ли работать или нет. Как регистрацию прикручу, надо будет проверить.
+
+
+        captchaResponse.setSecret(captchaCode);
+        captchaResponse.setImage(image.toString());
 
         return captchaResponse;
     }
+
 
 }
