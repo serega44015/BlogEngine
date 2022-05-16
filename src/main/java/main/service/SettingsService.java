@@ -10,6 +10,7 @@ public class SettingsService {
         SettingsResponse settingsResponse = new SettingsResponse();
         settingsResponse.setPostPremoderation(true);
         settingsResponse.setStatisticsIsPublic(true);
+        settingsResponse.setMultimuserMode(true);
         return settingsResponse;
     }
 }

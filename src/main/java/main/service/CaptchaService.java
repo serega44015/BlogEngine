@@ -52,7 +52,7 @@ public class CaptchaService {
         captchaCodes.setTime(time);
         captchaCodes.setCode(captchaCode);
         captchaCodes.setSecretCode(secretCode);
-        captchaRepository.save(captchaCodes);// не знаю, будет ли работать или нет. Как регистрацию прикручу, надо будет проверить.
+        captchaRepository.save(captchaCodes);
 
 
         captchaResponse.setSecret(captchaCode);
