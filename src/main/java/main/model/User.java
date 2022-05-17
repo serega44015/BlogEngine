@@ -3,6 +3,7 @@ package main.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.model.enums.Role;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -46,6 +47,8 @@ public class User {
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
     private List<PostComments> postCommentsUser;
 
-
+    public Role getRole(){
+        return isModerator == 1 ? Role.MODERATOR : Role.USER;
+    }
 
 }

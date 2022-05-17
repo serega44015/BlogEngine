@@ -17,7 +17,8 @@ public class DefaultController {
     @RequestMapping("/")
     public String defaultController() {
         System.out.println("serega " + initResponse.getTitle());
-        return "index.html";
+        //return "index.html";
+        return "index";
     }
 
     @RequestMapping(method = {RequestMethod.OPTIONS, RequestMethod.GET}, value = "/**/{path:[^\\\\.]*}")

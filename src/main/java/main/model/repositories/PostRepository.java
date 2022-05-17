@@ -85,7 +85,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findPostsByDate(Pageable pageable, @Param("date") String date);
 
     @Query(value = "SELECT p FROM Post p " +
-            "INNER JOIN Tags2Post tgp2 ON tgp2.postId = p.id " +
+            "INNER JOIN Tag2Post tgp2 ON tgp2.postId = p.id " +
             "WHERE p.moderationStatus = 'ACCEPTED' " +
             "AND p.isActive = 1 " +
             "AND p.time <= CURRENT_TIME " +
@@ -97,7 +97,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
             "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.postId.id = p.id " +
-            "LEFT JOIN Tags2Post t2p ON t2p.postId = p.id " +
+            "LEFT JOIN Tag2Post t2p ON t2p.postId = p.id " +
             "LEFT JOIN Tag tg ON tg.id = t2p.tagId " +
             "WHERE p.id = :id AND p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
             "GROUP BY p.id")
