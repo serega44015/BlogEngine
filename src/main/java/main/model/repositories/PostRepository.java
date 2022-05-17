@@ -1,6 +1,5 @@
 package main.model.repositories;
 
-import main.helpJPA.JpaSQLHelp;
 import main.model.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -104,15 +103,5 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "GROUP BY p.id")
     Optional<Post> findPostsById(@Param("id") Integer id);
 
-//    @Query(value = "SELECT p FROM Post p " +
-//            "LEFT JOIN User u ON u.id = p.userId.id " +
-//            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
-//            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
-//            "LEFT JOIN PostComments pc ON pc.postId.id = p.id " +
-//            "LEFT JOIN Tags2Post t2p ON t2p.postId = p.id " +
-//            "LEFT JOIN Tag tg ON tg.id = t2p.tagId " +
-//            "WHERE p.id = :id AND p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
-//            "GROUP BY p.id")
-//    Optional<Post> findPostsById(@Param("id") Integer id);
 
 }
