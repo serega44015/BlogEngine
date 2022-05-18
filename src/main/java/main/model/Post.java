@@ -3,11 +3,14 @@ package main.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.enums.ModerationStatus;
+import main.model.repositories.PostRepository;
+import org.mapstruct.Named;
 
 import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -58,6 +61,25 @@ public class Post {
             inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
     private List<Tag> tagList;
+
+    public int getLikesAmount(){
+        return postVotesList.stream()
+                .filter(p -> p.getValue() == 1)
+                .collect(Collectors.toList()).size();
+    }
+
+    public int getDislikesAmount(){
+        return postVotesList.stream()
+                .filter(p -> p.getValue() == -1)
+                .collect(Collectors.toList()).size();
+    }
+
+    public int getCommentCount(){
+        return postCommentsList.size();
+    }
+
+
+
 
 
 }
