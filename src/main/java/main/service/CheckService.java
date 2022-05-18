@@ -19,7 +19,6 @@ public class CheckService {
         this.userRepository = userRepository;
     }
 
-    //он тоже должен быть в сервисе
     public LoginResponse getLoginResponse(String email) {
         main.model.User currentUser = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
         UserLoginDTO userLoginDTO = new UserLoginDTO();
@@ -34,25 +33,4 @@ public class CheckService {
         return loginResponse;
     }
 
-
-//    public CheckResponse getResult(){
-//        CheckResponse checkResponse = new CheckResponse();
-//        checkResponse.setResult(false);
-//
-//
-//        UserLoginDTO userLoginDTO = new UserLoginDTO();
-//        Optional<User> userOptional = userRepository.findByEmail("serega44015@gmail.com");
-//
-//        userLoginDTO.setId(userOptional.get().getId());
-//        userLoginDTO.setName(userOptional.get().getName());
-//        userLoginDTO.setPhoto(userOptional.get().getPhoto());
-//        userLoginDTO.setEmail(userOptional.get().getEmail());
-//        userLoginDTO.setModeration(false);
-//        userLoginDTO.setModerationCount(userOptional.get().getIsModerator());
-//        userLoginDTO.setSettings(true);
-//
-//        checkResponse.setUserLoginDTO(userLoginDTO);
-//
-//        return checkResponse;
-//    }
 }

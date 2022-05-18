@@ -13,7 +13,6 @@ public class PostsDTO {
 
     @JsonProperty("user")
     private UserDTO userDTO;
-
     private String title;
     private String announce;
     private int likeCount;

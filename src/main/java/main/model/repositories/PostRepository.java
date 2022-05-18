@@ -15,18 +15,18 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
 
     @Query(value = "SELECT p FROM Post p " +
-            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "LEFT JOIN User u ON p.user.id = u.id " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME")
     Page<Post> findAllPostsSortedByRecent(Pageable pageable);
 
     @Query(value = "SELECT p FROM Post p " +
-            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "LEFT JOIN User u ON p.user.id = u.id " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME")
     Page<Post> findAllPostsSortedByEarly(Pageable pageable);
 
 
     @Query(value = "SELECT p FROM Post p " +
-            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "LEFT JOIN User u ON p.user.id = u.id " +
             "LEFT JOIN PostVotes pv1 ON  pv1.postId.id = p.id AND pv1.value = 1 " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
             "GROUP BY p.id " +
@@ -34,7 +34,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findAllPostOrderByLikes(Pageable pageable);
 
     @Query(value = "SELECT p FROM Post p " +
-            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "LEFT JOIN User u ON p.user.id = u.id " +
             "LEFT JOIN PostComments pc1 ON pc1.postId.id = p.id " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 " +
             "GROUP BY p.id " +
@@ -43,7 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
 
     @Query(value = "SELECT p FROM Post p " +
-            "LEFT JOIN User u ON p.userId.id = u.id " +
+            "LEFT JOIN User u ON p.user.id = u.id " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
             "AND p.text LIKE %:query%")
     Page<Post> findPostsBySearch(Pageable pageable, @Param("query") String query);
@@ -93,7 +93,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findPostsByTagId(Pageable pageable, @Param("tagId") Integer tagId);
 
     @Query(value = "SELECT p FROM Post p " +
-            "LEFT JOIN User u ON u.id = p.userId.id " +
+            "LEFT JOIN User u ON u.id = p.user.id " +
             "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
             "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.postId.id = p.id " +

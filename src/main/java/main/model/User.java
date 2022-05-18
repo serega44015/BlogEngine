@@ -41,7 +41,7 @@ public class User {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String photo;
 
-    @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> userPosts;
 
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL)

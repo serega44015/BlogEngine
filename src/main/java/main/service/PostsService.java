@@ -7,13 +7,13 @@ import main.dto.UserDTO;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
-import main.model.Post;
-import main.model.PostComments;
-import main.model.Tag;
-import main.model.User;
+import main.mappers.PostMapper;
+import main.model.*;
 import main.model.repositories.PostRepository;
 import main.model.repositories.TagRepository;
 import main.model.repositories.UserRepository;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,6 +28,8 @@ public class PostsService {
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    //private final PostMapper postMapper = Mappers.getMapper(PostMapper.class);
+    private final PostMapper mapper = PostMapper.INSTANCE;
 
     public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository) {
         this.postsRepository = postsRepository;
@@ -41,6 +43,7 @@ public class PostsService {
 
         List<Post> postsList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
+
 
         if (query.isEmpty()) {
             postsList.addAll(
@@ -67,6 +70,13 @@ public class PostsService {
     public PostsResponse getPosts(int offset, int limit, String mode) {
         PostsResponse postsResponse = new PostsResponse();
         List<Post> postsList = new ArrayList<>();
+
+
+
+
+        //map -> каждый пост convert(DTO).toList()
+        //каждый пост прогнать через map в Mapper, получить ДТОхи и в конце их преобразовать в лист PostDTO и отдать их респонсу
+        //List<Post> postsList = new ArrayList<>(); это можно будет удалить
 
 
         if (mode.equals("recent")) {
@@ -102,6 +112,12 @@ public class PostsService {
 
         List<PostsDTO> postsDTOList = toPostDTOList(postsList);
 
+        UserDTO userDTO = new UserDTO();
+        userDTO.setName("Серёга а вдруг");
+        userDTO.setId(2611);
+        PostsDTO postsDTOTest = mapper.toPostDTO(postsList.get(0));
+        System.out.println("Чё пойдёт? " + postsDTOTest.getTitle() + " And UserDTO " + postsDTOTest.getUserDTO().getName());
+
         postsResponse.setCount(390);
         postsResponse.setPostsDTO(postsDTOList);
         return postsResponse;
@@ -121,10 +137,8 @@ public class PostsService {
             postsDTO.setTimeStamp(times);
 
             UserDTO userDTO = new UserDTO();
-            Optional<User> optionalUser = userRepository.findUserById(post.getUserId().getId());
-
-            userDTO.setName(optionalUser.get().getName());
-            userDTO.setId(optionalUser.get().getId());
+            userDTO.setName(post.getUser().getName());
+            userDTO.setId(post.getUser().getId());
             postsDTO.setUserDTO(userDTO);
 
             postsDTO.setTitle(post.getTitle());
@@ -231,8 +245,8 @@ public class PostsService {
         long times = post.getTime().getTime().getTime() / 1000; //на 3 часа отстают, потом додумать
         boolean isActive = post.getIsActive() == 1 ? true : false;
         UserDTO userDTO = new UserDTO();
-        userDTO.setId(post.getUserId().getId());
-        userDTO.setName(post.getUserId().getName());
+        userDTO.setId(post.getUser().getId());
+        userDTO.setName(post.getUser().getName());
         String title = post.getTitle();
         String text = post.getText();
         Integer likeCount = postsRepository.countOfLikesPerPost(postId);
