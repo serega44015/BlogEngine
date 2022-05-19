@@ -18,7 +18,6 @@ public class DateConverter {
             return 0;
         }
         long time = calendarTime.getTime().getTime() / 1000;
-        System.out.println("Время возвращаем 3 " + time);
         return time;
     }
 

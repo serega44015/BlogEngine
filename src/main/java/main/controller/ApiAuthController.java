@@ -3,16 +3,14 @@ package main.controller;
 import main.dto.UserLoginDTO;
 import main.dto.api.request.LoginRequest;
 import main.dto.api.request.RegisterRequest;
-import main.dto.api.response.CaptchaResponse;
-import main.dto.api.response.CheckResponse;
-import main.dto.api.response.LoginResponse;
-import main.dto.api.response.RegisterResponse;
+import main.dto.api.response.*;
 import main.model.repositories.UserRepository;
 import main.service.CaptchaService;
 import main.service.CheckService;
 import main.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,8 +72,20 @@ public class ApiAuthController {
         SecurityContextHolder.getContext().setAuthentication(auth);
         User user = (User) auth.getPrincipal();
 
+
+
         return ResponseEntity.ok(checkService.getLoginResponse(user.getUsername()));
     }
+
+    @GetMapping("/logout")
+    public LogoutResponse logout(){
+        LogoutResponse logoutResponse = new LogoutResponse();
+        logoutResponse.setResult(true);
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return logoutResponse;
+    }
+
+
 
 
 }

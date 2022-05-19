@@ -1,9 +1,5 @@
 package main.service;
 
-import main.dto.CommentDTO;
-import main.dto.PostsDTO;
-import main.dto.UserCommentDTO;
-import main.dto.UserDTO;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
@@ -17,6 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,12 +30,13 @@ public class PostsService {
     private final TagRepository tagRepository;
     private final PostMapper postMapper = PostMapper.INSTANCE;
     private final PostCommentsMapper commentsMapper = PostCommentsMapper.INSTANCE;
+    private final AuthenticationManager authenticationManager;
 
-    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository) {
+    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, AuthenticationManager authenticationManager) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
-
+        this.authenticationManager = authenticationManager;
     }
 
 
@@ -169,6 +170,29 @@ public class PostsService {
 
         return postMapper.toPostResponseById(post);
     }
+
+    public PostsResponse getMyPosts(int offset, int limit, String status){
+        PostsResponse postsResponse = new PostsResponse();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
+
+        List<Post> postList = new ArrayList<>();
+
+
+        if (status.equals("inactive")) {
+        postList = currentUser.getUserPosts().stream().filter(p-> p.getIsActive() == 0).collect(Collectors.toList());
+//            Page<Post> posts = postsRepository
+//                    .findAllPostsSortedByRecent(getSortedPaging(offset, limit, Sort.by("time").descending()));
+
+        }
+
+        //settersPostsResponse(postsResponse, postList);
+
+
+        return postsResponse;
+    }
+
 
 
 

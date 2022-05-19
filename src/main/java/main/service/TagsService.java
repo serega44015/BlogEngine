@@ -36,11 +36,10 @@ public class TagsService {
         int countAllPosts = postRepository.countPosts();
         int weights = allTags.size();
 
-        int maxTag = allTags.stream().mapToInt(v -> tag2PostRepository.countOfPostsWithTheName(v.getName())).max().getAsInt();
-
+        int maxTag = allTags.stream().mapToInt(v ->
+                tag2PostRepository.countOfPostsWithTheName(v.getName())).max().getAsInt();
 
         List<TagsDTO> tagsDTOList = new ArrayList<>();
-
 
         for (int a = 0; a < allTags.size(); a++) {
             TagsDTO tagsDTO = new TagsDTO();
