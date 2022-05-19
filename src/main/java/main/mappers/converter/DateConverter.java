@@ -14,12 +14,12 @@ public class DateConverter {
 
     @Named("convertRegDate")
     public long convertRegDate(Calendar calendarTime) {
-
         if (calendarTime == null) {
             return 0;
         }
-
-        return calendarTime.getTime().getTime() / 1000;
+        long time = calendarTime.getTime().getTime() / 1000;
+        System.out.println("Время возвращаем 3 " + time);
+        return time;
     }
 
     public LocalDateTime longToDate(Long dateLong) {

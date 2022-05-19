@@ -3,12 +3,9 @@ package main.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import main.model.enums.ModerationStatus;
-import main.model.repositories.PostRepository;
-import org.mapstruct.Named;
 
 import javax.persistence.*;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +48,7 @@ public class Post {
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostVotes> postVotesList;
 
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostComments> postCommentsList;
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -77,6 +74,17 @@ public class Post {
     public int getCommentCount(){
         return postCommentsList.size();
     }
+
+    public boolean getIsActiveResult(){
+        return isActive == 1 ? true : false;
+    }
+
+    public List<String> getTagNameList(){
+        return tagList.stream()
+                .map(t -> t.getName()).collect(Collectors.toList());
+    }
+
+
 
 
 

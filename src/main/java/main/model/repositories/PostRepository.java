@@ -35,7 +35,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN User u ON p.user.id = u.id " +
-            "LEFT JOIN PostComments pc1 ON pc1.postId.id = p.id " +
+            "LEFT JOIN PostComments pc1 ON pc1.post.id = p.id " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(pc1.id) DESC")
@@ -61,7 +61,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "GROUP BY p.id")
     Integer countOfDisLikesPerPost(@Param("postsId") Integer postsId);
 
-    @Query(value = "SELECT COUNT(p.id) FROM Post p INNER JOIN PostComments pc ON p.id = pc.postId.id WHERE p.id = :postsId GROUP BY p.id")
+    @Query(value = "SELECT COUNT(p.id) FROM Post p INNER JOIN PostComments pc ON p.id = pc.post.id WHERE p.id = :postsId GROUP BY p.id")
     Integer countOfCommentsPerComments(@Param("postsId") Integer postsId);
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p")
@@ -96,7 +96,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "LEFT JOIN User u ON u.id = p.user.id " +
             "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
             "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
-            "LEFT JOIN PostComments pc ON pc.postId.id = p.id " +
+            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
             "LEFT JOIN Tag2Post t2p ON t2p.postId = p.id " +
             "LEFT JOIN Tag tg ON tg.id = t2p.tagId " +
             "WHERE p.id = :id AND p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +

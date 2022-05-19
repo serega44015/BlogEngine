@@ -7,6 +7,7 @@ import main.dto.UserDTO;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
+import main.mappers.PostCommentsMapper;
 import main.mappers.PostMapper;
 import main.model.*;
 import main.model.repositories.PostRepository;
@@ -27,7 +28,8 @@ public class PostsService {
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
-    private final PostMapper mapper = PostMapper.INSTANCE;
+    private final PostMapper postMapper = PostMapper.INSTANCE;
+    private final PostCommentsMapper commentsMapper = PostCommentsMapper.INSTANCE;
 
     public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository) {
         this.postsRepository = postsRepository;
@@ -93,7 +95,7 @@ public class PostsService {
     private void settersPostsResponse(PostsResponse postsResponse, Page<Post> posts) {
         postsResponse.setPostsDTO(posts
                 .stream()
-                .map(mapper::toPostDTO)
+                .map(postMapper::toPostDTO)
                 .collect(Collectors.toList()));
         postsResponse.setCount(posts.getTotalElements());
     }
@@ -157,9 +159,7 @@ public class PostsService {
     }
 
     public PostsIdResponse getPostById(int id) {
-        Post post = new Post();
-        PostsIdResponse postsIdResponse = new PostsIdResponse();
-
+        Post post;
         try {
             post = postsRepository.findPostsById(id).get();
         } catch (NoSuchElementException n) {
@@ -167,71 +167,9 @@ public class PostsService {
             return null; //Если поста с данным id не существует, то возвращаем null, и контроллер выдаст HttpStatus.NOT_FOUND
         }
 
-
-        int postId = post.getId();
-        long times = post.getTime().getTime().getTime() / 1000; //на 3 часа отстают, потом додумать
-        boolean isActive = post.getIsActive() == 1 ? true : false;
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(post.getUser().getId());
-        userDTO.setName(post.getUser().getName());
-        String title = post.getTitle();
-        String text = post.getText();
-        Integer likeCount = postsRepository.countOfLikesPerPost(postId);
-        Integer disLikeCount = postsRepository.countOfDisLikesPerPost(postId);
-        Integer viewCount = post.getViewCount();
-        List<PostComments> commentsList = post.getPostCommentsList();
-        List<Tag> tagsList = post.getTagList();
-
-        /*Если модератор авторизован, то не считаем его просмотры вообще
-           Если автор авторизован, то не считаем просмотры своих же публикаций
-           Это пока не сделал*/
-        List<CommentDTO> comments = new ArrayList<>();
-        for (PostComments comment : commentsList) {
-            CommentDTO commentDTO = new CommentDTO();
-
-            int commentId = comment.getId();
-            long commentTimeStamp = comment.getTime().getTime() / 1000;
-            String commentText = comment.getText();
-
-            UserCommentDTO userCommentDTO = new UserCommentDTO();
-            int userId = comment.getUserId().getId();
-            String userName = comment.getUserId().getName();
-            String userPhoto = comment.getUserId().getPhoto();
-            userCommentDTO.setId(userId);
-            userCommentDTO.setName(userName);
-            userCommentDTO.setPhoto(userPhoto);
-
-            commentDTO.setId(commentId);
-            commentDTO.setTimestamp(commentTimeStamp);
-            commentDTO.setText(commentText);
-            commentDTO.setUser(userCommentDTO);
-
-            comments.add(commentDTO);
-        }
-
-
-        List<String> tags = new ArrayList<>();
-
-        for (Tag tag : tagsList) {
-            String tagName = tag.getName();
-            tags.add(tagName);
-        }
-
-        postsIdResponse.setId(postId);
-        postsIdResponse.setTimeStamp(times);
-        postsIdResponse.setActive(isActive);
-        postsIdResponse.setUserDTO(userDTO);
-        postsIdResponse.setTitle(title);
-        postsIdResponse.setText(text);
-        postsIdResponse.setLikeCount(likeCount != null ? likeCount : 0);
-        postsIdResponse.setDislikeCount(disLikeCount != null ? disLikeCount : 0);
-        postsIdResponse.setViewCount(viewCount);
-        postsIdResponse.setComments(comments);
-        postsIdResponse.setTags(tags);
-
-
-        return postsIdResponse;
+        return postMapper.toPostResponseById(post);
     }
+
 
 
 }
