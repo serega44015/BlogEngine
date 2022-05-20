@@ -6,8 +6,8 @@ import main.model.enums.ModerationStatus;
 
 import javax.persistence.*;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -31,7 +31,7 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User userId;
+    private User user;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
     private Calendar time;
@@ -48,7 +48,7 @@ public class Post {
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostVotes> postVotesList;
 
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostComments> postCommentsList;
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -58,6 +58,36 @@ public class Post {
             inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
     private List<Tag> tagList;
+
+    public int getLikesAmount(){
+        return postVotesList.stream()
+                .filter(p -> p.getValue() == 1)
+                .collect(Collectors.toList()).size();
+    }
+
+    public int getDislikesAmount(){
+        return postVotesList.stream()
+                .filter(p -> p.getValue() == -1)
+                .collect(Collectors.toList()).size();
+    }
+
+    public int getCommentCount(){
+        return postCommentsList.size();
+    }
+
+    public boolean getIsActiveResult(){
+        return isActive == 1 ? true : false;
+    }
+
+    public List<String> getTagNameList(){
+        return tagList.stream()
+                .map(t -> t.getName()).collect(Collectors.toList());
+    }
+
+
+
+
+
 
 
 }

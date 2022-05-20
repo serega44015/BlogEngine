@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class PostsResponse {
 
-    private int count;
+    private long count;
 
     @JsonProperty("posts")
     private List<PostsDTO> postsDTO;

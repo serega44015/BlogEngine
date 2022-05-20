@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Table(name = "tags2post")
 @Data
 @NoArgsConstructor
-public class Tags2Post {
+public class Tag2Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

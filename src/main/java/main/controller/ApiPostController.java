@@ -2,11 +2,11 @@ package main.controller;
 
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
-import main.model.Post;
 import main.service.PostsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
@@ -25,6 +25,7 @@ public class ApiPostController {
 
 
     @GetMapping
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<PostsResponse> posts(
             @RequestParam(defaultValue = "0", required = false) Integer offset,
             @RequestParam(defaultValue = "10", required = false) Integer limit,
@@ -33,6 +34,7 @@ public class ApiPostController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('user:moderate')")
     public ResponseEntity<PostsResponse> postSearch(
             @RequestParam(defaultValue = "0", required = false) Integer offset,
             @RequestParam(defaultValue = "10", required = false) Integer limit,
@@ -59,15 +61,25 @@ public class ApiPostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostsIdResponse> postById(@PathVariable("id") int id) throws NoSuchElementException {
 
-//        if ("servicenull"){
-//            System.out.println("return, http.ok else hpppt.huk");
-//        }
         PostsIdResponse postsIdResponse = postsService.getPostById(id);
         if (postsIdResponse == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(postsIdResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<PostsResponse> myPost (
+            @RequestParam(defaultValue = "0", required = false) Integer offset,
+            @RequestParam(defaultValue = "10", required = false) Integer limit,
+            @RequestParam(defaultValue = "status", required = false) String status){
+
+        PostsResponse postsResponse = postsService.getMyPosts(offset, limit, status);
+
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+
     }
 
 

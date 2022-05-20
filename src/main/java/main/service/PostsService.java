@@ -1,25 +1,27 @@
 package main.service;
 
-import main.dto.CommentDTO;
-import main.dto.PostsDTO;
-import main.dto.UserCommentDTO;
-import main.dto.UserDTO;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
+import main.mappers.PostCommentsMapper;
+import main.mappers.PostMapper;
 import main.model.Post;
-import main.model.PostComments;
-import main.model.Tag;
-import main.model.User;
 import main.model.repositories.PostRepository;
 import main.model.repositories.TagRepository;
 import main.model.repositories.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,37 +30,33 @@ public class PostsService {
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final PostMapper postMapper = PostMapper.INSTANCE;
+    private final PostCommentsMapper commentsMapper = PostCommentsMapper.INSTANCE;
+    private final AuthenticationManager authenticationManager;
 
-    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository) {
+    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, AuthenticationManager authenticationManager) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
-
+        this.authenticationManager = authenticationManager;
     }
 
 
     public PostsResponse getPostBySearch(int offset, int limit, String query) {
 
-        List<Post> postsList = new ArrayList<>();
         PostsResponse postsResponse = new PostsResponse();
 
         if (query.isEmpty()) {
-            postsList.addAll(
-                    postsRepository.findAllPostsSortedByRecent(
-                            getSortedPaging(offset, limit, Sort.by("time").descending())
-                    ).toList()
-            );
+            Page<Post> posts = postsRepository.findAllPostsSortedByRecent(
+                    getSortedPaging(offset, limit, Sort.by("time").descending()));
+            settersPostsResponse(postsResponse, posts);
+
         } else {
-            postsList.addAll(postsRepository.findPostsBySearch(
-                            getPaging(offset, limit), query)
-                    .toList()
-            );
+            Page<Post> posts = postsRepository.findPostsBySearch(
+                    getPaging(offset, limit), query);
+            settersPostsResponse(postsResponse, posts);
         }
 
-        List<PostsDTO> postsDTOList = toPostDTOList(postsList);
-
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);
 
         return postsResponse;
     }
@@ -66,84 +64,45 @@ public class PostsService {
 
     public PostsResponse getPosts(int offset, int limit, String mode) {
         PostsResponse postsResponse = new PostsResponse();
-        List<Post> postsList = new ArrayList<>();
-
 
         if (mode.equals("recent")) {
-            postsList.addAll(
-                    postsRepository.findAllPostsSortedByRecent(
-                            getSortedPaging(offset, limit, Sort.by("time").descending())
-                    ).toList()
-            );
+            Page<Post> posts = postsRepository
+                    .findAllPostsSortedByRecent(getSortedPaging(offset, limit, Sort.by("time").descending()));
+            settersPostsResponse(postsResponse, posts);
         }
+
 
         if (mode.equals("early")) {
-            postsList.addAll(
-                    postsRepository.findAllPostsSortedByRecent(
-                            getSortedPaging(offset, limit, Sort.by("time").ascending())
-                    ).toList()
-            );
+            Page<Post> posts = postsRepository
+                    .findAllPostsSortedByRecent(getSortedPaging(offset, limit, Sort.by("time").ascending()));
+            settersPostsResponse(postsResponse, posts);
         }
+
 
         if (mode.equals("popular")) {
-            postsList.addAll(
-                    postsRepository.findAllPostOrderByComments(
-                            getPaging(offset, limit)).toList()
-            );
+            Page<Post> posts = postsRepository
+                    .findAllPostOrderByComments(getPaging(offset, limit));
+            settersPostsResponse(postsResponse, posts);
         }
+
 
         if (mode.equals("best")) {
-            postsList.addAll(
-                    postsRepository.findAllPostOrderByLikes(
-                            getPaging(offset, limit)
-                    ).toList()
-            );
+            Page<Post> posts = postsRepository
+                    .findAllPostOrderByLikes(getPaging(offset, limit));
+            settersPostsResponse(postsResponse, posts);
         }
 
-        List<PostsDTO> postsDTOList = toPostDTOList(postsList);
-
-        postsResponse.setCount(390);
-        postsResponse.setPostsDTO(postsDTOList);
         return postsResponse;
     }
 
-    private List<PostsDTO> toPostDTOList(List<Post> postsList) {
-
-        List<PostsDTO> postsDTOList = new ArrayList<>();
-
-        for (int a = 0; a < postsList.size(); a++) {
-            Post post = postsList.get(a);
-            int postId = post.getId();
-            PostsDTO postsDTO = new PostsDTO();
-
-            postsDTO.setId(postId);
-            long times = post.getTime().getTime().getTime() / 1000; //на 3 часа отстают, потом додумать
-            postsDTO.setTimeStamp(times);
-
-            UserDTO userDTO = new UserDTO();
-            Optional<User> optionalUser = userRepository.findUserById(post.getUserId().getId());
-
-            userDTO.setName(optionalUser.get().getName());
-            userDTO.setId(optionalUser.get().getId());
-            postsDTO.setUserDTO(userDTO);
-
-            postsDTO.setTitle(post.getTitle());
-            postsDTO.setAnnounce(post.getText());
-
-            Integer likes = postsRepository.countOfLikesPerPost(postId);
-            Integer disLikes = postsRepository.countOfDisLikesPerPost(postId);
-            Integer commentsCount = postsRepository.countOfCommentsPerComments(postId);
-
-            postsDTO.setLikeCount(likes != null ? likes : 0);
-            postsDTO.setDislikeCount(disLikes != null ? disLikes : 0);
-            postsDTO.setCommentCount(commentsCount != null ? commentsCount : 0);
-            postsDTO.setViewCount(post.getViewCount());
-
-            postsDTOList.add(postsDTO);
-        }
-
-        return postsDTOList;
+    private void settersPostsResponse(PostsResponse postsResponse, Page<Post> posts) {
+        postsResponse.setPostsDTO(posts
+                .stream()
+                .map(postMapper::toPostDTO)
+                .collect(Collectors.toList()));
+        postsResponse.setCount(posts.getTotalElements());
     }
+
 
     public Pageable getPaging(int offset, int limit) {
 
@@ -187,38 +146,23 @@ public class PostsService {
 
     public PostsResponse getPostByDate(int offset, int limit, String date) {
         PostsResponse postsResponse = new PostsResponse();
-
-        List<PostsDTO> postsDTOList = toPostDTOList(
-                postsRepository.findPostsByDate(getPaging(offset, limit), date).toList()
-        );
-
-        postsResponse.setCount(postsDTOList.size());
-        postsResponse.setPostsDTO(postsDTOList);
-
+        Page<Post> posts = postsRepository.findPostsByDate(getPaging(offset, limit), date);
+        settersPostsResponse(postsResponse, posts);
         return postsResponse;
-
     }
 
     public PostsResponse getPostByTag(int offset, int limit, String tag) {
         PostsResponse postsResponse = new PostsResponse();
-
         int tagId = tagRepository.findTagIdByName(tag);
 
-        List<PostsDTO> postsDTOList = toPostDTOList(
-                postsRepository.findPostsByTagId(getPaging(offset, limit), tagId).toList()
-        );
-
-        postsResponse.setCount(postsDTOList.size());
-        postsResponse.setPostsDTO(postsDTOList);
+        Page<Post> posts = postsRepository.findPostsByTagId(getPaging(offset, limit), tagId);
+        settersPostsResponse(postsResponse, posts);
 
         return postsResponse;
-
     }
 
     public PostsIdResponse getPostById(int id) {
-        Post post = new Post();
-        PostsIdResponse postsIdResponse = new PostsIdResponse();
-
+        Post post;
         try {
             post = postsRepository.findPostsById(id).get();
         } catch (NoSuchElementException n) {
@@ -226,71 +170,48 @@ public class PostsService {
             return null; //Если поста с данным id не существует, то возвращаем null, и контроллер выдаст HttpStatus.NOT_FOUND
         }
 
-
-        int postId = post.getId();
-        long times = post.getTime().getTime().getTime() / 1000; //на 3 часа отстают, потом додумать
-        boolean isActive = post.getIsActive() == 1 ? true : false;
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(post.getUserId().getId());
-        userDTO.setName(post.getUserId().getName());
-        String title = post.getTitle();
-        String text = post.getText();
-        Integer likeCount = postsRepository.countOfLikesPerPost(postId);
-        Integer disLikeCount = postsRepository.countOfDisLikesPerPost(postId);
-        Integer viewCount = post.getViewCount();
-        List<PostComments> commentsList = post.getPostCommentsList();
-        List<Tag> tagsList = post.getTagList();
-
-        /*Если модератор авторизован, то не считаем его просмотры вообще
-           Если автор авторизован, то не считаем просмотры своих же публикаций
-           Это пока не сделал*/
-        List<CommentDTO> comments = new ArrayList<>();
-        for (PostComments comment : commentsList) {
-            CommentDTO commentDTO = new CommentDTO();
-
-            int commentId = comment.getId();
-            long commentTimeStamp = comment.getTime().getTime() / 1000;
-            String commentText = comment.getText();
-
-            UserCommentDTO userCommentDTO = new UserCommentDTO();
-            int userId = comment.getUserId().getId();
-            String userName = comment.getUserId().getName();
-            String userPhoto = comment.getUserId().getPhoto();
-            userCommentDTO.setId(userId);
-            userCommentDTO.setName(userName);
-            userCommentDTO.setPhoto(userPhoto);
-
-            commentDTO.setId(commentId);
-            commentDTO.setTimestamp(commentTimeStamp);
-            commentDTO.setText(commentText);
-            commentDTO.setUser(userCommentDTO);
-
-            comments.add(commentDTO);
-        }
-
-
-        List<String> tags = new ArrayList<>();
-
-        for (Tag tag : tagsList) {
-            String tagName = tag.getName();
-            tags.add(tagName);
-        }
-
-        postsIdResponse.setId(postId);
-        postsIdResponse.setTimeStamp(times);
-        postsIdResponse.setActive(isActive);
-        postsIdResponse.setUserDTO(userDTO);
-        postsIdResponse.setTitle(title);
-        postsIdResponse.setText(text);
-        postsIdResponse.setLikeCount(likeCount != null ? likeCount : 0);
-        postsIdResponse.setDislikeCount(disLikeCount != null ? disLikeCount : 0);
-        postsIdResponse.setViewCount(viewCount);
-        postsIdResponse.setComments(comments);
-        postsIdResponse.setTags(tags);
-
-
-        return postsIdResponse;
+        return postMapper.toPostResponseById(post);
     }
+
+    public PostsResponse getMyPosts(int offset, int limit, String status){
+        PostsResponse postsResponse = new PostsResponse();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
+        Sort sort = Sort.by("time").descending();
+
+        if (status.equals("inactive")) {
+            Page<Post> posts = postsRepository
+                    .findStatusInactiveByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
+        }
+
+        if (status.equals("pending")) {
+            Page<Post> posts = postsRepository
+                    .findStatusPendingByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
+        }
+
+        if (status.equals("declined")){
+            Page<Post> posts = postsRepository
+                    .findStatusDeclinedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
+        }
+
+        if (status.equals("published")){
+            Page<Post> posts = postsRepository
+                    .findStatusPublishedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
+        }
+
+        return postsResponse;
+    }
+
+
 
 
 }
