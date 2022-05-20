@@ -20,6 +20,8 @@ public class CheckService {
     }
 
     public LoginResponse getLoginResponse(String email) {
+
+
         main.model.User currentUser = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
         UserLoginDTO userLoginDTO = new UserLoginDTO();
         userLoginDTO.setEmail(currentUser.getEmail());

@@ -55,6 +55,7 @@ public class TagsService {
             tagsDTO.setWeight(weightTag);
             tagsDTOList.add(tagsDTO);
 
+
         }
 
 

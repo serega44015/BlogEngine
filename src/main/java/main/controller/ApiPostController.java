@@ -2,7 +2,6 @@ package main.controller;
 
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
-import main.model.Post;
 import main.service.PostsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

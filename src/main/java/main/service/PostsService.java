@@ -5,7 +5,7 @@ import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
 import main.mappers.PostCommentsMapper;
 import main.mappers.PostMapper;
-import main.model.*;
+import main.model.Post;
 import main.model.repositories.PostRepository;
 import main.model.repositories.TagRepository;
 import main.model.repositories.UserRepository;
@@ -19,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -176,19 +178,35 @@ public class PostsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
-
-        List<Post> postList = new ArrayList<>();
-
+        Sort sort = Sort.by("time").descending();
 
         if (status.equals("inactive")) {
-        postList = currentUser.getUserPosts().stream().filter(p-> p.getIsActive() == 0).collect(Collectors.toList());
-//            Page<Post> posts = postsRepository
-//                    .findAllPostsSortedByRecent(getSortedPaging(offset, limit, Sort.by("time").descending()));
-
+            Page<Post> posts = postsRepository
+                    .findStatusInactiveByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
         }
 
-        //settersPostsResponse(postsResponse, postList);
+        if (status.equals("pending")) {
+            Page<Post> posts = postsRepository
+                    .findStatusPendingByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
+        }
 
+        if (status.equals("declined")){
+            Page<Post> posts = postsRepository
+                    .findStatusDeclinedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
+        }
+
+        if (status.equals("published")){
+            Page<Post> posts = postsRepository
+                    .findStatusPublishedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
+            postsResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postsResponse, posts);
+        }
 
         return postsResponse;
     }

@@ -1,9 +1,11 @@
 package main.controller;
 
-import main.dto.UserLoginDTO;
 import main.dto.api.request.LoginRequest;
 import main.dto.api.request.RegisterRequest;
-import main.dto.api.response.*;
+import main.dto.api.response.CaptchaResponse;
+import main.dto.api.response.LoginResponse;
+import main.dto.api.response.LogoutResponse;
+import main.dto.api.response.RegisterResponse;
 import main.model.repositories.UserRepository;
 import main.service.CaptchaService;
 import main.service.CheckService;
@@ -16,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -40,11 +41,6 @@ public class ApiAuthController {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
     }
-
-//    @GetMapping("/check")
-//    public CheckResponse check() {
-//        return checkService.getResult();
-//    }
 
     @GetMapping("/check")
     public ResponseEntity<LoginResponse> check(Principal principal) {
@@ -72,12 +68,11 @@ public class ApiAuthController {
         SecurityContextHolder.getContext().setAuthentication(auth);
         User user = (User) auth.getPrincipal();
 
-
-
         return ResponseEntity.ok(checkService.getLoginResponse(user.getUsername()));
     }
 
     @GetMapping("/logout")
+    @PreAuthorize("hasAuthority('user:write')")
     public LogoutResponse logout(){
         LogoutResponse logoutResponse = new LogoutResponse();
         logoutResponse.setResult(true);
