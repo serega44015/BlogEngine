@@ -8,14 +8,12 @@ import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
 import main.mappers.PostCommentsMapper;
 import main.mappers.PostMapper;
+import main.model.GlobalSetting;
 import main.model.Post;
 import main.model.Tag;
 import main.model.Tag2Post;
 import main.model.enums.ModerationStatus;
-import main.model.repositories.PostRepository;
-import main.model.repositories.Tag2PostRepository;
-import main.model.repositories.TagRepository;
-import main.model.repositories.UserRepository;
+import main.model.repositories.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,15 +36,17 @@ public class PostsService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final Tag2PostRepository tag2PostRepository;
+    private final GlobalSettingRepository globalSettingRepository;
     private final PostMapper postMapper = PostMapper.INSTANCE;
     private final PostCommentsMapper commentsMapper = PostCommentsMapper.INSTANCE;
     private final AuthenticationManager authenticationManager;
 
-    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, Tag2PostRepository tag2PostRepository, AuthenticationManager authenticationManager) {
+    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, Tag2PostRepository tag2PostRepository, GlobalSettingRepository globalSettingRepository, AuthenticationManager authenticationManager) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
         this.tag2PostRepository = tag2PostRepository;
+        this.globalSettingRepository = globalSettingRepository;
         this.authenticationManager = authenticationManager;
     }
 
@@ -273,9 +273,15 @@ public class PostsService {
 
         Post post = new Post();
 
+        GlobalSetting postPremoderation = globalSettingRepository.findByCode("POST_PREMODERATION");
+        if (postPremoderation.getValue().equals("YES")) {
+            post.setModerationStatus(ModerationStatus.NEW);
+        } else {
+            post.setModerationStatus(ModerationStatus.ACCEPTED);
+        }
 
-        Calendar time = Calendar.getInstance();
-        time.setTimeInMillis(newPostRequest.getTimestamp());
+        Calendar time = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        time.setTimeInMillis(newPostRequest.getTimestamp() * 1000);
         post.setTime(time);
         post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
         post.setModeratorId(currentUser.getIsModerator());
@@ -283,15 +289,16 @@ public class PostsService {
         post.setTime(time);
         post.setTitle(title);
         post.setText(text);
+        postsRepository.save(post);
         post.setTagList(lookTag(newPostRequest.getTags(), post));
-
-
+        postsRepository.save(post);
         newPostsResponse.setErrors(errorsNewPostDTO);
         return newPostsResponse;
     }
 
 
     private List<Tag> lookTag(List<String> tags, Post post) {
+        //TODO после настройки модерации поправить теги. Посмотреть, как они сохраняются в базу и узнать, попадают ли они все на пост
         List<Tag> tagList = new ArrayList<>();
 
         for (String tagName : tags) {
@@ -299,6 +306,7 @@ public class PostsService {
             if (tagOpt.isEmpty()) {
                 Tag tag = new Tag();
                 tag.setName(tagName);
+                //TODO мб в else тоже нужен tagList.add
                 tagList.add(tag);
             } else {
                 Tag repoTag = tagOpt.get();
