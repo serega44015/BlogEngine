@@ -42,7 +42,7 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
 
-    @Column(name = "view_count", nullable = false, columnDefinition = "INT")
+    @Column(name = "view_count", columnDefinition = "INT")
     private int viewCount;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)

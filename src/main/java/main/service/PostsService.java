@@ -1,12 +1,19 @@
 package main.service;
 
+import main.dto.ErrorsNewPostDTO;
+import main.dto.api.request.NewPostRequest;
 import main.dto.api.response.CalendarResponse;
+import main.dto.api.response.NewPostResponse;
 import main.dto.api.response.PostsIdResponse;
 import main.dto.api.response.PostsResponse;
 import main.mappers.PostCommentsMapper;
 import main.mappers.PostMapper;
 import main.model.Post;
+import main.model.Tag;
+import main.model.Tag2Post;
+import main.model.enums.ModerationStatus;
 import main.model.repositories.PostRepository;
+import main.model.repositories.Tag2PostRepository;
 import main.model.repositories.TagRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.data.domain.Page;
@@ -18,10 +25,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.TreeSet;
+import java.security.Principal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,14 +37,16 @@ public class PostsService {
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final Tag2PostRepository tag2PostRepository;
     private final PostMapper postMapper = PostMapper.INSTANCE;
     private final PostCommentsMapper commentsMapper = PostCommentsMapper.INSTANCE;
     private final AuthenticationManager authenticationManager;
 
-    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, AuthenticationManager authenticationManager) {
+    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, Tag2PostRepository tag2PostRepository, AuthenticationManager authenticationManager) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
+        this.tag2PostRepository = tag2PostRepository;
         this.authenticationManager = authenticationManager;
     }
 
@@ -173,7 +182,7 @@ public class PostsService {
         return postMapper.toPostResponseById(post);
     }
 
-    public PostsResponse getMyPosts(int offset, int limit, String status){
+    public PostsResponse getMyPosts(int offset, int limit, String status) {
         PostsResponse postsResponse = new PostsResponse();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -194,14 +203,14 @@ public class PostsService {
             settersPostsResponse(postsResponse, posts);
         }
 
-        if (status.equals("declined")){
+        if (status.equals("declined")) {
             Page<Post> posts = postsRepository
                     .findStatusDeclinedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
             postsResponse.setCount(posts.getTotalElements());
             settersPostsResponse(postsResponse, posts);
         }
 
-        if (status.equals("published")){
+        if (status.equals("published")) {
             Page<Post> posts = postsRepository
                     .findStatusPublishedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
             postsResponse.setCount(posts.getTotalElements());
@@ -211,7 +220,97 @@ public class PostsService {
         return postsResponse;
     }
 
+    public PostsResponse getModerationPost(int offset, int limit, String status) {
+        PostsResponse postsResponse = new PostsResponse();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
 
+        ModerationStatus moderationStatus = ModerationStatus.NEW;
+        if (status.equals("accepted")) {
+            moderationStatus = ModerationStatus.ACCEPTED;
+        }
+
+        if (status.equals("declined")) {
+            moderationStatus = ModerationStatus.DECLINED;
+        }
+
+        Page<Post> posts = postsRepository
+                .findModeratedPost(currentUser.getId(), moderationStatus,
+                        getSortedPaging(offset, limit, Sort.by("time").descending()));
+
+        postsResponse.setCount(posts.getTotalElements());
+        settersPostsResponse(postsResponse, posts);
+
+        return postsResponse;
+    }
+
+    public NewPostResponse addNewPost(@RequestBody NewPostRequest newPostRequest, Principal principal) {
+        Integer MIN_TITLE_LENGTH = 3;
+        Integer MIN_TEXT_LENGTH = 10;
+        NewPostResponse newPostsResponse = new NewPostResponse();
+        //TODO сделать, чтобы не возвращал Optional, а просто User
+        main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+        ErrorsNewPostDTO errorsNewPostDTO = new ErrorsNewPostDTO();
+
+        System.out.println(newPostRequest.getTitle());
+        System.out.println(newPostRequest.getActive());
+        System.out.println(newPostRequest.getTags().toString());
+        System.out.println(newPostRequest.getText());
+        System.out.println(newPostRequest.getTimestamp());
+        System.out.println("____________________________");
+
+        String title = newPostRequest.getTitle();
+        String text = newPostRequest.getText();
+        newPostsResponse.setResult(false);
+        if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
+            errorsNewPostDTO.setTitle("Заголовок не установлен");
+        } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
+            errorsNewPostDTO.setText("Текст публикации слишком короткий");
+        } else {
+            newPostsResponse.setResult(true);
+        }
+
+        Post post = new Post();
+
+
+        Calendar time = Calendar.getInstance();
+        time.setTimeInMillis(newPostRequest.getTimestamp());
+        post.setTime(time);
+        post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
+        post.setModeratorId(currentUser.getIsModerator());
+        post.setUser(currentUser);
+        post.setTime(time);
+        post.setTitle(title);
+        post.setText(text);
+        post.setTagList(lookTag(newPostRequest.getTags(), post));
+
+
+        newPostsResponse.setErrors(errorsNewPostDTO);
+        return newPostsResponse;
+    }
+
+
+    private List<Tag> lookTag(List<String> tags, Post post) {
+        List<Tag> tagList = new ArrayList<>();
+
+        for (String tagName : tags) {
+            Optional<Tag> tagOpt = tagRepository.findTagByName(tagName);
+            if (tagOpt.isEmpty()) {
+                Tag tag = new Tag();
+                tag.setName(tagName);
+                tagList.add(tag);
+            } else {
+                Tag repoTag = tagOpt.get();
+                Tag2Post tag2Post = new Tag2Post();
+                tag2Post.setTagId(repoTag.getId());
+                tag2Post.setPostId(post.getId());
+                tag2PostRepository.save(tag2Post);
+            }
+        }
+
+        return tagList;
+    }
 
 
 }

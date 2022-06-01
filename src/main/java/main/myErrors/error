@@ -1,2 +1,5 @@
 1. PostCommentsMapper - не устанавливается время в комменты. Возвращает long норм,
 но в PostCommentsMapper = {DateConverter.class, UserMapper.class}) не прописываются в PostCommentsMapperImpl как final файлы
+2. Поменять везде примитивы на классы
+3. не Posts - а Post
+

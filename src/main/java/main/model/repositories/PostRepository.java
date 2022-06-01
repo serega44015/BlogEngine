@@ -2,6 +2,7 @@ package main.model.repositories;
 
 import main.model.Post;
 import main.model.User;
+import main.model.enums.ModerationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -139,5 +140,17 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.user.id = :userId " +
             "GROUP BY p.id")
     Page<Post> findStatusPublishedByPosts(@Param("userId") Integer userId, Pageable pageable);
+
+    @Query("SELECT p FROM Post p " +
+            "LEFT JOIN User u ON u.id = p.user.id " +
+            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = :status AND p.moderatorId = :id " +
+            "GROUP BY p.id")
+    Page<Post> findModeratedPost(@Param("id") int id, @Param("status") ModerationStatus status,
+                                  Pageable pageable);
+
+
 
 }
