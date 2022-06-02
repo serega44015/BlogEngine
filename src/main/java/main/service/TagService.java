@@ -6,28 +6,76 @@ import main.model.Tag;
 import main.model.repositories.PostRepository;
 import main.model.repositories.Tag2PostRepository;
 import main.model.repositories.TagRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+//@Service
+//public class TagService {
+//    private final TagRepository tagRepository;
+//
+//
+//    public TagService(TagRepository tagRepository) {
+//        this.tagRepository = tagRepository;
+//    }
+//
+//    public TagsResponse getTags(String query) {
+//
+//        List<Tag> tagList = tagRepository.findAll();
+//        TagsResponse tagsResponse = new TagsResponse();
+//        List<TagsDTO> finishTagList = new ArrayList<>();
+//
+//        if (tagList.size() > 0) {
+//            Tag popularTag = tagList.stream().max(Comparator.comparing(t -> t.getPostWithTags().size())).get();
+//            int tagsCount = tagList.size();
+//            System.out.println(popularTag.getName());
+//            System.out.println(popularTag.getPostWithTags().size());
+//            System.out.println(tagsCount);
+//            double k = 1.0 / (popularTag.getPostWithTags().size() / tagsCount);
+//            if (query == null) {
+//                tagList.forEach(t -> {
+//                    TagsDTO tagDto = new TagsDTO();
+//                    tagDto.setName(t.getName());
+//                    tagDto.setWeight(t.getPostWithTags().size() / tagsCount * k);
+//                    finishTagList.add(tagDto);
+//                });
+//            } else {
+//                tagList.forEach(t -> {
+//                    if (t.getName().equals(query)) {
+//                        TagsDTO tagDto = new TagsDTO();
+//                        tagDto.setName(t.getName());
+//                        tagDto.setWeight((double) Math.round(t.getPostWithTags().size() / tagsCount * k));
+//                        finishTagList.add(tagDto);
+//                    }
+//                });
+//            }
+//            tagsResponse.setTags(finishTagList);
+//        }
+//        return tagsResponse;
+//    }
+//}
+
+
+
 
 @Service
-public class TagsService {
+public class TagService {
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
     private final Tag2PostRepository tag2PostRepository;
 
-    public TagsService(TagRepository tagRepository, PostRepository postRepository, Tag2PostRepository tag2PostRepository) {
+    public TagService(TagRepository tagRepository, PostRepository postRepository, Tag2PostRepository tag2PostRepository) {
         this.tagRepository = tagRepository;
         this.postRepository = postRepository;
         this.tag2PostRepository = tag2PostRepository;
     }
 
-    public TagsResponse getTags(String tagName) {
+    public TagsResponse getTags() {
         TagsResponse tagsResponse = new TagsResponse();
 
         List<TagsDTO> tagsDTOList = toDTOTags();
-        tagsResponse.setTagsDTO(tagsDTOList);
+        tagsResponse.setTags(tagsDTOList);
         return tagsResponse;
     }
 
@@ -61,5 +109,6 @@ public class TagsService {
 
         return tagsDTOList;
     }
+
 
 }

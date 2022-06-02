@@ -1,35 +1,47 @@
 package main.controller;
 
-import main.dto.api.response.CalendarResponse;
-import main.dto.api.response.InitResponse;
-import main.dto.api.response.SettingsResponse;
-import main.dto.api.response.TagsResponse;
+import main.dto.api.request.CommentRequest;
+import main.dto.api.request.SettingsRequest;
+import main.dto.api.response.*;
+import main.service.CommentService;
 import main.service.PostsService;
-import main.service.SettingsService;
-import main.service.TagsService;
+import main.service.SettingService;
+import main.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
 public class ApiGeneralController {
 
-    private final SettingsService settingsService;
+    private final SettingService settingService;
     private final InitResponse initResponse;
-    private final TagsService tagsService;
+    private final TagService tagService;
     private final PostsService postsService;
+    private final CommentService commentService;
 
     @Autowired
-    public ApiGeneralController(SettingsService settingsService, InitResponse initResponse, TagsService tagsService, PostsService postsService) {
-        this.settingsService = settingsService;
+    public ApiGeneralController(SettingService settingService, InitResponse initResponse, TagService tagService, PostsService postsService, CommentService commentService) {
+        this.settingService = settingService;
         this.initResponse = initResponse;
-        this.tagsService = tagsService;
+        this.tagService = tagService;
         this.postsService = postsService;
+        this.commentService = commentService;
     }
 
     @GetMapping("/settings")
     private SettingsResponse settings() {
-        return settingsService.getInitGlobalSettings();
+        return settingService.getSetting();
+    }
+
+    @PutMapping("/settings")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    public void changeSettings(@RequestBody SettingsRequest settingsRequest) {
+        settingService.putSetting(settingsRequest);
     }
 
     @GetMapping("/init")
@@ -38,10 +50,10 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/tag")
-    private TagsResponse tags(
-            @RequestParam(value = "query", defaultValue = "") String tagName) {
-        return tagsService.getTags(tagName);
+    public TagsResponse tag(@PathVariable @Nullable String query) {
+        return tagService.getTags();
     }
+
 
     @GetMapping("calendar")
     private CalendarResponse calendar(
@@ -49,6 +61,14 @@ public class ApiGeneralController {
 
         return postsService.getPostByYear(year);
     }
+
+    @PostMapping("/comment")
+    @PreAuthorize("hasAuthority('user:write')")
+    public CommentResponse comment(@RequestBody CommentRequest commentRequest, Principal principal) {
+        System.out.println("Заходим?");
+        return commentService.postComment(commentRequest, principal);
+    }
+
 
 
 

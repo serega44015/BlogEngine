@@ -8,7 +8,6 @@ import java.util.List;
 @Data
 public class TagsResponse {
 
-    @JsonProperty("tags")
-    private List<TagsDTO> tagsDTO;
+    private List<TagsDTO> tags;
 
 }

@@ -173,7 +173,7 @@ public class PostsService {
     public PostsIdResponse getPostById(int id) {
         Post post;
         try {
-            post = postsRepository.findPostsById(id).get();
+            post = postsRepository.findPostById(id);
         } catch (NoSuchElementException n) {
             n.getMessage();
             return null; //Если поста с данным id не существует, то возвращаем null, и контроллер выдаст HttpStatus.NOT_FOUND
@@ -253,13 +253,6 @@ public class PostsService {
         main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
         ErrorsNewPostDTO errorsNewPostDTO = new ErrorsNewPostDTO();
 
-        System.out.println(newPostRequest.getTitle());
-        System.out.println(newPostRequest.getActive());
-        System.out.println(newPostRequest.getTags().toString());
-        System.out.println(newPostRequest.getText());
-        System.out.println(newPostRequest.getTimestamp());
-        System.out.println("____________________________");
-
         String title = newPostRequest.getTitle();
         String text = newPostRequest.getText();
         newPostsResponse.setResult(false);
@@ -296,6 +289,61 @@ public class PostsService {
         return newPostsResponse;
     }
 
+    public NewPostResponse updatePost(Integer id, NewPostRequest newPostRequest, Principal principal) {
+        //TODO убрать эти колхозные методы, сделать мапперы, из репозиториев нормально дёргаать
+        // и попробовать соеденить с addNewPost, большинство одинаковой реализации
+        Integer MIN_TITLE_LENGTH = 3;
+        Integer MIN_TEXT_LENGTH = 10;
+        NewPostResponse newPostsResponse = new NewPostResponse();
+        //TODO сделать, чтобы не возвращал Optional, а просто User
+        main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+        ErrorsNewPostDTO errorsNewPostDTO = new ErrorsNewPostDTO();
+
+        String title = newPostRequest.getTitle();
+        String text = newPostRequest.getText();
+
+
+        newPostsResponse.setResult(false);
+        if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
+            errorsNewPostDTO.setTitle("Заголовок не установлен");
+        } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
+            errorsNewPostDTO.setText("Текст публикации слишком короткий");
+        } else {
+            newPostsResponse.setResult(true);
+        }
+
+        Post post = postsRepository.findPostById(id);
+        Calendar time = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        post.setId(post.getId());
+        post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
+        post.setTitle(title);
+        post.setText(text);
+        post.setUser(currentUser);
+        post.setTagList(lookTag(newPostRequest.getTags(), post));
+        post.setModeratorId(currentUser.getIsModerator());
+
+        Long calendarTime = time.getTimeInMillis();
+        Long requestTime = newPostRequest.getTimestamp() * 1000;
+        if (requestTime > calendarTime){
+            time.setTimeInMillis(requestTime);
+        } else {
+            time.setTimeInMillis(calendarTime);
+        }
+        post.setTime(time);
+
+        boolean isAuthor = currentUser.getName().equals(post.getUser().getName());
+        boolean isModerator = currentUser.getIsModerator() == 1;
+        if (isAuthor) {
+            post.setModerationStatus(ModerationStatus.NEW);
+        }
+        if (isModerator) {
+            post.setModerationStatus(post.getModerationStatus());
+        }
+        postsRepository.save(post);
+        newPostsResponse.setErrors(errorsNewPostDTO);
+
+        return newPostsResponse;
+    }
 
     private List<Tag> lookTag(List<String> tags, Post post) {
         //TODO после настройки модерации поправить теги. Посмотреть, как они сохраняются в базу и узнать, попадают ли они все на пост

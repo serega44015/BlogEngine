@@ -105,6 +105,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
             "GROUP BY p.id")
     Optional<Post> findPostsById(@Param("id") Integer id);
 
+    Post findPostById(Integer id);
+
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
             "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +

@@ -63,7 +63,6 @@ public class ApiPostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PostsIdResponse> postById(@PathVariable("id") int id) throws NoSuchElementException {
-
         PostsIdResponse postsIdResponse = postsService.getPostById(id);
         if (postsIdResponse == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -94,9 +93,17 @@ public class ApiPostController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('user:moderate')")
-    public ResponseEntity<NewPostResponse> newPost(@RequestBody NewPostRequest newPostRequest, Principal principal){
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<NewPostResponse> newPost(@RequestBody NewPostRequest newPostRequest, Principal principal) {
         return new ResponseEntity<>(postsService.addNewPost(newPostRequest, principal), HttpStatus.OK);
     }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<NewPostResponse> updatePost(@PathVariable int id, @RequestBody NewPostRequest newPostRequest, Principal principal) {
+        return new ResponseEntity<>(postsService.updatePost(id, newPostRequest, principal), HttpStatus.OK);
+    }
+
+
 
 }

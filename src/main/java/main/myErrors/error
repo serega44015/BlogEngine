@@ -2,4 +2,5 @@
 но в PostCommentsMapper = {DateConverter.class, UserMapper.class}) не прописываются в PostCommentsMapperImpl как final файлы
 2. Поменять везде примитивы на классы
 3. не Posts - а Post
+4. Загрузка изображений - POST /api/image пропустил пока что
 
