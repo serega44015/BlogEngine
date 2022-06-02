@@ -9,8 +9,8 @@ import org.mapstruct.factory.Mappers;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-02T16:05:07+0300",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.15 (Amazon.com Inc.)"
+    date = "2022-06-02T18:27:06+0300",
+    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.14 (Amazon.com Inc.)"
 )
 public class PostMapperImpl implements PostMapper {
 

@@ -1,9 +1,9 @@
 package main.service;
 
+
 import main.dto.api.request.SettingsRequest;
-import main.dto.api.response.SettingsResponse;
+import main.dto.api.response.GlobalSettingsResponse;
 import main.model.repositories.GlobalSettingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,8 +15,9 @@ public class SettingService {
         this.globalSettingRepository = globalSettingRepository;
     }
 
-    public SettingsResponse getSetting() {
-        SettingsResponse settingResponse = new SettingsResponse();
+    public GlobalSettingsResponse getSettings() {
+
+        GlobalSettingsResponse settingResponse = new GlobalSettingsResponse();
         if (globalSettingRepository.findById(1).get().getValue().equals("YES")) {
             settingResponse.setMultimuserMode(true);
         }

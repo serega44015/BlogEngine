@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class SettingsResponse {
+public class GlobalSettingsResponse {
     @JsonProperty("MULTIUSER_MODE")
     private boolean multimuserMode;
 

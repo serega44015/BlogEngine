@@ -7,21 +7,18 @@ import main.model.repositories.PostRepository;
 @Data
 public class PostsDTO {
 
-    private int id;
+  private int id;
 
-    @JsonProperty("timestamp")
-    private long timeStamp;
+  @JsonProperty("timestamp")
+  private long timeStamp;
 
-    @JsonProperty("user")
-    private UserDTO userDTO;
-    private String title;
-    private String announce;
-    private int likeCount;
-    private int dislikeCount;
-    private int commentCount;
-    private int viewCount;
+  @JsonProperty("user")
+  private UserDTO userDTO;
 
-
-
-
+  private String title;
+  private String announce;
+  private int likeCount;
+  private int dislikeCount;
+  private int commentCount;
+  private int viewCount;
 }
