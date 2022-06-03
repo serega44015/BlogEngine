@@ -2,13 +2,12 @@ package main.controller;
 
 import main.dto.api.request.LoginRequest;
 import main.dto.api.request.RegisterRequest;
-import main.dto.api.response.CaptchaResponse;
-import main.dto.api.response.LoginResponse;
-import main.dto.api.response.LogoutResponse;
-import main.dto.api.response.RegisterResponse;
+import main.dto.api.request.RestoreRequest;
+import main.dto.api.response.*;
 import main.model.repositories.UserRepository;
 import main.service.CaptchaService;
 import main.service.CheckService;
+import main.service.EmailService;
 import main.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +29,16 @@ public class ApiAuthController {
     private final CheckService checkService;
     private final CaptchaService captchaService;
     private final RegisterService registerService;
+    private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
 
     @Autowired
-    public ApiAuthController(CheckService checkService, CaptchaService captchaService, RegisterService registerService, AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public ApiAuthController(CheckService checkService, CaptchaService captchaService, RegisterService registerService, EmailService emailService, AuthenticationManager authenticationManager, UserRepository userRepository) {
         this.checkService = checkService;
         this.captchaService = captchaService;
         this.registerService = registerService;
+        this.emailService = emailService;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
     }
@@ -73,16 +74,18 @@ public class ApiAuthController {
 
     @GetMapping("/logout")
     @PreAuthorize("hasAuthority('user:write')")
-    public LogoutResponse logout(){
+    public LogoutResponse logout() {
         LogoutResponse logoutResponse = new LogoutResponse();
         logoutResponse.setResult(true);
         SecurityContextHolder.getContext().setAuthentication(null);
         return logoutResponse;
     }
 
-
-
-
+    @PostMapping("/restore")
+    public PasswordRestoreResponse passwordRestore(@RequestBody RestoreRequest restoreRequest) {
+        System.out.println("А контролле?");
+        return emailService.restore(restoreRequest);
+    }
 
 
 }
