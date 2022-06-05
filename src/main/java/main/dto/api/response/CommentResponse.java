@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class CommentResponse {
 
-    private int id;
-    private boolean result;
-    private String text;
+  private Integer id;
+  private Boolean result;
+  private String text;
 }

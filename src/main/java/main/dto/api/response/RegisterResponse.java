@@ -2,14 +2,13 @@ package main.dto.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.dto.ErrorDTO;
+import main.dto.ErrorDto;
 
 @Data
 public class RegisterResponse {
 
-    private boolean result;
-    @JsonProperty("errors")
-    private ErrorDTO errorDTO;
+  private Boolean result;
 
-
+  @JsonProperty("errors")
+  private ErrorDto errorDTO;
 }

@@ -1,12 +1,12 @@
 package main.service;
 
-import main.dto.ErrorNewPostDTO;
+import main.dto.ErrorNewPostDto;
 import main.dto.api.request.NewPostRequest;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.NewPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
-import main.mappers.PostCommentsMapper;
+import main.mappers.PostCommentMapper;
 import main.mappers.PostMapper;
 import main.model.GlobalSetting;
 import main.model.Post;
@@ -38,7 +38,7 @@ public class PostService {
     private final Tag2PostRepository tag2PostRepository;
     private final GlobalSettingRepository globalSettingRepository;
     private final PostMapper postMapper = PostMapper.INSTANCE;
-    private final PostCommentsMapper commentsMapper = PostCommentsMapper.INSTANCE;
+    private final PostCommentMapper commentsMapper = PostCommentMapper.INSTANCE;
     private final AuthenticationManager authenticationManager;
 
     public PostService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, Tag2PostRepository tag2PostRepository, GlobalSettingRepository globalSettingRepository, AuthenticationManager authenticationManager) {
@@ -105,7 +105,7 @@ public class PostService {
     }
 
     private void settersPostsResponse(PostResponse postResponse, Page<Post> posts) {
-        postResponse.setPostsDTO(posts
+        postResponse.setPostDTO(posts
                 .stream()
                 .map(postMapper::toPostDTO)
                 .collect(Collectors.toList()));
@@ -251,7 +251,7 @@ public class PostService {
         NewPostResponse newPostsResponse = new NewPostResponse();
         //TODO сделать, чтобы не возвращал Optional, а просто User
         main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
-        ErrorNewPostDTO errorNewPostDTO = new ErrorNewPostDTO();
+        ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
 
         String title = newPostRequest.getTitle();
         String text = newPostRequest.getText();
@@ -297,7 +297,7 @@ public class PostService {
         NewPostResponse newPostsResponse = new NewPostResponse();
         //TODO сделать, чтобы не возвращал Optional, а просто User
         main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
-        ErrorNewPostDTO errorNewPostDTO = new ErrorNewPostDTO();
+        ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
 
         String title = newPostRequest.getTitle();
         String text = newPostRequest.getText();

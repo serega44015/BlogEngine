@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.ErrorDTO;
+import main.dto.ErrorDto;
 import main.dto.api.request.RegisterRequest;
 import main.dto.api.response.RegisterResponse;
 import main.model.User;
@@ -20,7 +20,7 @@ public class RegisterService {
 
     public RegisterResponse registration(RegisterRequest registerRequest) {
         RegisterResponse registerResponse = new RegisterResponse();
-        ErrorDTO errorDTO = new ErrorDTO();
+        ErrorDto errorDTO = new ErrorDto();
         User user = new User();
 
         String email = registerRequest.getEmail();

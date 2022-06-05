@@ -3,9 +3,9 @@ package main.service;
 import main.dto.api.request.LikeDislikeRequest;
 import main.dto.api.response.LikeDislikeResponse;
 import main.model.Post;
-import main.model.PostVotes;
+import main.model.PostVote;
 import main.model.repositories.PostRepository;
-import main.model.repositories.PostVotesRepository;
+import main.model.repositories.PostVoteRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,41 +18,41 @@ public class LikeDislikeService {
 
   private final UserRepository userRepository;
   private final PostRepository postRepository;
-  private final PostVotesRepository postVotesRepository;
+  private final PostVoteRepository postVoteRepository;
 
   public LikeDislikeService(
       UserRepository userRepository,
       PostRepository postRepository,
-      PostVotesRepository postVotesRepository) {
+      PostVoteRepository postVoteRepository) {
     this.userRepository = userRepository;
     this.postRepository = postRepository;
-    this.postVotesRepository = postVotesRepository;
+    this.postVoteRepository = postVoteRepository;
   }
 
   public LikeDislikeResponse getLikePost(LikeDislikeRequest likeRequest, Principal principal) {
     LikeDislikeResponse likeResponse = new LikeDislikeResponse();
     main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
     Post post = postRepository.findPostById(likeRequest.getPostId());
-    PostVotes postVotes = postVotesRepository.findByPostAndUserId(post, currentUser.getId());
+    PostVote postVote = postVoteRepository.findByPostAndUserId(post, currentUser.getId());
 
-    if (!Objects.isNull(postVotes) && postVotes.getValue() != 1) {
-      Integer voteUserId = postVotes.getUserId();
+    if (!Objects.isNull(postVote) && postVote.getValue() != 1) {
+      Integer voteUserId = postVote.getUserId();
       Integer currentUserId = currentUser.getId();
-      if ((voteUserId == currentUserId) && (postVotes.getValue() == -1)) {
-        postVotes.setValue(1);
-        postVotesRepository.save(postVotes);
+      if ((voteUserId == currentUserId) && (postVote.getValue() == -1)) {
+        postVote.setValue(1);
+        postVoteRepository.save(postVote);
         likeResponse.setResult(true);
       }
     }
 
-    if (Objects.isNull(postVotes)) {
-      postVotes = new PostVotes();
-      postVotes.setPost(post);
-      postVotes.setValue(1);
-      postVotes.setUserId(currentUser.getId());
-      postVotes.setTime(new Date());
+    if (Objects.isNull(postVote)) {
+      postVote = new PostVote();
+      postVote.setPost(post);
+      postVote.setValue(1);
+      postVote.setUserId(currentUser.getId());
+      postVote.setTime(new Date());
       likeResponse.setResult(true);
-      postVotesRepository.save(postVotes);
+      postVoteRepository.save(postVote);
       return likeResponse;
     }
 
@@ -64,26 +64,26 @@ public class LikeDislikeService {
     LikeDislikeResponse likeResponse = new LikeDislikeResponse();
     main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
     Post post = postRepository.findPostById(likeRequest.getPostId());
-    PostVotes postVotes = postVotesRepository.findByPostAndUserId(post, currentUser.getId());
+    PostVote postVote = postVoteRepository.findByPostAndUserId(post, currentUser.getId());
 
-    if (!Objects.isNull(postVotes) && postVotes.getValue() != -1) {
-      Integer voteUserId = postVotes.getUserId();
+    if (!Objects.isNull(postVote) && postVote.getValue() != -1) {
+      Integer voteUserId = postVote.getUserId();
       Integer currentUserId = currentUser.getId();
-      if ((voteUserId == currentUserId) && (postVotes.getValue() == 1)) {
-        postVotes.setValue(-1);
-        postVotesRepository.save(postVotes);
+      if ((voteUserId == currentUserId) && (postVote.getValue() == 1)) {
+        postVote.setValue(-1);
+        postVoteRepository.save(postVote);
         likeResponse.setResult(true);
       }
     }
 
-    if (Objects.isNull(postVotes)) {
-      postVotes = new PostVotes();
-      postVotes.setPost(post);
-      postVotes.setValue(-1);
-      postVotes.setUserId(currentUser.getId());
-      postVotes.setTime(new Date());
+    if (Objects.isNull(postVote)) {
+      postVote = new PostVote();
+      postVote.setPost(post);
+      postVote.setValue(-1);
+      postVote.setUserId(currentUser.getId());
+      postVote.setTime(new Date());
       likeResponse.setResult(true);
-      postVotesRepository.save(postVotes);
+      postVoteRepository.save(postVote);
       return likeResponse;
     }
 

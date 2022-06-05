@@ -1,12 +1,12 @@
 package main.dto.api.response;
 
 import lombok.Data;
-import main.dto.TagsDTO;
+import main.dto.TagDto;
+
 import java.util.List;
 
 @Data
 public class TagResponse {
 
-    private List<TagsDTO> tags;
-
+  private List<TagDto> tags;
 }

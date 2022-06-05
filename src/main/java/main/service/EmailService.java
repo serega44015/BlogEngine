@@ -6,9 +6,9 @@ import main.dto.api.request.ChangePasswordRequest;
 import main.dto.api.request.RestoreRequest;
 import main.dto.api.response.PasswordChangeResponse;
 import main.dto.api.response.PasswordRestoreResponse;
-import main.model.CaptchaCodes;
+import main.model.CaptchaCode;
 import main.model.User;
-import main.model.repositories.CaptchaCodesRepository;
+import main.model.repositories.CaptchaCodeRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,15 +20,15 @@ import java.util.UUID;
 @Service
 public class EmailService {
   private final UserRepository userRepository;
-  private final CaptchaCodesRepository captchaCodesRepository;
+  private final CaptchaCodeRepository captchaCodeRepository;
   private final MailSender mailSender;
 
   public EmailService(
       UserRepository userRepository,
-      CaptchaCodesRepository captchaCodesRepository,
+      CaptchaCodeRepository captchaCodeRepository,
       MailSender mailSender) {
     this.userRepository = userRepository;
-    this.captchaCodesRepository = captchaCodesRepository;
+    this.captchaCodeRepository = captchaCodeRepository;
     this.mailSender = mailSender;
   }
 
@@ -79,9 +79,9 @@ public class EmailService {
         errorPasswordChangeDto.setPassword("Пароль короче 6-ти символов");
       }
 
-      CaptchaCodes captchaCodes =
-          captchaCodesRepository.findByCode(changePasswordRequest.getCaptchaSecret());
-      if (checkCaptcha(changePasswordRequest.getCaptcha(), captchaCodes)){
+      CaptchaCode captchaCode =
+          captchaCodeRepository.findByCode(changePasswordRequest.getCaptchaSecret());
+      if (checkCaptcha(changePasswordRequest.getCaptcha(), captchaCode)){
           userRepository.save(user);
       } else {
         passwordChangeResponse.setResult(false);
@@ -93,7 +93,7 @@ public class EmailService {
     return passwordChangeResponse;
   }
 
-  private boolean checkCaptcha(String captcha, CaptchaCodes repoCaptcha) {
+  private boolean checkCaptcha(String captcha, CaptchaCode repoCaptcha) {
     Boolean check = true;
     Boolean captchaCorrect = captcha.equals(repoCaptcha.getCode());
 

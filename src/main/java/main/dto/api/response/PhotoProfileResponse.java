@@ -1,11 +1,11 @@
 package main.dto.api.response;
 
 import lombok.Data;
-import main.dto.ErrorProfilePhotoDTO;
+import main.dto.ErrorProfilePhotoDto;
 
 @Data
 public class PhotoProfileResponse {
 
-    private Boolean result;
-    private ErrorProfilePhotoDTO errors;
+  private Boolean result;
+  private ErrorProfilePhotoDto errors;
 }

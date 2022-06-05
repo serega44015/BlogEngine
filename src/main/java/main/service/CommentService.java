@@ -3,8 +3,8 @@ package main.service;
 import main.dto.api.request.CommentRequest;
 import main.dto.api.response.CommentResponse;
 import main.model.Post;
-import main.model.PostComments;
-import main.model.repositories.PostCommentsRepository;
+import main.model.PostComment;
+import main.model.repositories.PostCommentRepository;
 import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -20,15 +20,15 @@ public class CommentService {
 
   private final UserRepository userRepository;
   private final PostRepository postRepository;
-  private final PostCommentsRepository postCommentsRepository;
+  private final PostCommentRepository postCommentRepository;
 
   public CommentService(
       UserRepository userRepository,
       PostRepository postRepository,
-      PostCommentsRepository postCommentsRepository) {
+      PostCommentRepository postCommentRepository) {
     this.userRepository = userRepository;
     this.postRepository = postRepository;
-    this.postCommentsRepository = postCommentsRepository;
+    this.postCommentRepository = postCommentRepository;
   }
 
   public ResponseEntity<CommentResponse> postComment(
@@ -37,7 +37,7 @@ public class CommentService {
     main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
 
     CommentResponse commentResponse = new CommentResponse();
-    PostComments postComment = new PostComments();
+    PostComment postComment = new PostComment();
     int parentId = commentRequest.getParentId();
     int postId = commentRequest.getPostId();
     String commentText = commentRequest.getText();
@@ -57,7 +57,7 @@ public class CommentService {
     postComment.setUser(currentUser);
     postComment.setTime(currentTime);
     postComment.setText(commentText);
-    postCommentsRepository.save(postComment);
+    postCommentRepository.save(postComment);
     commentResponse.setId(postComment.getId());
 
     return new ResponseEntity<CommentResponse>(commentResponse, HttpStatus.OK);

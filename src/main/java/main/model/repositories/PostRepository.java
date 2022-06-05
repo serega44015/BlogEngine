@@ -29,7 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN User u ON p.user.id = u.id " +
-            "LEFT JOIN PostVotes pv1 ON  pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVote pv1 ON  pv1.post.id = p.id AND pv1.value = 1 " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(pv1.value) DESC")
@@ -37,7 +37,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN User u ON p.user.id = u.id " +
-            "LEFT JOIN PostComments pc1 ON pc1.post.id = p.id " +
+            "LEFT JOIN PostComment pc1 ON pc1.post.id = p.id " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(pc1.id) DESC")
@@ -52,18 +52,18 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p " +
-            "INNER JOIN PostVotes pv ON p.id = pv.post.id " +
+            "INNER JOIN PostVote pv ON p.id = pv.post.id " +
             "WHERE pv.value = 1 AND p.id = :postsId " +
             "GROUP BY p.id")
     Integer countOfLikesPerPost(@Param("postsId") Integer postsId);
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p " +
-            "INNER JOIN PostVotes pv ON p.id = pv.post.id " +
+            "INNER JOIN PostVote pv ON p.id = pv.post.id " +
             "WHERE pv.value = -1 AND p.id = :postsId " +
             "GROUP BY p.id")
     Integer countOfDisLikesPerPost(@Param("postsId") Integer postsId);
 
-    @Query(value = "SELECT COUNT(p.id) FROM Post p INNER JOIN PostComments pc ON p.id = pc.post.id WHERE p.id = :postsId GROUP BY p.id")
+    @Query(value = "SELECT COUNT(p.id) FROM Post p INNER JOIN PostComment pc ON p.id = pc.post.id WHERE p.id = :postsId GROUP BY p.id")
     Integer countOfCommentsPerComments(@Param("postsId") Integer postsId);
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p")
@@ -96,9 +96,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
-            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
+            "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComment pc ON pc.post.id = p.id " +
             "LEFT JOIN Tag2Post t2p ON t2p.postId = p.id " +
             "LEFT JOIN Tag tg ON tg.id = t2p.tagId " +
             "WHERE p.id = :id AND p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
@@ -109,45 +109,45 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
-            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
+            "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComment pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 0 AND p.user.id = :userId " +
             "GROUP BY p.id")
     Page<Post> findStatusInactiveByPosts(@Param("userId") Integer userId, Pageable pageable);
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
-            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
+            "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComment pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'NEW' AND p.user.id = :userId " +
             "GROUP BY p.id")
     Page<Post> findStatusPendingByPosts(@Param("userId") Integer userId, Pageable pageable);
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
-            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
+            "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComment pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'DECLINED' AND p.user.id = :userId " +
             "GROUP BY p.id")
     Page<Post> findStatusDeclinedByPosts(@Param("userId") Integer userId, Pageable pageable);
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
-            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
+            "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComment pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.user.id = :userId " +
             "GROUP BY p.id")
     Page<Post> findStatusPublishedByPosts(@Param("userId") Integer userId, Pageable pageable);
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
-            "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
+            "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostComment pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = :status AND p.moderatorId = :id " +
             "GROUP BY p.id")
     Page<Post> findModeratedPost(@Param("id") int id, @Param("status") ModerationStatus status,

@@ -3,7 +3,7 @@ package main.dto;
 import lombok.Data;
 
 @Data
-public class TagsDTO {
+public class TagDto {
 
     private String name;
     private Double weight;

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class PasswordRestoreResponse {
 
-    private Boolean result;
+  private Boolean result;
 }

@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class ProfileRequest {
-	private String name;
-	private String email;
-	private String password;
-	private Integer removePhoto;
-	private String photo;
+  private String name;
+  private String email;
+  private String password;
+  private Integer removePhoto;
+  private String photo;
 }

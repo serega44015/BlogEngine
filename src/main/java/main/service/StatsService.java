@@ -2,7 +2,7 @@ package main.service;
 
 import main.dto.api.response.StatisticResponse;
 import main.model.Post;
-import main.model.PostVotes;
+import main.model.PostVote;
 import main.model.repositories.GlobalSettingRepository;
 import main.model.repositories.PostRepository;
 import main.model.repositories.UserRepository;
@@ -58,7 +58,7 @@ public class StatsService {
 
     // TODO подумать, как превратить в стрим
     for (Post p : posts) {
-      for (PostVotes pv : p.getPostVotesList()) {
+      for (PostVote pv : p.getPostVoteList()) {
         if (pv.getValue() == 1) {
           likeCount++;
         }

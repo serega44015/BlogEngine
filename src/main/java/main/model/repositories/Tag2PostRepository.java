@@ -7,13 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface Tag2PostRepository extends JpaRepository<Tag2Post, Integer> {
 
-    //@Query(value = "SELECT COUNT(tgPost.postId) FROM Tags2Post tgPost INNER JOIN Post p ON p.id = tgPost.postId INNER JOIN  Tag tg ON tg.id = tgPost.tagId WHERE Tag.name = 'Java'")
-    //@Query(value = "SELECT COUNT(tgPost.postId) FROM Tags2Post tgPost INNER JOIN Post p ON p.id = tgPost.postId INNER JOIN  Tag tg ON tg.id = tgPost.tagId WHERE tg.name = 'Java' ")
-    @Query(value = "SELECT COUNT(tgPost.postId) FROM Tag2Post tgPost INNER JOIN Post p ON p.id = tgPost.postId INNER JOIN  Tag tg ON tg.id = tgPost.tagId WHERE tg.name = :tagName ")
-    Integer countOfPostsWithTheName(@Param("tagName") String tagName);
-    //Optional<Tags2Post> findByName();
-    //Integer countOfPostsWithTheName();
-
-
-
+  @Query(
+      value =
+          "SELECT COUNT(tgPost.postId) FROM Tag2Post tgPost INNER JOIN Post p ON p.id = tgPost.postId INNER JOIN  Tag tg ON tg.id = tgPost.tagId WHERE tg.name = :tagName ")
+  Integer countOfPostsWithTheName(@Param("tagName") String tagName);
 }

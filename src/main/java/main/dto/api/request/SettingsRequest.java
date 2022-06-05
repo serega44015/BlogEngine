@@ -6,13 +6,12 @@ import lombok.Data;
 @Data
 public class SettingsRequest {
 
-    @JsonProperty("MULTIUSER_MODE")
-    private boolean multiuserMode;
+  @JsonProperty("MULTIUSER_MODE")
+  private Boolean multiuserMode;
 
-    @JsonProperty("POST_PREMODERATION")
-    private boolean postPremoderation;
+  @JsonProperty("POST_PREMODERATION")
+  private Boolean postPremoderation;
 
-    @JsonProperty("STATISTICS_IS_PUBLIC")
-    private boolean statisticsIsPublic;
-
+  @JsonProperty("STATISTICS_IS_PUBLIC")
+  private Boolean statisticsIsPublic;
 }

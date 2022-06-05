@@ -2,32 +2,29 @@ package main.dto.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.dto.CommentDTO;
-import main.dto.UserDTO;
+import main.dto.CommentDto;
+import main.dto.UserDto;
 
 import java.util.List;
 
 @Data
 public class PostIdResponse {
 
-    private int id;
+  private Integer id;
 
-    @JsonProperty("timestamp")
-    private long timeStamp;
+  @JsonProperty("timestamp")
+  private Long timeStamp;
 
-    private boolean active;
+  private Boolean active;
 
-    @JsonProperty("user")
-    private UserDTO userDTO;
+  @JsonProperty("user")
+  private UserDto userDto;
 
-    private String title;
-    private String text;
-    private int likeCount;
-    private int dislikeCount;
-    private int viewCount;
-    private List<CommentDTO> comments;
-    private List<String> tags;
-
-
-
+  private String title;
+  private String text;
+  private Integer likeCount;
+  private Integer dislikeCount;
+  private Integer viewCount;
+  private List<CommentDto> comments;
+  private List<String> tags;
 }

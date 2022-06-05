@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class CommentDTO {
+public class CommentDto {
 
     private int id;
 
@@ -12,6 +12,6 @@ public class CommentDTO {
     private long timeStamp;
 
     private String text;
-    private UserCommentDTO user;
+    private UserCommentDto user;
 
 }

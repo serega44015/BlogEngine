@@ -2,10 +2,9 @@ package main.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.model.repositories.PostRepository;
 
 @Data
-public class PostsDTO {
+public class PostDto {
 
   private int id;
 
@@ -13,7 +12,7 @@ public class PostsDTO {
   private long timeStamp;
 
   @JsonProperty("user")
-  private UserDTO userDTO;
+  private UserDto userDTO;
 
   private String title;
   private String announce;

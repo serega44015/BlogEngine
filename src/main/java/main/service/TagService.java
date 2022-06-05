@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.TagsDTO;
+import main.dto.TagDto;
 import main.dto.api.response.TagResponse;
 import main.model.Tag;
 import main.model.repositories.PostRepository;
@@ -73,12 +73,12 @@ public class TagService {
     public TagResponse getTags() {
         TagResponse tagResponse = new TagResponse();
 
-        List<TagsDTO> tagsDTOList = toDTOTags();
-        tagResponse.setTags(tagsDTOList);
+        List<TagDto> tagDtoList = toDTOTags();
+        tagResponse.setTags(tagDtoList);
         return tagResponse;
     }
 
-    private List<TagsDTO> toDTOTags() {
+    private List<TagDto> toDTOTags() {
         List<Tag> allTags = tagRepository.findAll();
         int countAllPosts = postRepository.countPosts();
         int weights = allTags.size();
@@ -86,10 +86,10 @@ public class TagService {
         int maxTag = allTags.stream().mapToInt(v ->
                 tag2PostRepository.countOfPostsWithTheName(v.getName())).max().getAsInt();
 
-        List<TagsDTO> tagsDTOList = new ArrayList<>();
+        List<TagDto> tagDtoList = new ArrayList<>();
 
         for (int a = 0; a < allTags.size(); a++) {
-            TagsDTO tagsDTO = new TagsDTO();
+            TagDto tagDto = new TagDto();
             String tagsName = allTags.get(a).getName();
 
             int countOfTagsByName = tag2PostRepository.countOfPostsWithTheName(tagsName); //Количество тегов с конкретным именем в постах
@@ -98,15 +98,15 @@ public class TagService {
             double k = 1.0 / dWeightMax; //k = 1 / dWeightMax = 1 / 0.90 = 1.11
             double weightTag = dWeightHibernate * k; // weightHibernate = hibernate * k = 0.20 * 1.11 = 0.22
 
-            tagsDTO.setName(tagsName);
-            tagsDTO.setWeight(weightTag);
-            tagsDTOList.add(tagsDTO);
+            tagDto.setName(tagsName);
+            tagDto.setWeight(weightTag);
+            tagDtoList.add(tagDto);
 
 
         }
 
 
-        return tagsDTOList;
+        return tagDtoList;
     }
 
 

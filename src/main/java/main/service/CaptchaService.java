@@ -3,8 +3,8 @@ package main.service;
 import com.github.cage.Cage;
 import com.github.cage.GCage;
 import main.dto.api.response.CaptchaResponse;
-import main.model.CaptchaCodes;
-import main.model.repositories.CaptchaCodesRepository;
+import main.model.CaptchaCode;
+import main.model.repositories.CaptchaCodeRepository;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @Service
 public class CaptchaService {
 
-    private final CaptchaCodesRepository captchaRepository;
+    private final CaptchaCodeRepository captchaRepository;
 
-    public CaptchaService(CaptchaCodesRepository captchaRepository) {
+    public CaptchaService(CaptchaCodeRepository captchaRepository) {
         this.captchaRepository = captchaRepository;
     }
 
@@ -30,7 +30,7 @@ public class CaptchaService {
         });
 
         CaptchaResponse captchaResponse = new CaptchaResponse();
-        CaptchaCodes captchaCodes = new CaptchaCodes();
+        CaptchaCode captchaCodes = new CaptchaCode();
 
         LocalDateTime time = LocalDateTime.now();
         Cage cage = new GCage();

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class LikeDislikeResponse {
 
-	private Boolean result;
+  private Boolean result;
 }

@@ -10,11 +10,11 @@ import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<Tag, Integer> {
 
-    @Override
-    List<Tag> findAll();
+  @Override
+  List<Tag> findAll();
 
-    @Query(value = "SELECT tg.id FROM Tag tg WHERE tg.name = :tagName")
-    Integer findTagIdByName(@Param("tagName") String tagName);
+  @Query(value = "SELECT tg.id FROM Tag tg WHERE tg.name = :tagName")
+  Integer findTagIdByName(@Param("tagName") String tagName);
 
-    Optional<Tag> findTagByName(String name);
+  Optional<Tag> findTagByName(String name);
 }
