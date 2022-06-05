@@ -3,7 +3,7 @@ package main.dto.api.response;
 import lombok.Data;
 
 @Data
-public class MyStatsResponse {
+public class StatisticResponse {
 
     private Integer postsCount;
     private Integer likesCount;

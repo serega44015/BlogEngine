@@ -7,7 +7,7 @@ import main.dto.PostsDTO;
 import java.util.List;
 
 @Data
-public class PostsResponse {
+public class PostResponse {
 
     private long count;
 

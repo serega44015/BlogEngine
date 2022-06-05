@@ -12,4 +12,6 @@ public interface CaptchaCodesRepository extends JpaRepository<CaptchaCodes, Inte
     @Override
     List<CaptchaCodes> findAll();
 
+    CaptchaCodes findByCode(String code);
+
 }

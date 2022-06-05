@@ -3,7 +3,7 @@ package main.dto;
 import lombok.Data;
 
 @Data
-public class ErrorsNewPostDTO {
+public class ErrorNewPostDTO {
 
     private String title;
     private String text;

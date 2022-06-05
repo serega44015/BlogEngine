@@ -45,7 +45,7 @@ public class Post {
     @Column(name = "view_count", columnDefinition = "INT")
     private int viewCount;
 
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostVotes> postVotesList;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)

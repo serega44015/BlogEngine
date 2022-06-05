@@ -29,7 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN User u ON p.user.id = u.id " +
-            "LEFT JOIN PostVotes pv1 ON  pv1.postId.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv1 ON  pv1.post.id = p.id AND pv1.value = 1 " +
             "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME " +
             "GROUP BY p.id " +
             "ORDER BY COUNT(pv1.value) DESC")
@@ -52,13 +52,13 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p " +
-            "INNER JOIN PostVotes pv ON p.id = pv.postId.id " +
+            "INNER JOIN PostVotes pv ON p.id = pv.post.id " +
             "WHERE pv.value = 1 AND p.id = :postsId " +
             "GROUP BY p.id")
     Integer countOfLikesPerPost(@Param("postsId") Integer postsId);
 
     @Query(value = "SELECT COUNT(p.id) FROM Post p " +
-            "INNER JOIN PostVotes pv ON p.id = pv.postId.id " +
+            "INNER JOIN PostVotes pv ON p.id = pv.post.id " +
             "WHERE pv.value = -1 AND p.id = :postsId " +
             "GROUP BY p.id")
     Integer countOfDisLikesPerPost(@Param("postsId") Integer postsId);
@@ -96,8 +96,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query(value = "SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
             "LEFT JOIN Tag2Post t2p ON t2p.postId = p.id " +
             "LEFT JOIN Tag tg ON tg.id = t2p.tagId " +
@@ -109,8 +109,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 0 AND p.user.id = :userId " +
             "GROUP BY p.id")
@@ -118,8 +118,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'NEW' AND p.user.id = :userId " +
             "GROUP BY p.id")
@@ -127,8 +127,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'DECLINED' AND p.user.id = :userId " +
             "GROUP BY p.id")
@@ -136,8 +136,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.user.id = :userId " +
             "GROUP BY p.id")
@@ -145,8 +145,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     @Query("SELECT p FROM Post p " +
             "LEFT JOIN User u ON u.id = p.user.id " +
-            "LEFT JOIN PostVotes pv1 ON pv1.postId.id = p.id AND pv1.value = 1 " +
-            "LEFT JOIN PostVotes pv2 ON pv2.postId.id = p.id AND pv2.value = -1 " +
+            "LEFT JOIN PostVotes pv1 ON pv1.post.id = p.id AND pv1.value = 1 " +
+            "LEFT JOIN PostVotes pv2 ON pv2.post.id = p.id AND pv2.value = -1 " +
             "LEFT JOIN PostComments pc ON pc.post.id = p.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = :status AND p.moderatorId = :id " +
             "GROUP BY p.id")

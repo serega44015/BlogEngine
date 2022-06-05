@@ -22,7 +22,7 @@ public class ApiGeneralController {
     private final SettingService settingService;
     private final InitResponse initResponse;
     private final TagService tagService;
-    private final PostsService postsService;
+    private final PostService postService;
     private final CommentService commentService;
     private final ModerateService moderateService;
     private final ProfileService profileService;
@@ -33,14 +33,14 @@ public class ApiGeneralController {
             SettingService settingService,
             InitResponse initResponse,
             TagService tagService,
-            PostsService postsService,
+            PostService postService,
             CommentService commentService,
             ModerateService moderateService,
             ProfileService profileService, StatsService statsService) {
         this.settingService = settingService;
         this.initResponse = initResponse;
         this.tagService = tagService;
-        this.postsService = postsService;
+        this.postService = postService;
         this.commentService = commentService;
         this.moderateService = moderateService;
         this.profileService = profileService;
@@ -64,14 +64,14 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/tag")
-    public TagsResponse tag(@PathVariable @Nullable String query) {
+    public TagResponse tag(@PathVariable @Nullable String query) {
         return tagService.getTags();
     }
 
     @GetMapping("calendar")
     public CalendarResponse calendar(@RequestParam(value = "year", defaultValue = "") String year) {
 
-        return postsService.getPostByYear(year);
+        return postService.getPostByYear(year);
     }
 
     @PostMapping("/comment")
@@ -116,8 +116,14 @@ public class ApiGeneralController {
 
     @GetMapping("/statistics/my")
     @PreAuthorize("hasAuthority('user:write')")
-    public MyStatsResponse myStats(Principal principal){
+    public StatisticResponse myStats(Principal principal){
         return statsService.getMyStatistics(principal);
+    }
+
+    @GetMapping("/statistics/all")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<StatisticResponse> allStats(Principal principal){
+       return statsService.getAllStatistics(principal);
     }
 
 }

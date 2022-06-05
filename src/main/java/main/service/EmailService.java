@@ -1,67 +1,105 @@
 package main.service;
 
-import main.config.EmailConfig;
+import main.config.MailSender;
+import main.dto.ErrorPasswordChangeDto;
+import main.dto.api.request.ChangePasswordRequest;
 import main.dto.api.request.RestoreRequest;
+import main.dto.api.response.PasswordChangeResponse;
 import main.dto.api.response.PasswordRestoreResponse;
+import main.model.CaptchaCodes;
 import main.model.User;
+import main.model.repositories.CaptchaCodesRepository;
 import main.model.repositories.UserRepository;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class EmailService {
-    private final UserRepository userRepository;
-    private final EmailConfig emailConfig;
+  private final UserRepository userRepository;
+  private final CaptchaCodesRepository captchaCodesRepository;
+  private final MailSender mailSender;
 
-    public EmailService(UserRepository userRepository, EmailConfig emailConfig) {
-        this.userRepository = userRepository;
-        this.emailConfig = emailConfig;
+  public EmailService(
+      UserRepository userRepository,
+      CaptchaCodesRepository captchaCodesRepository,
+      MailSender mailSender) {
+    this.userRepository = userRepository;
+    this.captchaCodesRepository = captchaCodesRepository;
+    this.mailSender = mailSender;
+  }
+
+  public PasswordRestoreResponse restore(RestoreRequest restoreRequest) {
+    PasswordRestoreResponse response = new PasswordRestoreResponse();
+    User user = userRepository.findByEmail(restoreRequest.getEmail()).get();
+
+    if (Objects.isNull(user) || StringUtils.isEmpty(restoreRequest.getEmail())) {
+      response.setResult(false);
+      return response;
     }
 
-    public PasswordRestoreResponse restore(RestoreRequest restoreRequest){
-        //TODO дома поделать, чёт тут мб не работает с этого компа
-        PasswordRestoreResponse response = new PasswordRestoreResponse();
-        String HASH = UUID.randomUUID().toString();
+    user.setCode(UUID.randomUUID().toString());
+    userRepository.save(user);
 
-        Optional<User> optionalUser = userRepository.findByEmail(restoreRequest.getEmail());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            user.setCode(HASH);
-            userRepository.save(user);
+    String message =
+        String.format(
+            "Hello, %s \n "
+                + "Dear user, please follow the link: http://localhost:8080/login/change-password/%s to reset your password.",
+            user.getName(), user.getCode());
 
-            String message = String.format(
-                    "Hello, %s \n"
-                            + "To restore password please link: https://movie-blog-java-skillbox.herokuapp.com/login/change-password/%s",
-                    user.getName(), HASH
-            );
+    mailSender.sends(user.getEmail(), "Restore Password", message);
+    response.setResult(true);
 
-            send(user.getEmail(), "Restore Password", message);
+    return response;
+  }
 
-            response.setResult(true);
-        }
-        System.out.println("И дошли");
-        return response;
+  public PasswordChangeResponse change(ChangePasswordRequest changePasswordRequest) {
+    PasswordChangeResponse passwordChangeResponse = new PasswordChangeResponse();
+    ErrorPasswordChangeDto errorPasswordChangeDto = new ErrorPasswordChangeDto();
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    passwordChangeResponse.setResult(true);
+
+    User user = userRepository.findByCode(changePasswordRequest.getCode());
+
+    if (Objects.isNull(user)) {
+      passwordChangeResponse.setResult(true);
+      errorPasswordChangeDto.setPassword(
+          "Ссылка для восстановления пароля устарела.\n"
+              + " <a href=\n"
+              + " \\\"/auth/restore\\\">Запросить ссылку снова</a>");
+    } else {
+      if (changePasswordRequest.getPassword().length() >= 6) {
+        passwordChangeResponse.setResult(true);
+        user.setPassword(encoder.encode(changePasswordRequest.getPassword()));
+      } else {
+        passwordChangeResponse.setResult(false);
+        errorPasswordChangeDto.setPassword("Пароль короче 6-ти символов");
+      }
+
+      CaptchaCodes captchaCodes =
+          captchaCodesRepository.findByCode(changePasswordRequest.getCaptchaSecret());
+      if (checkCaptcha(changePasswordRequest.getCaptcha(), captchaCodes)){
+          userRepository.save(user);
+      } else {
+        passwordChangeResponse.setResult(false);
+        errorPasswordChangeDto.setCaptcha("Код с картинки введен неверно");
+      }
+
     }
+    passwordChangeResponse.setErrors(errorPasswordChangeDto);
+    return passwordChangeResponse;
+  }
 
-    public void send(String emailTo, String subject, String message) {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+  private boolean checkCaptcha(String captcha, CaptchaCodes repoCaptcha) {
+    Boolean check = true;
+    Boolean captchaCorrect = captcha.equals(repoCaptcha.getCode());
 
-        mailSender.setHost(this.emailConfig.getHost());
-        mailSender.setPort(this.emailConfig.getPort());
-        mailSender.setUsername(this.emailConfig.getUsername());
-        mailSender.setPassword(this.emailConfig.getPassword());
-
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-
-        mailMessage.setFrom(this.emailConfig.getUsername());
-        mailMessage.setTo(emailTo);
-        mailMessage.setSubject(subject);
-        mailMessage.setText(message);
-
-        mailSender.send(mailMessage);
+    if (!captchaCorrect) {
+      check = false;
     }
+    return check;
+  }
 }

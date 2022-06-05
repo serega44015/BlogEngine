@@ -8,7 +8,7 @@ import main.dto.UserDTO;
 import java.util.List;
 
 @Data
-public class PostsIdResponse {
+public class PostIdResponse {
 
     private int id;
 

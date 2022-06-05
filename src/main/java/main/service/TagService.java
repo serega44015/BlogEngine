@@ -1,12 +1,11 @@
 package main.service;
 
 import main.dto.TagsDTO;
-import main.dto.api.response.TagsResponse;
+import main.dto.api.response.TagResponse;
 import main.model.Tag;
 import main.model.repositories.PostRepository;
 import main.model.repositories.Tag2PostRepository;
 import main.model.repositories.TagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -71,12 +70,12 @@ public class TagService {
         this.tag2PostRepository = tag2PostRepository;
     }
 
-    public TagsResponse getTags() {
-        TagsResponse tagsResponse = new TagsResponse();
+    public TagResponse getTags() {
+        TagResponse tagResponse = new TagResponse();
 
         List<TagsDTO> tagsDTOList = toDTOTags();
-        tagsResponse.setTags(tagsDTOList);
-        return tagsResponse;
+        tagResponse.setTags(tagsDTOList);
+        return tagResponse;
     }
 
     private List<TagsDTO> toDTOTags() {

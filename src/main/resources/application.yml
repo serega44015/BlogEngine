@@ -3,19 +3,22 @@ spring.datasource.username: root
 spring.datasource.password: root
 spring.jpa.hibernate.ddl-auto: validate
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
-server.port: ${PORT:8070}
+server.port: ${PORT:8080}
 
 blog.title: QuietCorner
 blog.subtitle: Blog
 blog.phone: +7 915 871-59-39
 blog.email: s.khoroshkov@mail.ru
-blog.copyright: Serg Alternative
-blog.copyrightFrom: 2021
+blog.copyright: Alternative
+blog.copyrightFrom: 2022
 spring:
   jpa:
     show-sql: false
+    properties: true
+  mail:
+    host: smtp.yandex.ru
+    port: 465
+    username: KhoroshkovBlogEngine@yandex.ru
+    password: KhoroshkovBlogEngine1
+    protocol: smtps
 
-spring.mail.host: ${MAIL_HOST:smtp.mailtrap.io}
-spring.mail.port: ${SMTP_PORT:993}
-spring.mail.username: ${LOGIN:springblogkhoroshkov@mail.ru}
-spring.mail.password: ${PASSWORD:YAA%b3rxa3oR}

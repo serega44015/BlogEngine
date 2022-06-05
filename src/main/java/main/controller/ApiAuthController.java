@@ -1,5 +1,6 @@
 package main.controller;
 
+import main.dto.api.request.ChangePasswordRequest;
 import main.dto.api.request.LoginRequest;
 import main.dto.api.request.RegisterRequest;
 import main.dto.api.request.RestoreRequest;
@@ -53,12 +54,12 @@ public class ApiAuthController {
     }
 
     @GetMapping("/captcha")
-    private CaptchaResponse captcha() throws IOException {
+    public CaptchaResponse captcha() throws IOException {
         return captchaService.getCaptcha();
     }
 
     @PostMapping("/register")
-    private RegisterResponse register(@RequestBody RegisterRequest registerRequest) {
+    public RegisterResponse register(@RequestBody RegisterRequest registerRequest) {
         return registerService.registration(registerRequest);
     }
 
@@ -83,9 +84,14 @@ public class ApiAuthController {
 
     @PostMapping("/restore")
     public PasswordRestoreResponse passwordRestore(@RequestBody RestoreRequest restoreRequest) {
-        System.out.println("А контролле?");
         return emailService.restore(restoreRequest);
     }
+
+    @PostMapping("/password")
+    public PasswordChangeResponse passwordChange(@RequestBody ChangePasswordRequest changePasswordRequest){
+        return emailService.change(changePasswordRequest);
+    }
+
 
 
 }

@@ -23,7 +23,6 @@ public class CaptchaService {
     }
 
     public CaptchaResponse getCaptcha() throws IOException{
-
         captchaRepository.findAll().forEach(captcha -> {
             if (captcha.getTime().isBefore(LocalDateTime.now().minusHours(1))) {
                 captchaRepository.delete(captcha);
@@ -56,7 +55,7 @@ public class CaptchaService {
 
 
         captchaResponse.setSecret(captchaCode);
-        captchaResponse.setImage(image.toString());
+        captchaResponse.setImage(image);
 
         return captchaResponse;
     }

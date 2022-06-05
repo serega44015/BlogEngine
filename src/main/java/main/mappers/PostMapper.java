@@ -1,7 +1,7 @@
 package main.mappers;
 
 import main.dto.PostsDTO;
-import main.dto.api.response.PostsIdResponse;
+import main.dto.api.response.PostIdResponse;
 import main.mappers.converter.DateConverter;
 import main.model.Post;
 import org.mapstruct.Mapper;
@@ -34,6 +34,6 @@ public interface PostMapper {
     @Mapping(target = "dislikeCount", expression = "java(post.getDislikesAmount())")
     @Mapping(target = "comments", source = "post.postCommentsList", qualifiedByName = "toListCommentDTO")
     @Mapping(target = "tags", expression = "java(post.getTagNameList())")
-    PostsIdResponse toPostResponseById(Post post);
+	PostIdResponse toPostResponseById(Post post);
 
 }

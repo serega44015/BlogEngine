@@ -1,11 +1,11 @@
 package main.service;
 
-import main.dto.ErrorsNewPostDTO;
+import main.dto.ErrorNewPostDTO;
 import main.dto.api.request.NewPostRequest;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.NewPostResponse;
-import main.dto.api.response.PostsIdResponse;
-import main.dto.api.response.PostsResponse;
+import main.dto.api.response.PostIdResponse;
+import main.dto.api.response.PostResponse;
 import main.mappers.PostCommentsMapper;
 import main.mappers.PostMapper;
 import main.model.GlobalSetting;
@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class PostsService {
+public class PostService {
 
     private final PostRepository postsRepository;
     private final UserRepository userRepository;
@@ -41,7 +41,7 @@ public class PostsService {
     private final PostCommentsMapper commentsMapper = PostCommentsMapper.INSTANCE;
     private final AuthenticationManager authenticationManager;
 
-    public PostsService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, Tag2PostRepository tag2PostRepository, GlobalSettingRepository globalSettingRepository, AuthenticationManager authenticationManager) {
+    public PostService(PostRepository postsRepository, UserRepository userRepository, TagRepository tagRepository, Tag2PostRepository tag2PostRepository, GlobalSettingRepository globalSettingRepository, AuthenticationManager authenticationManager) {
         this.postsRepository = postsRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
@@ -51,65 +51,65 @@ public class PostsService {
     }
 
 
-    public PostsResponse getPostBySearch(int offset, int limit, String query) {
+    public PostResponse getPostBySearch(int offset, int limit, String query) {
 
-        PostsResponse postsResponse = new PostsResponse();
+        PostResponse postResponse = new PostResponse();
 
         if (query.isEmpty()) {
             Page<Post> posts = postsRepository.findAllPostsSortedByRecent(
                     getSortedPaging(offset, limit, Sort.by("time").descending()));
-            settersPostsResponse(postsResponse, posts);
+            settersPostsResponse(postResponse, posts);
 
         } else {
             Page<Post> posts = postsRepository.findPostsBySearch(
                     getPaging(offset, limit), query);
-            settersPostsResponse(postsResponse, posts);
+            settersPostsResponse(postResponse, posts);
         }
 
 
-        return postsResponse;
+        return postResponse;
     }
 
 
-    public PostsResponse getPosts(int offset, int limit, String mode) {
-        PostsResponse postsResponse = new PostsResponse();
+    public PostResponse getPosts(int offset, int limit, String mode) {
+        PostResponse postResponse = new PostResponse();
 
         if (mode.equals("recent")) {
             Page<Post> posts = postsRepository
                     .findAllPostsSortedByRecent(getSortedPaging(offset, limit, Sort.by("time").descending()));
-            settersPostsResponse(postsResponse, posts);
+            settersPostsResponse(postResponse, posts);
         }
 
 
         if (mode.equals("early")) {
             Page<Post> posts = postsRepository
                     .findAllPostsSortedByRecent(getSortedPaging(offset, limit, Sort.by("time").ascending()));
-            settersPostsResponse(postsResponse, posts);
+            settersPostsResponse(postResponse, posts);
         }
 
 
         if (mode.equals("popular")) {
             Page<Post> posts = postsRepository
                     .findAllPostOrderByComments(getPaging(offset, limit));
-            settersPostsResponse(postsResponse, posts);
+            settersPostsResponse(postResponse, posts);
         }
 
 
         if (mode.equals("best")) {
             Page<Post> posts = postsRepository
                     .findAllPostOrderByLikes(getPaging(offset, limit));
-            settersPostsResponse(postsResponse, posts);
+            settersPostsResponse(postResponse, posts);
         }
 
-        return postsResponse;
+        return postResponse;
     }
 
-    private void settersPostsResponse(PostsResponse postsResponse, Page<Post> posts) {
-        postsResponse.setPostsDTO(posts
+    private void settersPostsResponse(PostResponse postResponse, Page<Post> posts) {
+        postResponse.setPostsDTO(posts
                 .stream()
                 .map(postMapper::toPostDTO)
                 .collect(Collectors.toList()));
-        postsResponse.setCount(posts.getTotalElements());
+        postResponse.setCount(posts.getTotalElements());
     }
 
 
@@ -153,24 +153,24 @@ public class PostsService {
         return calendarResponse;
     }
 
-    public PostsResponse getPostByDate(int offset, int limit, String date) {
-        PostsResponse postsResponse = new PostsResponse();
+    public PostResponse getPostByDate(int offset, int limit, String date) {
+        PostResponse postResponse = new PostResponse();
         Page<Post> posts = postsRepository.findPostsByDate(getPaging(offset, limit), date);
-        settersPostsResponse(postsResponse, posts);
-        return postsResponse;
+        settersPostsResponse(postResponse, posts);
+        return postResponse;
     }
 
-    public PostsResponse getPostByTag(int offset, int limit, String tag) {
-        PostsResponse postsResponse = new PostsResponse();
+    public PostResponse getPostByTag(int offset, int limit, String tag) {
+        PostResponse postResponse = new PostResponse();
         int tagId = tagRepository.findTagIdByName(tag);
 
         Page<Post> posts = postsRepository.findPostsByTagId(getPaging(offset, limit), tagId);
-        settersPostsResponse(postsResponse, posts);
+        settersPostsResponse(postResponse, posts);
 
-        return postsResponse;
+        return postResponse;
     }
 
-    public PostsIdResponse getPostById(int id) {
+    public PostIdResponse getPostById(int id) {
         Post post;
         try {
             post = postsRepository.findPostById(id);
@@ -182,8 +182,8 @@ public class PostsService {
         return postMapper.toPostResponseById(post);
     }
 
-    public PostsResponse getMyPosts(int offset, int limit, String status) {
-        PostsResponse postsResponse = new PostsResponse();
+    public PostResponse getMyPosts(int offset, int limit, String status) {
+        PostResponse postResponse = new PostResponse();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
@@ -192,36 +192,36 @@ public class PostsService {
         if (status.equals("inactive")) {
             Page<Post> posts = postsRepository
                     .findStatusInactiveByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
-            postsResponse.setCount(posts.getTotalElements());
-            settersPostsResponse(postsResponse, posts);
+            postResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postResponse, posts);
         }
 
         if (status.equals("pending")) {
             Page<Post> posts = postsRepository
                     .findStatusPendingByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
-            postsResponse.setCount(posts.getTotalElements());
-            settersPostsResponse(postsResponse, posts);
+            postResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postResponse, posts);
         }
 
         if (status.equals("declined")) {
             Page<Post> posts = postsRepository
                     .findStatusDeclinedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
-            postsResponse.setCount(posts.getTotalElements());
-            settersPostsResponse(postsResponse, posts);
+            postResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postResponse, posts);
         }
 
         if (status.equals("published")) {
             Page<Post> posts = postsRepository
                     .findStatusPublishedByPosts(currentUser.getId(), getSortedPaging(offset, limit, sort));
-            postsResponse.setCount(posts.getTotalElements());
-            settersPostsResponse(postsResponse, posts);
+            postResponse.setCount(posts.getTotalElements());
+            settersPostsResponse(postResponse, posts);
         }
 
-        return postsResponse;
+        return postResponse;
     }
 
-    public PostsResponse getModerationPost(int offset, int limit, String status) {
-        PostsResponse postsResponse = new PostsResponse();
+    public PostResponse getModerationPost(int offset, int limit, String status) {
+        PostResponse postResponse = new PostResponse();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
@@ -239,10 +239,10 @@ public class PostsService {
                 .findModeratedPost(currentUser.getId(), moderationStatus,
                         getSortedPaging(offset, limit, Sort.by("time").descending()));
 
-        postsResponse.setCount(posts.getTotalElements());
-        settersPostsResponse(postsResponse, posts);
+        postResponse.setCount(posts.getTotalElements());
+        settersPostsResponse(postResponse, posts);
 
-        return postsResponse;
+        return postResponse;
     }
 
     public NewPostResponse addNewPost(@RequestBody NewPostRequest newPostRequest, Principal principal) {
@@ -251,15 +251,15 @@ public class PostsService {
         NewPostResponse newPostsResponse = new NewPostResponse();
         //TODO сделать, чтобы не возвращал Optional, а просто User
         main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
-        ErrorsNewPostDTO errorsNewPostDTO = new ErrorsNewPostDTO();
+        ErrorNewPostDTO errorNewPostDTO = new ErrorNewPostDTO();
 
         String title = newPostRequest.getTitle();
         String text = newPostRequest.getText();
         newPostsResponse.setResult(false);
         if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
-            errorsNewPostDTO.setTitle("Заголовок не установлен");
+            errorNewPostDTO.setTitle("Заголовок не установлен");
         } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
-            errorsNewPostDTO.setText("Текст публикации слишком короткий");
+            errorNewPostDTO.setText("Текст публикации слишком короткий");
         } else {
             newPostsResponse.setResult(true);
         }
@@ -285,7 +285,7 @@ public class PostsService {
         postsRepository.save(post);
         post.setTagList(lookTag(newPostRequest.getTags(), post));
         postsRepository.save(post);
-        newPostsResponse.setErrors(errorsNewPostDTO);
+        newPostsResponse.setErrors(errorNewPostDTO);
         return newPostsResponse;
     }
 
@@ -297,7 +297,7 @@ public class PostsService {
         NewPostResponse newPostsResponse = new NewPostResponse();
         //TODO сделать, чтобы не возвращал Optional, а просто User
         main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
-        ErrorsNewPostDTO errorsNewPostDTO = new ErrorsNewPostDTO();
+        ErrorNewPostDTO errorNewPostDTO = new ErrorNewPostDTO();
 
         String title = newPostRequest.getTitle();
         String text = newPostRequest.getText();
@@ -305,9 +305,9 @@ public class PostsService {
 
         newPostsResponse.setResult(false);
         if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
-            errorsNewPostDTO.setTitle("Заголовок не установлен");
+            errorNewPostDTO.setTitle("Заголовок не установлен");
         } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
-            errorsNewPostDTO.setText("Текст публикации слишком короткий");
+            errorNewPostDTO.setText("Текст публикации слишком короткий");
         } else {
             newPostsResponse.setResult(true);
         }
@@ -340,7 +340,7 @@ public class PostsService {
             post.setModerationStatus(post.getModerationStatus());
         }
         postsRepository.save(post);
-        newPostsResponse.setErrors(errorsNewPostDTO);
+        newPostsResponse.setErrors(errorNewPostDTO);
 
         return newPostsResponse;
     }

@@ -3,7 +3,7 @@ package main.dto;
 import lombok.Data;
 
 @Data
-public class ErrorsDTO {
+public class ErrorDTO {
 
     private String email;
     private String name;

@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.ErrorsDTO;
+import main.dto.ErrorDTO;
 import main.dto.api.request.RegisterRequest;
 import main.dto.api.response.RegisterResponse;
 import main.model.User;
@@ -20,7 +20,7 @@ public class RegisterService {
 
     public RegisterResponse registration(RegisterRequest registerRequest) {
         RegisterResponse registerResponse = new RegisterResponse();
-        ErrorsDTO errorsDTO = new ErrorsDTO();
+        ErrorDTO errorDTO = new ErrorDTO();
         User user = new User();
 
         String email = registerRequest.getEmail();
@@ -37,13 +37,13 @@ public class RegisterService {
         registerResponse.setResult(false);
 
         if (!validEmail) {
-            errorsDTO.setEmail("Этот e-mail уже зарегистрирован");
+            errorDTO.setEmail("Этот e-mail уже зарегистрирован");
         } else if (!validName) {
-            errorsDTO.setName("Имя указано неверно");
+            errorDTO.setName("Имя указано неверно");
         } else if (!validPassword) {
-            errorsDTO.setPassword("Пароль короче 6-ти символов");
+            errorDTO.setPassword("Пароль короче 6-ти символов");
         } else if (!validCaptcha) {
-            errorsDTO.setCaptcha("Код с картинки введён неверно");
+            errorDTO.setCaptcha("Код с картинки введён неверно");
         } else {
             user.setEmail(email);
             user.setName(name);
@@ -56,7 +56,7 @@ public class RegisterService {
             registerResponse.setResult(true);
         }
 
-        registerResponse.setErrorsDTO(errorsDTO);
+        registerResponse.setErrorDTO(errorDTO);
 
         return registerResponse;
     }

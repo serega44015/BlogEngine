@@ -15,24 +15,23 @@ public class PostVotes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private int id;
+    private Integer id;
 
     @Column(name = "user_id", nullable = false, columnDefinition = "INT")
-    private int userId;
+    private Integer userId;
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
-    private Post postId;
+    private Post post;
 
     @Column(nullable = false, columnDefinition = "DATETIME")
     private Date time;
 
     @Column(nullable = false, columnDefinition = "TINYINT")
-    private int value;
+    private Integer value;
 
     public PostVotes(Date time, int value) {
         this.time = time;
         this.value = value;
     }
-
 }
