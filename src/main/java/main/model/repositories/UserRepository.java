@@ -9,10 +9,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-  // TODO переделать везде на hibernate
   Optional<User> findByEmail(String email);
-
-  Optional<User> findUserById(int id);
 
   User findByCode(String code);
 }

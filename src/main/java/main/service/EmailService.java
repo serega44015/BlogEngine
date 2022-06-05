@@ -81,13 +81,12 @@ public class EmailService {
 
       CaptchaCode captchaCode =
           captchaCodeRepository.findByCode(changePasswordRequest.getCaptchaSecret());
-      if (checkCaptcha(changePasswordRequest.getCaptcha(), captchaCode)){
-          userRepository.save(user);
+      if (checkCaptcha(changePasswordRequest.getCaptcha(), captchaCode)) {
+        userRepository.save(user);
       } else {
         passwordChangeResponse.setResult(false);
         errorPasswordChangeDto.setCaptcha("Код с картинки введен неверно");
       }
-
     }
     passwordChangeResponse.setErrors(errorPasswordChangeDto);
     return passwordChangeResponse;

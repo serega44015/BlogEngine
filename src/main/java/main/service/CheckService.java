@@ -2,7 +2,6 @@ package main.service;
 
 import main.dto.UserLoginDto;
 import main.dto.api.response.LoginResponse;
-import main.mappers.UserMapper;
 import main.model.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 public class CheckService {
 
   private final UserRepository userRepository;
-  private final UserMapper userMapper = UserMapper.INSTANCE;
 
   public CheckService(UserRepository userRepository) {
     this.userRepository = userRepository;
