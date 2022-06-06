@@ -1,16 +1,14 @@
 package main.controller;
 
+import main.dto.api.request.ChangePasswordRequest;
 import main.dto.api.request.LoginRequest;
 import main.dto.api.request.RegisterRequest;
-import main.dto.api.response.CaptchaResponse;
-import main.dto.api.response.LoginResponse;
-import main.dto.api.response.LogoutResponse;
-import main.dto.api.response.RegisterResponse;
-import main.model.repositories.UserRepository;
+import main.dto.api.request.RestoreRequest;
+import main.dto.api.response.*;
 import main.service.CaptchaService;
 import main.service.CheckService;
+import main.service.EmailService;
 import main.service.RegisterService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,65 +20,78 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/auth")
 public class ApiAuthController {
 
-    private final CheckService checkService;
-    private final CaptchaService captchaService;
-    private final RegisterService registerService;
-    private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
+  private final CheckService checkService;
+  private final CaptchaService captchaService;
+  private final RegisterService registerService;
+  private final EmailService emailService;
+  private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    public ApiAuthController(CheckService checkService, CaptchaService captchaService, RegisterService registerService, AuthenticationManager authenticationManager, UserRepository userRepository) {
-        this.checkService = checkService;
-        this.captchaService = captchaService;
-        this.registerService = registerService;
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+  public ApiAuthController(
+      CheckService checkService,
+      CaptchaService captchaService,
+      RegisterService registerService,
+      EmailService emailService,
+      AuthenticationManager authenticationManager) {
+    this.checkService = checkService;
+    this.captchaService = captchaService;
+    this.registerService = registerService;
+    this.emailService = emailService;
+    this.authenticationManager = authenticationManager;
+  }
+
+  @GetMapping("/check")
+  public ResponseEntity<LoginResponse> check(Principal principal) {
+    if (Objects.isNull(principal)) {
+      return ResponseEntity.ok(new LoginResponse());
     }
+    return ResponseEntity.ok(checkService.getLoginResponse(principal.getName()));
+  }
 
-    @GetMapping("/check")
-    public ResponseEntity<LoginResponse> check(Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.ok(new LoginResponse());
-        }
+  @GetMapping("/captcha")
+  public CaptchaResponse captcha() throws IOException {
+    return captchaService.getCaptcha();
+  }
 
-        return ResponseEntity.ok(checkService.getLoginResponse(principal.getName()));
-    }
+  @PostMapping("/register")
+  public RegisterResponse register(@RequestBody RegisterRequest registerRequest) {
+    return registerService.registration(registerRequest);
+  }
 
-    @GetMapping("/captcha")
-    private CaptchaResponse captcha() throws IOException {
-        return captchaService.getCaptcha();
-    }
+  @PostMapping("/login")
+  public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    Authentication auth =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(), loginRequest.getPassword()));
+    SecurityContextHolder.getContext().setAuthentication(auth);
+    User user = (User) auth.getPrincipal();
 
-    @PostMapping("/register")
-    private RegisterResponse register(@RequestBody RegisterRequest registerRequest) {
-        return registerService.registration(registerRequest);
-    }
+    return ResponseEntity.ok(checkService.getLoginResponse(user.getUsername()));
+  }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        Authentication auth = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        User user = (User) auth.getPrincipal();
+  @GetMapping("/logout")
+  @PreAuthorize("hasAuthority('user:write')")
+  public LogoutResponse logout() {
+    LogoutResponse logoutResponse = new LogoutResponse();
+    logoutResponse.setResult(true);
+    SecurityContextHolder.getContext().setAuthentication(null);
+    return logoutResponse;
+  }
 
-        return ResponseEntity.ok(checkService.getLoginResponse(user.getUsername()));
-    }
+  @PostMapping("/restore")
+  public PasswordRestoreResponse passwordRestore(@RequestBody RestoreRequest restoreRequest) {
+    return emailService.restore(restoreRequest);
+  }
 
-    @GetMapping("/logout")
-    @PreAuthorize("hasAuthority('user:write')")
-    public LogoutResponse logout(){
-        LogoutResponse logoutResponse = new LogoutResponse();
-        logoutResponse.setResult(true);
-        SecurityContextHolder.getContext().setAuthentication(null);
-        return logoutResponse;
-    }
-
-
-
-
+  @PostMapping("/password")
+  public PasswordChangeResponse passwordChange(
+      @RequestBody ChangePasswordRequest changePasswordRequest) {
+    return emailService.change(changePasswordRequest);
+  }
 }

@@ -1,56 +1,126 @@
 package main.controller;
 
-import main.dto.api.response.CalendarResponse;
-import main.dto.api.response.InitResponse;
-import main.dto.api.response.SettingsResponse;
-import main.dto.api.response.TagsResponse;
-import main.service.PostsService;
-import main.service.SettingsService;
-import main.service.TagsService;
+import main.dto.api.request.CommentRequest;
+import main.dto.api.request.ModerationRequest;
+import main.dto.api.request.ProfileRequest;
+import main.dto.api.request.SettingsRequest;
+import main.dto.api.response.*;
+import main.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
 public class ApiGeneralController {
 
-    private final SettingsService settingsService;
-    private final InitResponse initResponse;
-    private final TagsService tagsService;
-    private final PostsService postsService;
+  private final SettingService settingService;
+  private final InitResponse initResponse;
+  private final TagService tagService;
+  private final PostService postService;
+  private final CommentService commentService;
+  private final ModerateService moderateService;
+  private final ProfileService profileService;
+  private final StatsService statsService;
 
-    @Autowired
-    public ApiGeneralController(SettingsService settingsService, InitResponse initResponse, TagsService tagsService, PostsService postsService) {
-        this.settingsService = settingsService;
-        this.initResponse = initResponse;
-        this.tagsService = tagsService;
-        this.postsService = postsService;
-    }
+  @Autowired
+  public ApiGeneralController(
+      SettingService settingService,
+      InitResponse initResponse,
+      TagService tagService,
+      PostService postService,
+      CommentService commentService,
+      ModerateService moderateService,
+      ProfileService profileService,
+      StatsService statsService) {
+    this.settingService = settingService;
+    this.initResponse = initResponse;
+    this.tagService = tagService;
+    this.postService = postService;
+    this.commentService = commentService;
+    this.moderateService = moderateService;
+    this.profileService = profileService;
+    this.statsService = statsService;
+  }
 
-    @GetMapping("/settings")
-    private SettingsResponse settings() {
-        return settingsService.getInitGlobalSettings();
-    }
+  @GetMapping("/settings")
+  public GlobalSettingsResponse settings() {
+    return settingService.getSettings();
+  }
 
-    @GetMapping("/init")
-    private InitResponse init() {
-        return initResponse;
-    }
+  @PutMapping("/settings")
+  @PreAuthorize("hasAuthority('user:moderate')")
+  public void changeSettings(@RequestBody SettingsRequest settingsRequest) {
+    settingService.putSetting(settingsRequest);
+  }
 
-    @GetMapping("/tag")
-    private TagsResponse tags(
-            @RequestParam(value = "query", defaultValue = "") String tagName) {
-        return tagsService.getTags(tagName);
-    }
+  @GetMapping("/init")
+  public InitResponse init() {
+    return initResponse;
+  }
 
-    @GetMapping("calendar")
-    private CalendarResponse calendar(
-            @RequestParam(value = "year", defaultValue = "") String year) {
+  @GetMapping("/tag")
+  public TagResponse tag(@PathVariable @Nullable String query) {
+    return tagService.getTags();
+  }
 
-        return postsService.getPostByYear(year);
-    }
+  @GetMapping("calendar")
+  public CalendarResponse calendar(@RequestParam(value = "year", defaultValue = "") String year) {
+    return postService.getPostByYear(year);
+  }
 
+  @PostMapping("/comment")
+  @PreAuthorize("hasAuthority('user:write')")
+  public ResponseEntity<CommentResponse> comment(
+      @RequestBody CommentRequest commentRequest, Principal principal) {
+    return commentService.postComment(commentRequest, principal);
+  }
 
+  @PostMapping("/moderation")
+  @PreAuthorize("hasAuthority('user:moderate')")
+  public ModerationResponse moderatePost(
+      @RequestBody ModerationRequest moderationRequest, Principal principal) {
+    return moderateService.getModerator(moderationRequest, principal);
+  }
 
+  @PostMapping(
+      value = "/profile/my",
+      consumes = {"multipart/form-data"})
+  @PreAuthorize("hasAuthority('user:write')")
+  public ProfileResponse editProfile(
+      @RequestParam(value = "photo") MultipartFile photo,
+      @RequestParam(value = "name") String name,
+      @RequestParam(value = "email") String email,
+      @RequestParam(value = "password", required = false) String password,
+      @RequestParam(value = "removePhoto", defaultValue = "0") Integer removePhoto,
+      Principal principal) {
 
+    return profileService.getEditProfile(photo, name, email, password, removePhoto, principal);
+  }
+
+  @PostMapping(
+      value = "/profile/my",
+      consumes = {"application/json"})
+  @PreAuthorize("hasAuthority('user:write')")
+  public ProfileResponse editProfileJson(
+      @RequestBody ProfileRequest profileRequest, Principal principal) {
+    return profileService.getJsonEditProfile(profileRequest, principal);
+  }
+
+  @GetMapping("/statistics/my")
+  @PreAuthorize("hasAuthority('user:write')")
+  public StatisticResponse myStats(Principal principal) {
+    return statsService.getMyStatistics(principal);
+  }
+
+  @GetMapping("/statistics/all")
+  @PreAuthorize("hasAuthority('user:write')")
+  public ResponseEntity<StatisticResponse> allStats(Principal principal) {
+    return statsService.getAllStatistics(principal);
+  }
 }

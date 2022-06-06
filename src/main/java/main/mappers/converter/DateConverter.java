@@ -17,6 +17,7 @@ public class DateConverter {
         if (calendarTime == null) {
             return 0;
         }
+
         long time = calendarTime.getTime().getTime() / 1000;
         return time;
     }

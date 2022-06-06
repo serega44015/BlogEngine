@@ -1,5 +1,5 @@
 INSERT INTO users (id, code, email, is_moderator, name, password, photo, reg_time)
-VALUES (1, 121298, 'serega44015@gmail.com', 1, 'Сергей', '$2a$12$2Tu/fIjqqeDFZo4wjpj3H.7e5GKaSsDyET/.i46..iZkLKZnr8Y2S', 'IMGserega440.jpg', '2016-12-12 08:00:00'),
+VALUES (1, 121298, 'serega44015@gmail.com', 1, 'Сергей', '$2a$12$q/FvuBs7K3bzCpXGZkuGheVV7TMQ5vO9L5eo6ERSn60wUWZZKz52e', 'IMGserega440.jpg', '2016-12-12 08:00:00'),
        (2, 218122, 'yurchenkova99@gmail.com', 0, 'Катя', '$2a$12$2Tu/fIjqqeDFZo4wjpj3H.7e5GKaSsDyET/.i46..iZkLKZnr8Y2S', 'IMGkate22.jpg', '2022-01-21 11:21:56'),
        (3, 441566, 'mygkov55233@yandex.ru', 0, 'Виктор', 'lowadance8963', 'IMGlowadance8963.jpg',
         '2020-01-21 06:21:56'),

@@ -3,12 +3,14 @@ package main.service;
 import com.github.cage.Cage;
 import com.github.cage.GCage;
 import main.dto.api.response.CaptchaResponse;
-import main.model.CaptchaCodes;
-import main.model.repositories.CaptchaCodesRepository;
+import main.model.CaptchaCode;
+import main.model.repositories.CaptchaCodeRepository;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -16,50 +18,49 @@ import java.time.LocalDateTime;
 @Service
 public class CaptchaService {
 
-    private final CaptchaCodesRepository captchaRepository;
+  private final CaptchaCodeRepository captchaRepository;
 
-    public CaptchaService(CaptchaCodesRepository captchaRepository) {
-        this.captchaRepository = captchaRepository;
-    }
+  public CaptchaService(CaptchaCodeRepository captchaRepository) {
+    this.captchaRepository = captchaRepository;
+  }
 
-    public CaptchaResponse getCaptcha() throws IOException{
-
-        captchaRepository.findAll().forEach(captcha -> {
-            if (captcha.getTime().isBefore(LocalDateTime.now().minusHours(1))) {
+  public CaptchaResponse getCaptcha() throws IOException {
+    captchaRepository
+        .findAll()
+        .forEach(
+            captcha -> {
+              if (captcha.getTime().isBefore(LocalDateTime.now().minusHours(1))) {
                 captchaRepository.delete(captcha);
-            }
-        });
+              }
+            });
 
-        CaptchaResponse captchaResponse = new CaptchaResponse();
-        CaptchaCodes captchaCodes = new CaptchaCodes();
+    CaptchaResponse captchaResponse = new CaptchaResponse();
+    CaptchaCode captchaCodes = new CaptchaCode();
 
-        LocalDateTime time = LocalDateTime.now();
-        Cage cage = new GCage();
+    LocalDateTime time = LocalDateTime.now();
+    Cage cage = new GCage();
 
-        String captchaCode = cage.getTokenGenerator().next();
-        String secretCode = cage.getTokenGenerator().next();
+    String captchaCode = cage.getTokenGenerator().next();
+    String secretCode = cage.getTokenGenerator().next();
 
-        OutputStream os = new FileOutputStream("captcha.jpg", false);
-        cage.draw(captchaCode, os);
-        os.flush();
-        os.close();
+    OutputStream os = new FileOutputStream("captcha.jpg", false);
+    cage.draw(captchaCode, os);
+    os.flush();
+    os.close();
 
-        byte[] captcha = Files.readAllBytes(Paths.get("captcha.jpg"));
-        Files.delete(Paths.get("captcha.jpg"));
-        String encodedCaptcha = DatatypeConverter.printBase64Binary(captcha);
-        String image = "data:image/png;base64, " + encodedCaptcha;
+    byte[] captcha = Files.readAllBytes(Paths.get("captcha.jpg"));
+    Files.delete(Paths.get("captcha.jpg"));
+    String encodedCaptcha = DatatypeConverter.printBase64Binary(captcha);
+    String image = "data:image/png;base64, " + encodedCaptcha;
 
-        captchaCodes.setTime(time);
-        captchaCodes.setCode(captchaCode);
-        captchaCodes.setSecretCode(secretCode);
-        captchaRepository.save(captchaCodes);
+    captchaCodes.setTime(time);
+    captchaCodes.setCode(captchaCode);
+    captchaCodes.setSecretCode(secretCode);
+    captchaRepository.save(captchaCodes);
 
+    captchaResponse.setSecret(captchaCode);
+    captchaResponse.setImage(image);
 
-        captchaResponse.setSecret(captchaCode);
-        captchaResponse.setImage(image.toString());
-
-        return captchaResponse;
-    }
-
-
+    return captchaResponse;
+  }
 }

@@ -8,22 +8,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class DefaultController {
 
-    private final InitResponse initResponse;
+  private final InitResponse initResponse;
 
-    public DefaultController(InitResponse initResponse){
-        this.initResponse = initResponse;
-    }
+  public DefaultController(InitResponse initResponse) {
+    this.initResponse = initResponse;
+  }
 
-    @RequestMapping("/")
-    public String defaultController() {
-        System.out.println("serega " + initResponse.getTitle());
-        //return "index.html";
-        return "index";
-    }
+  @RequestMapping("/")
+  public String defaultController() {
+    return "index";
+  }
 
-    @RequestMapping(method = {RequestMethod.OPTIONS, RequestMethod.GET}, value = "/**/{path:[^\\\\.]*}")
-    public String redirectToIndex() {
-        return "forward:/";
-    }
-
+  @RequestMapping(
+      method = {RequestMethod.OPTIONS, RequestMethod.GET},
+      value = "/**/{path:[^\\\\.]*}")
+  public String redirectToIndex() {
+    return "forward:/";
+  }
 }

@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class LogoutResponse {
 
-    private boolean result;
-
+  private Boolean result;
 }

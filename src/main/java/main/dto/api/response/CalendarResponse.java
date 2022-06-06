@@ -8,7 +8,6 @@ import java.util.Set;
 @Data
 public class CalendarResponse {
 
-    private Set<Integer> years;
-    private Map<String, Integer> posts;
-
+  private Set<Integer> years;
+  private Map<String, Integer> posts;
 }
