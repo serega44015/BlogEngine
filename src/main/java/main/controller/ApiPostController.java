@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/post")
@@ -65,10 +66,10 @@ public class ApiPostController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<PostIdResponse> postById(@PathVariable("id") int id)
+  public ResponseEntity<PostIdResponse> postById(@PathVariable("id") Integer id)
       throws NoSuchElementException {
     PostIdResponse postIdResponse = postService.getPostById(id);
-    if (postIdResponse == null) {
+    if (Objects.isNull(postIdResponse)) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -96,7 +97,6 @@ public class ApiPostController {
         postService.getModerationPost(offset, limit, status), HttpStatus.OK);
   }
 
-  // TODO посмотреть в апи постмапинг
   @PostMapping
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<NewPostResponse> newPost(

@@ -23,9 +23,8 @@ public class ModerateService {
 
   public ModerationResponse getModerator(ModerationRequest moderationRequest, Principal principal) {
     ModerationResponse moderationResponse = new ModerationResponse();
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
     Post post = postRepository.findPostById(moderationRequest.getPostId());
-
 
     ModerationStatus status =
         moderationRequest.getDecision().equals("accept")

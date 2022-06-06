@@ -36,33 +36,33 @@ public class TagService {
 
   private List<TagDto> toDTOTags() {
     List<Tag> allTags = tagRepository.findAll();
-    int countAllPosts = postRepository.countPosts();
-    int weights = allTags.size();
+    Integer countAllPosts = postRepository.countPosts();
+    Integer weights = allTags.size();
 
-    int maxTag =
+    Integer maxTag =
         allTags.stream()
             .mapToInt(v -> tag2PostRepository.countOfPostsWithTheName(v.getName()))
             .max()
             .getAsInt();
 
     List<TagDto> tagDtoList = new ArrayList<>();
-
+    //TODO попробовать из базы сразу доставать
     for (int a = 0; a < allTags.size(); a++) {
       TagDto tagDto = new TagDto();
       String tagsName = allTags.get(a).getName();
 
-      int countOfTagsByName =
+      Integer countOfTagsByName =
           tag2PostRepository.countOfPostsWithTheName(
               tagsName); // Количество тегов с конкретным именем в постах
-      double dWeightHibernate =
+      Double dWeightHibernate =
           Double.valueOf(countOfTagsByName)
               / Double.valueOf(
                   countAllPosts); // dWeightHibernate = hibernate / weights = 4 / 20 = 0.20
-      double dWeightMax =
+      Double dWeightMax =
           Double.valueOf(maxTag)
               / Double.valueOf(weights); // dWeightMax = java / weights = 18 / 20 = 0.90
-      double k = 1.0 / dWeightMax; // k = 1 / dWeightMax = 1 / 0.90 = 1.11
-      double weightTag =
+      Double k = 1.0 / dWeightMax; // k = 1 / dWeightMax = 1 / 0.90 = 1.11
+      Double weightTag =
           dWeightHibernate * k; // weightHibernate = hibernate * k = 0.20 * 1.11 = 0.22
 
       tagDto.setName(tagsName);

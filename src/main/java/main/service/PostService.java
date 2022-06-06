@@ -56,25 +56,25 @@ public class PostService {
     this.authenticationManager = authenticationManager;
   }
 
-  public PostResponse getPostBySearch(int offset, int limit, String query) {
+  public PostResponse getPostBySearch(Integer offset, Integer limit, String query) {
 
     PostResponse postResponse = new PostResponse();
 
+    Page<Post> posts;
     if (query.isEmpty()) {
-      Page<Post> posts =
+      posts =
           postsRepository.findAllPostsSortedByRecent(
               getSortedPaging(offset, limit, Sort.by("time").descending()));
-      settersPostsResponse(postResponse, posts);
 
     } else {
-      Page<Post> posts = postsRepository.findPostsBySearch(getPaging(offset, limit), query);
-      settersPostsResponse(postResponse, posts);
+      posts = postsRepository.findPostsBySearch(getPaging(offset, limit), query);
     }
+    settersPostsResponse(postResponse, posts);
 
     return postResponse;
   }
 
-  public PostResponse getPosts(int offset, int limit, String mode) {
+  public PostResponse getPosts(Integer offset, Integer limit, String mode) {
     PostResponse postResponse = new PostResponse();
 
     if (mode.equals("recent")) {
@@ -109,20 +109,20 @@ public class PostService {
     postResponse.setCount(posts.getTotalElements());
   }
 
-  public Pageable getPaging(int offset, int limit) {
+  public Pageable getPaging(Integer offset, Integer limit) {
 
     // limit = itemPerPage
     // offset - это отступ от начала, с какого поста мы смотреть будем
     Pageable paging;
-    int pageNumber = offset / limit;
+    Integer pageNumber = offset / limit;
     paging = PageRequest.of(pageNumber, limit);
 
     return paging;
   }
 
-  public Pageable getSortedPaging(int offset, int limit, Sort sort) {
+  public Pageable getSortedPaging(Integer offset, Integer limit, Sort sort) {
     Pageable sortedPaging;
-    int pageNumber = offset / limit;
+    Integer pageNumber = offset / limit;
     sortedPaging = PageRequest.of(pageNumber, limit, sort);
 
     return sortedPaging;
@@ -146,24 +146,23 @@ public class PostService {
     return calendarResponse;
   }
 
-  public PostResponse getPostByDate(int offset, int limit, String date) {
+  public PostResponse getPostByDate(Integer offset, Integer limit, String date) {
     PostResponse postResponse = new PostResponse();
     Page<Post> posts = postsRepository.findPostsByDate(getPaging(offset, limit), date);
     settersPostsResponse(postResponse, posts);
     return postResponse;
   }
 
-  public PostResponse getPostByTag(int offset, int limit, String tag) {
+  public PostResponse getPostByTag(Integer offset, Integer limit, String tag) {
     PostResponse postResponse = new PostResponse();
-    int tagId = tagRepository.findTagIdByName(tag);
+    Integer tagId = tagRepository.findTagIdByName(tag);
 
     Page<Post> posts = postsRepository.findPostsByTagId(getPaging(offset, limit), tagId);
     settersPostsResponse(postResponse, posts);
-
     return postResponse;
   }
 
-  public PostIdResponse getPostById(int id) {
+  public PostIdResponse getPostById(Integer id) {
     Post post;
     try {
       post = postsRepository.findPostById(id);
@@ -175,11 +174,11 @@ public class PostService {
     return postMapper.toPostResponseById(post);
   }
 
-  public PostResponse getMyPosts(int offset, int limit, String status) {
+  public PostResponse getMyPosts(Integer offset, Integer limit, String status) {
     PostResponse postResponse = new PostResponse();
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     User user = (User) authentication.getPrincipal();
-    main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
+    main.model.User currentUser = userRepository.findByEmail(user.getUsername());
     Sort sort = Sort.by("time").descending();
 
     if (status.equals("inactive")) {
@@ -217,11 +216,11 @@ public class PostService {
     return postResponse;
   }
 
-  public PostResponse getModerationPost(int offset, int limit, String status) {
+  public PostResponse getModerationPost(Integer offset, Integer limit, String status) {
     PostResponse postResponse = new PostResponse();
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     User user = (User) authentication.getPrincipal();
-    main.model.User currentUser = userRepository.findByEmail(user.getUsername()).get();
+    main.model.User currentUser = userRepository.findByEmail(user.getUsername());
 
     ModerationStatus moderationStatus = ModerationStatus.NEW;
     if (status.equals("accepted")) {
@@ -249,7 +248,7 @@ public class PostService {
     Integer MIN_TITLE_LENGTH = 3;
     Integer MIN_TEXT_LENGTH = 10;
     NewPostResponse newPostsResponse = new NewPostResponse();
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
     ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
 
     String title = newPostRequest.getTitle();
@@ -290,13 +289,10 @@ public class PostService {
 
   public NewPostResponse updatePost(
       Integer id, NewPostRequest newPostRequest, Principal principal) {
-    // TODO убрать эти колхозные методы, сделать мапперы, из репозиториев нормально дёргаать
-    // и попробовать соеденить с addNewPost, большинство одинаковой реализации
     Integer MIN_TITLE_LENGTH = 3;
     Integer MIN_TEXT_LENGTH = 10;
     NewPostResponse newPostsResponse = new NewPostResponse();
-    // TODO сделать, чтобы не возвращал Optional, а просто User
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
     ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
 
     String title = newPostRequest.getTitle();
@@ -345,8 +341,6 @@ public class PostService {
   }
 
   private List<Tag> lookTag(List<String> tags, Post post) {
-    // TODO после настройки модерации поправить теги. Посмотреть, как они сохраняются в базу и
-    // узнать, попадают ли они все на пост
     List<Tag> tagList = new ArrayList<>();
 
     for (String tagName : tags) {
@@ -354,7 +348,6 @@ public class PostService {
       if (tagOpt.isEmpty()) {
         Tag tag = new Tag();
         tag.setName(tagName);
-        // TODO мб в else тоже нужен tagList.add
         tagList.add(tag);
       } else {
         Tag repoTag = tagOpt.get();

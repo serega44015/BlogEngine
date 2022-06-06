@@ -31,7 +31,7 @@ public class LikeDislikeService {
 
   public LikeDislikeResponse getLikePost(LikeDislikeRequest likeRequest, Principal principal) {
     LikeDislikeResponse likeResponse = new LikeDislikeResponse();
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
     Post post = postRepository.findPostById(likeRequest.getPostId());
     PostVote postVote = postVoteRepository.findByPostAndUserId(post, currentUser.getId());
 
@@ -62,7 +62,7 @@ public class LikeDislikeService {
 
   public LikeDislikeResponse getDislikePost(LikeDislikeRequest likeRequest, Principal principal) {
     LikeDislikeResponse likeResponse = new LikeDislikeResponse();
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
     Post post = postRepository.findPostById(likeRequest.getPostId());
     PostVote postVote = postVoteRepository.findByPostAndUserId(post, currentUser.getId());
 

@@ -29,14 +29,13 @@ public class StatsService {
   }
 
   public StatisticResponse getMyStatistics(Principal principal) {
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
-    List<Post> userPosts = userRepository.findByEmail(currentUser.getEmail()).get().getUserPosts();
-
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
+    List<Post> userPosts = userRepository.findByEmail(currentUser.getEmail()).getUserPosts();
     return getStatistics(userPosts);
   }
 
   public ResponseEntity<StatisticResponse> getAllStatistics(Principal principal) {
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
     StatisticResponse statisticResponse = getStatistics(postRepository.findAll());
 
     String showStatistics = globalSettingRepository.findByCode("STATISTICS_IS_PUBLIC").getValue();
@@ -56,7 +55,6 @@ public class StatsService {
     Integer viewCount = 0;
     Long firstPublication = posts.get(0).getTime().getTimeInMillis() / 1000;
 
-    // TODO подумать, как превратить в стрим
     for (Post p : posts) {
       for (PostVote pv : p.getPostVoteList()) {
         if (pv.getValue() == 1) {

@@ -34,12 +34,12 @@ public class CommentService {
   public ResponseEntity<CommentResponse> postComment(
       CommentRequest commentRequest, Principal principal) {
 
-    main.model.User currentUser = userRepository.findByEmail(principal.getName()).get();
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
 
     CommentResponse commentResponse = new CommentResponse();
     PostComment postComment = new PostComment();
-    int parentId = commentRequest.getParentId();
-    int postId = commentRequest.getPostId();
+    Integer parentId = commentRequest.getParentId();
+    Integer postId = commentRequest.getPostId();
     String commentText = commentRequest.getText();
 
     if (commentText.isEmpty()) {

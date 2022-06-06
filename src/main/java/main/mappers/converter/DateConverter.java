@@ -18,7 +18,6 @@ public class DateConverter {
             return 0;
         }
 
-        //TODO тут вроде на 3 часа раньше показывает
         long time = calendarTime.getTime().getTime() / 1000;
         return time;
     }

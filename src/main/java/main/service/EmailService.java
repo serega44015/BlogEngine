@@ -22,6 +22,7 @@ public class EmailService {
   private final UserRepository userRepository;
   private final CaptchaCodeRepository captchaCodeRepository;
   private final MailSender mailSender;
+  private final Integer PASSWORD_MIN_LENGTH = 6;
 
   public EmailService(
       UserRepository userRepository,
@@ -34,7 +35,7 @@ public class EmailService {
 
   public PasswordRestoreResponse restore(RestoreRequest restoreRequest) {
     PasswordRestoreResponse response = new PasswordRestoreResponse();
-    User user = userRepository.findByEmail(restoreRequest.getEmail()).get();
+    User user = userRepository.findByEmail(restoreRequest.getEmail());
 
     if (Objects.isNull(user) || StringUtils.isEmpty(restoreRequest.getEmail())) {
       response.setResult(false);
@@ -71,12 +72,12 @@ public class EmailService {
               + " <a href=\n"
               + " \\\"/auth/restore\\\">Запросить ссылку снова</a>");
     } else {
-      if (changePasswordRequest.getPassword().length() >= 6) {
+      if (changePasswordRequest.getPassword().length() >= PASSWORD_MIN_LENGTH) {
         passwordChangeResponse.setResult(true);
         user.setPassword(encoder.encode(changePasswordRequest.getPassword()));
       } else {
         passwordChangeResponse.setResult(false);
-        errorPasswordChangeDto.setPassword("Пароль короче 6-ти символов");
+        errorPasswordChangeDto.setPassword("Пароль короче " +  PASSWORD_MIN_LENGTH + " символов");
       }
 
       CaptchaCode captchaCode =
@@ -92,7 +93,7 @@ public class EmailService {
     return passwordChangeResponse;
   }
 
-  private boolean checkCaptcha(String captcha, CaptchaCode repoCaptcha) {
+  private Boolean checkCaptcha(String captcha, CaptchaCode repoCaptcha) {
     Boolean check = true;
     Boolean captchaCorrect = captcha.equals(repoCaptcha.getCode());
 

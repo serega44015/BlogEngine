@@ -8,6 +8,7 @@ import main.model.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,7 @@ public class RegisterService {
     String captcha = registerRequest.getCaptcha();
     String secretCaptcha = registerRequest.getCaptchaSecret();
 
-    Boolean validEmail = userRepository.findByEmail(email).isPresent() ? false : true;
+    Boolean validEmail = Objects.nonNull(userRepository.findByEmail(email)) ? false : true;
     Boolean validName = isValidName(name);
     Boolean validPassword = isValidPassword(password);
     Boolean validCaptcha = captcha.equals(secretCaptcha);
