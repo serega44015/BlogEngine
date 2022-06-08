@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +49,6 @@ public class ProfileService {
     String email = profileRequest.getEmail();
     String password = profileRequest.getPassword();
     String name = profileRequest.getName();
-    String photo = profileRequest.getPhoto(); //TODO после фронта посмотреть
     Integer removePhoto = profileRequest.getRemovePhoto();
 
     return editProfile(name, email, currentUser, password, removePhoto);
@@ -58,7 +58,7 @@ public class ProfileService {
       String name, String email, User currentUser, String password, Integer removePhoto) {
     ProfileResponse profileResponse = new ProfileResponse();
     ErrorProfileDto errorProfileDto = new ErrorProfileDto();
-
+    profileResponse.setResult(true);
     while (true) {
       if (email.equals(currentUser.getEmail())) {
         break;
@@ -84,8 +84,12 @@ public class ProfileService {
     }
 
     if (Objects.nonNull(removePhoto) && removePhoto == 1) {
-      // TODO remove is database userRepositoryDell(currentUser.getPhoto()); Если разберусь, что с
-      // фронтом
+      Path oldFileNext = Path.of(currentUser.getPhoto().substring(1));
+      try {
+        Files.delete(oldFileNext);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       currentUser.setPhoto("");
     }
 
