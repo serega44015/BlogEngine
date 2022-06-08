@@ -8,12 +8,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class DefaultController {
 
-  private final InitResponse initResponse;
-
-  public DefaultController(InitResponse initResponse) {
-    this.initResponse = initResponse;
-  }
-
   @RequestMapping("/")
   public String defaultController() {
     return "index";

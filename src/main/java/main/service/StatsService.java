@@ -37,13 +37,11 @@ public class StatsService {
   public ResponseEntity<StatisticResponse> getAllStatistics(Principal principal) {
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
     StatisticResponse statisticResponse = getStatistics(postRepository.findAll());
-
     String showStatistics = globalSettingRepository.findByCode("STATISTICS_IS_PUBLIC").getValue();
 
     if (currentUser.getIsModerator() == 0 && showStatistics.equals("NO")) {
       return new ResponseEntity<>(statisticResponse, HttpStatus.UNAUTHORIZED);
     }
-
     return new ResponseEntity<>(statisticResponse, HttpStatus.OK);
   }
 

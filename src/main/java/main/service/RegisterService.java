@@ -24,7 +24,7 @@ public class RegisterService {
     RegisterResponse registerResponse = new RegisterResponse();
     ErrorDto errorDTO = new ErrorDto();
     User user = new User();
-
+    //TODO тут тоже можно потом маппер посмотреть, но врядли
     String email = registerRequest.getEmail();
     String name = registerRequest.getName();
     String password = registerRequest.getPassword();

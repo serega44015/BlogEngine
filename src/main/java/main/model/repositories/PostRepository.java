@@ -20,14 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
           "SELECT p FROM Post p "
               + "LEFT JOIN User u ON p.user.id = u.id "
               + "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME")
-  Page<Post> findAllPostsSortedByRecent(Pageable pageable);
-
-  @Query(
-      value =
-          "SELECT p FROM Post p "
-              + "LEFT JOIN User u ON p.user.id = u.id "
-              + "WHERE p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME")
-  Page<Post> findAllPostsSortedByEarly(Pageable pageable);
+  Page<Post> findAllPostsSortedByRecentOrEarly(Pageable pageable);
 
   @Query(
       value =
