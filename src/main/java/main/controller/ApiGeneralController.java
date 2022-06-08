@@ -69,9 +69,9 @@ public class ApiGeneralController {
     return tagService.getTags();
   }
 
-  @GetMapping("calendar")
-  public CalendarResponse calendar(@RequestParam(value = "year", defaultValue = "") String year) {
-    return postService.getPostByYear(year);
+  @GetMapping("/calendar")
+  public CalendarResponse calendar() {
+    return postService.getPostsByYear();
   }
 
   @PostMapping("/comment")

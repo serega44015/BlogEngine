@@ -24,11 +24,14 @@ public class CheckService {
     if (Objects.isNull(user)) {
       throw new UsernameNotFoundException("user" + email + " not found");
     }
+
+    //TODO Логин в самое конце тогда в мапперы
     UserLoginDto userLoginDTO = new UserLoginDto();
     userLoginDTO.setEmail(user.getEmail());
     userLoginDTO.setName(user.getName());
     userLoginDTO.setModeration(user.getIsModerator() == 1);
     userLoginDTO.setId(user.getId());
+    userLoginDTO.setPhoto(user.getPhoto());
 
     LoginResponse loginResponse = new LoginResponse();
     loginResponse.setResult(true);

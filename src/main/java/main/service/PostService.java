@@ -6,7 +6,6 @@ import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.NewPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
-import main.mappers.PostCommentMapper;
 import main.mappers.PostMapper;
 import main.model.GlobalSetting;
 import main.model.Post;
@@ -38,8 +37,6 @@ public class PostService {
   private final Tag2PostRepository tag2PostRepository;
   private final GlobalSettingRepository globalSettingRepository;
   private final PostMapper postMapper = PostMapper.INSTANCE;
-  private final PostCommentMapper commentsMapper = PostCommentMapper.INSTANCE;
-  private final AuthenticationManager authenticationManager;
 
   public PostService(
       PostRepository postsRepository,
@@ -53,7 +50,6 @@ public class PostService {
     this.tagRepository = tagRepository;
     this.tag2PostRepository = tag2PostRepository;
     this.globalSettingRepository = globalSettingRepository;
-    this.authenticationManager = authenticationManager;
   }
 
   public PostResponse getPostBySearch(Integer offset, Integer limit, String query) {
@@ -63,14 +59,12 @@ public class PostService {
     Page<Post> posts;
     if (query.isEmpty()) {
       posts =
-          postsRepository.findAllPostsSortedByRecent(
+          postsRepository.findAllPostsSortedByRecentOrEarly(
               getSortedPaging(offset, limit, Sort.by("time").descending()));
-
     } else {
       posts = postsRepository.findPostsBySearch(getPaging(offset, limit), query);
     }
     settersPostsResponse(postResponse, posts);
-
     return postResponse;
   }
 
@@ -79,14 +73,14 @@ public class PostService {
 
     if (mode.equals("recent")) {
       Page<Post> posts =
-          postsRepository.findAllPostsSortedByRecent(
+          postsRepository.findAllPostsSortedByRecentOrEarly(
               getSortedPaging(offset, limit, Sort.by("time").descending()));
       settersPostsResponse(postResponse, posts);
     }
 
     if (mode.equals("early")) {
       Page<Post> posts =
-          postsRepository.findAllPostsSortedByRecent(
+          postsRepository.findAllPostsSortedByRecentOrEarly(
               getSortedPaging(offset, limit, Sort.by("time").ascending()));
       settersPostsResponse(postResponse, posts);
     }
@@ -110,7 +104,6 @@ public class PostService {
   }
 
   public Pageable getPaging(Integer offset, Integer limit) {
-
     // limit = itemPerPage
     // offset - это отступ от начала, с какого поста мы смотреть будем
     Pageable paging;
@@ -128,7 +121,7 @@ public class PostService {
     return sortedPaging;
   }
 
-  public CalendarResponse getPostByYear(String year) {
+  public CalendarResponse getPostsByYear() {
 
     CalendarResponse calendarResponse = new CalendarResponse();
     TreeSet<Integer> years = postsRepository.getSetYearsByAllPosts();
@@ -142,7 +135,6 @@ public class PostService {
 
     calendarResponse.setYears(years);
     calendarResponse.setPosts(posts);
-
     return calendarResponse;
   }
 
@@ -155,8 +147,7 @@ public class PostService {
 
   public PostResponse getPostByTag(Integer offset, Integer limit, String tag) {
     PostResponse postResponse = new PostResponse();
-    Integer tagId = tagRepository.findTagIdByName(tag);
-
+    Integer tagId = tagRepository.findByName(tag).getId();
     Page<Post> posts = postsRepository.findPostsByTagId(getPaging(offset, limit), tagId);
     settersPostsResponse(postResponse, posts);
     return postResponse;
