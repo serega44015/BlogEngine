@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,11 +36,38 @@ public class ProfileService {
       String email,
       String password,
       Integer removePhoto,
-      Principal principal) {
+      Principal principal,
+      HttpServletRequest request) {
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
-    currentUser.setPhoto(store(photo, "upload/ab/cd/ef/", currentUser.getPhoto()));
-
+    // currentUser.setPhoto(store(photo, "upload/ab/cd/ef/", currentUser.getPhoto()));
+    addImage(photo, request, principal);
     return editProfile(name, email, currentUser, password, removePhoto);
+  }
+
+  public void addImage(byte[] photo, HttpServletRequest request, Principal principal) {
+    String path = "upload/" + principal.hashCode() + ".jpg";
+    String realPath = request.getServletContext().getRealPath(path);
+    System.out.println("path " + path);
+    System.out.println("realpath " + realPath);
+    File file = new File(realPath);
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(photo);
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+    try {
+      BufferedImage bufferedImage = ImageIO.read(inputStream);
+      BufferedImage resizedImage = Scalr.resize(bufferedImage, 36);
+      ImageIO.write(resizedImage, "jpg", outputStream);
+      byte[] bytes = outputStream.toByteArray();
+      FileUtils.writeByteArrayToFile(file, bytes);
+    } catch (IOException e) {
+      System.out.println(e.getMessage());
+      e.printStackTrace();
+    }
+
+    User user = userRepository.findByEmail(principal.getName());
+    user.setPhoto(path);
+    userRepository.save(user);
+    System.out.println(userRepository.findByEmail(principal.getName()).getPhoto());
   }
 
   public ProfileResponse getJsonEditProfile(ProfileRequest profileRequest, Principal principal) {
@@ -49,6 +75,7 @@ public class ProfileService {
     String email = profileRequest.getEmail();
     String password = profileRequest.getPassword();
     String name = profileRequest.getName();
+    String photo = profileRequest.getPhoto(); // TODO после фронта посмотреть
     Integer removePhoto = profileRequest.getRemovePhoto();
 
     return editProfile(name, email, currentUser, password, removePhoto);
@@ -58,7 +85,7 @@ public class ProfileService {
       String name, String email, User currentUser, String password, Integer removePhoto) {
     ProfileResponse profileResponse = new ProfileResponse();
     ErrorProfileDto errorProfileDto = new ErrorProfileDto();
-    profileResponse.setResult(true);
+
     while (true) {
       if (email.equals(currentUser.getEmail())) {
         break;
@@ -84,12 +111,8 @@ public class ProfileService {
     }
 
     if (Objects.nonNull(removePhoto) && removePhoto == 1) {
-      Path oldFileNext = Path.of(currentUser.getPhoto().substring(1));
-      try {
-        Files.delete(oldFileNext);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+      // TODO remove is database userRepositoryDell(currentUser.getPhoto()); Если разберусь, что с
+      // фронтом
       currentUser.setPhoto("");
     }
 
@@ -97,35 +120,35 @@ public class ProfileService {
     return profileResponse;
   }
 
-  public String store(MultipartFile file, String uploadPath, String oldFile) {
-
-    if (file.isEmpty()) {
-      return null;
-    }
-
-    try {
-      Path uploadPathNext = Paths.get(uploadPath);
-      if (!Files.exists(uploadPathNext)) {
-        Files.createDirectories(uploadPathNext);
-      }
-
-      String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
-      String fileName = String.format("%s.%s", UUID.randomUUID(), fileExtension);
-      String filePath = String.format("%s/%s", uploadPath, fileName).replaceAll("//", "/");
-
-      if (Objects.nonNull(oldFile) && !Objects.equals(oldFile, "")) {
-        Path oldFileNext = Path.of(oldFile.substring(1));
-        if (Files.exists(oldFileNext)) Files.delete(oldFileNext);
-      }
-
-      ImageIO.write(
-          resizeImage(ImageIO.read(file.getInputStream()), 36, 36), "jpg", new File(filePath));
-
-      return "/" + filePath;
-    } catch (Exception e) {
-      return null;
-    }
-  }
+  //  public String store(byte[] photo, String uploadPath, String oldFile) {
+  //
+  //    if (file.isEmpty()) {
+  //      return null;
+  //    }
+  //
+  //    try {
+  //      Path uploadPathNext = Paths.get(uploadPath);
+  //      if (!Files.exists(uploadPathNext)) {
+  //        Files.createDirectories(uploadPathNext);
+  //      }
+  //
+  //      String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+  //      String fileName = String.format("%s.%s", UUID.randomUUID(), fileExtension);
+  //      String filePath = String.format("%s/%s", uploadPath, fileName).replaceAll("//", "/");
+  //
+  //      if (Objects.nonNull(oldFile) && !Objects.equals(oldFile, "")) {
+  //        Path oldFileNext = Path.of(oldFile.substring(1));
+  //        if (Files.exists(oldFileNext)) Files.delete(oldFileNext);
+  //      }
+  //
+  //      ImageIO.write(
+  //          resizeImage(ImageIO.read(file.getInputStream()), 36, 36), "jpg", new File(filePath));
+  //
+  //      return "/" + filePath;
+  //    } catch (Exception e) {
+  //      return null;
+  //    }
+  //  }
 
   private BufferedImage resizeImage(
       BufferedImage originalImage, int targetWidth, int targetHeight) {
