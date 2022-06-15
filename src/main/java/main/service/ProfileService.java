@@ -5,20 +5,21 @@ import main.dto.api.request.ProfileRequest;
 import main.dto.api.response.ProfileResponse;
 import main.model.User;
 import main.model.repositories.UserRepository;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.imgscalr.Scalr;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class ProfileService {
@@ -30,7 +31,7 @@ public class ProfileService {
   }
 
   public ProfileResponse getEditProfile(
-      byte[] photo,
+      MultipartFile photo,
       String name,
       String email,
       String password,

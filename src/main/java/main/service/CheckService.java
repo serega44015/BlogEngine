@@ -31,6 +31,7 @@ public class CheckService {
     userLoginDTO.setName(user.getName());
     userLoginDTO.setModeration(user.getIsModerator() == 1);
     userLoginDTO.setId(user.getId());
+    userLoginDTO.setPhoto(user.getPhoto());
 
     LoginResponse loginResponse = new LoginResponse();
     loginResponse.setResult(true);
