@@ -7,12 +7,15 @@ import main.dto.api.request.SettingsRequest;
 import main.dto.api.response.*;
 import main.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.security.Principal;
 
 @RestController
@@ -93,14 +96,14 @@ public class ApiGeneralController {
       consumes = {"multipart/form-data"})
   @PreAuthorize("hasAuthority('user:write')")
   public ProfileResponse editProfile(
-      @RequestParam(value = "photo") MultipartFile photo,
-      @RequestParam(value = "name") String name,
-      @RequestParam(value = "email") String email,
-      @RequestParam(value = "password", required = false) String password,
-      @RequestParam(value = "removePhoto", defaultValue = "0") Integer removePhoto,
-      Principal principal) {
+          @RequestPart("photo") byte[] photo,
+          @RequestParam(value = "name") String name,
+          @RequestParam(value = "email") String email,
+          @RequestParam(value = "password", required = false) String password,
+          @RequestParam(value = "removePhoto", defaultValue = "0") Integer removePhoto,
+          Principal principal, HttpServletRequest request) {
 
-    return profileService.getEditProfile(photo, name, email, password, removePhoto, principal);
+    return profileService.getEditProfile(photo, name, email, password, removePhoto, principal, request);
   }
 
   @PostMapping(
