@@ -1,6 +1,7 @@
 package main.mappers;
 
 import main.dto.CommentDto;
+import main.dto.api.request.CommentRequest;
 import main.mappers.converter.DateConverter;
 import main.model.PostComment;
 import org.mapstruct.Mapper;

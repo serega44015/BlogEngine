@@ -5,6 +5,7 @@ import main.dto.api.request.RegisterRequest;
 import main.dto.api.response.RegisterResponse;
 import main.model.User;
 import main.model.repositories.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -15,16 +16,18 @@ import java.util.regex.Pattern;
 @Service
 public class RegisterService {
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
-  public RegisterService(UserRepository userRepository) {
+  public RegisterService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   public RegisterResponse registration(RegisterRequest registerRequest) {
     RegisterResponse registerResponse = new RegisterResponse();
     ErrorDto errorDTO = new ErrorDto();
     User user = new User();
-    //TODO тут тоже можно потом маппер посмотреть, но врядли
+
     String email = registerRequest.getEmail();
     String name = registerRequest.getName();
     String password = registerRequest.getPassword();
@@ -47,9 +50,10 @@ public class RegisterService {
     } else if (!validCaptcha) {
       errorDTO.setCaptcha("Код с картинки введён неверно");
     } else {
+
       user.setEmail(email);
       user.setName(name);
-      user.setPassword(password);
+      user.setPassword(passwordEncoder.encode(password));
       user.setRegTime(new Date());
       user.setIsModerator(0);
       user.setPhoto("img");
