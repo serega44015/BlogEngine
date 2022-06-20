@@ -3,7 +3,7 @@ spring.datasource.username: root
 spring.datasource.password: root
 spring.jpa.hibernate.ddl-auto: validate
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
-server.port: ${PORT:8070}
+server.port: ${PORT:8080}
 
 blog.title: QuietCorner
 blog.subtitle: Blog
