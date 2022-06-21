@@ -116,13 +116,13 @@ public class ApiPostController {
   @PreAuthorize("hasAuthority('user:write')")
   public LikeDislikeResponse likePost(
       @RequestBody LikeDislikeRequest likeRequest, Principal principal) {
-    return likeDislikeService.getLikePost(likeRequest, principal);
+    return likeDislikeService.getReactionPost(likeRequest, principal, true);
   }
 
   @PostMapping("/dislike")
   @PreAuthorize("hasAuthority('user:write')")
   public LikeDislikeResponse dislikePost(
       @RequestBody LikeDislikeRequest likeRequest, Principal principal) {
-    return likeDislikeService.getDislikePost(likeRequest, principal);
+    return likeDislikeService.getReactionPost(likeRequest, principal, false);
   }
 }

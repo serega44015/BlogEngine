@@ -10,7 +10,7 @@ public class SettingService {
   private final GlobalSettingRepository globalSettingRepository;
   private final String YES = "YES";
   private final String NO = "YES";
-  private final Integer[] SETTING_ID = {1,2,3};
+  private final Integer[] SETTING_ID = {1, 2, 3};
 
   public SettingService(GlobalSettingRepository globalSettingRepository) {
     this.globalSettingRepository = globalSettingRepository;
@@ -53,6 +53,8 @@ public class SettingService {
   private String booleanToString(Boolean result) {
     if (result) {
       return NO;
-    } else return YES;
+    } else {
+      return YES;
+    }
   }
 }

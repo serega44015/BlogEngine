@@ -65,7 +65,7 @@ public class ApiGeneralController {
   }
 
   @GetMapping("/tag")
-  public TagResponse tag(@PathVariable @Nullable String query) {
+  public TagResponse tag() {
     return tagService.getTags();
   }
 

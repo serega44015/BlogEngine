@@ -1,16 +1,19 @@
 package main.mappers;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import javax.annotation.processing.Generated;
 import main.dto.CommentDto;
 import main.dto.UserCommentDto;
+import main.dto.api.request.CommentRequest;
+import main.model.Post;
 import main.model.PostComment;
 import main.model.User;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-08T13:08:42+0300",
+    date = "2022-06-21T12:59:35+0300",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.15 (Amazon.com Inc.)"
 )
 public class PostCommentMapperImpl implements PostCommentMapper {
@@ -27,6 +30,29 @@ public class PostCommentMapperImpl implements PostCommentMapper {
         }
 
         return list;
+    }
+
+    @Override
+    public PostComment toPostComment(CommentRequest commentRequest, Post post, User user, Calendar currentTime) {
+        if ( commentRequest == null && post == null && user == null && currentTime == null ) {
+            return null;
+        }
+
+        PostComment postComment = new PostComment();
+
+        if ( commentRequest != null ) {
+            postComment.setText( commentRequest.getText() );
+            postComment.setParentId( commentRequest.getParentId() );
+        }
+        if ( post != null ) {
+            postComment.setPost( post );
+            postComment.setUser( post.getUser() );
+        }
+        if ( currentTime != null ) {
+            postComment.setTime( currentTime );
+        }
+
+        return postComment;
     }
 
     protected UserCommentDto userToUserCommentDto(User user) {

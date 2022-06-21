@@ -46,7 +46,7 @@ public class TagService {
             .getAsInt();
 
     List<TagDto> tagDtoList = new ArrayList<>();
-    //TODO попробовать из базы сразу доставать
+
     for (int a = 0; a < allTags.size(); a++) {
       TagDto tagDto = new TagDto();
       String tagsName = allTags.get(a).getName();

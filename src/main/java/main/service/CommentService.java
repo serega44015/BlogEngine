@@ -2,6 +2,7 @@ package main.service;
 
 import main.dto.api.request.CommentRequest;
 import main.dto.api.response.CommentResponse;
+import main.mappers.PostCommentMapper;
 import main.model.Post;
 import main.model.PostComment;
 import main.model.repositories.PostCommentRepository;
@@ -20,46 +21,33 @@ public class CommentService {
 
   private final UserRepository userRepository;
   private final PostRepository postRepository;
-  private final PostCommentRepository postCommentRepository;
+  private final PostCommentMapper postCommentMapper = PostCommentMapper.INSTANCE;
 
   public CommentService(
       UserRepository userRepository,
-      PostRepository postRepository,
-      PostCommentRepository postCommentRepository) {
+      PostRepository postRepository) {
     this.userRepository = userRepository;
     this.postRepository = postRepository;
-    this.postCommentRepository = postCommentRepository;
   }
 
   public ResponseEntity<CommentResponse> postComment(
       CommentRequest commentRequest, Principal principal) {
-
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
-
     CommentResponse commentResponse = new CommentResponse();
-    PostComment postComment = new PostComment();
-    Integer parentId = commentRequest.getParentId();
-    Integer postId = commentRequest.getPostId();
-    String commentText = commentRequest.getText();
 
-    if (commentText.isEmpty()) {
+    if (commentRequest.getText().isEmpty()) {
       commentResponse.setId(1);
       commentResponse.setText("Поле для текста не может быть пустым");
       commentResponse.setResult(false);
-      return new ResponseEntity<CommentResponse>(commentResponse, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(commentResponse, HttpStatus.BAD_REQUEST);
     }
 
-    Post post = postRepository.findPostById(postId);
-    Calendar currentTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-
-    postComment.setPost(post);
-    postComment.setParentId(parentId);
-    postComment.setUser(currentUser);
-    postComment.setTime(currentTime);
-    postComment.setText(commentText);
-    postCommentRepository.save(postComment);
+    Post post = postRepository.findPostById(commentRequest.getPostId());
+    PostComment postComment =
+        postCommentMapper.toPostComment(
+            commentRequest, post, currentUser, Calendar.getInstance(TimeZone.getTimeZone("UTC")));
     commentResponse.setId(postComment.getId());
 
-    return new ResponseEntity<CommentResponse>(commentResponse, HttpStatus.OK);
+    return new ResponseEntity<>(commentResponse, HttpStatus.OK);
   }
 }

@@ -37,6 +37,8 @@ public class PostService {
   private final Tag2PostRepository tag2PostRepository;
   private final GlobalSettingRepository globalSettingRepository;
   private final PostMapper postMapper = PostMapper.INSTANCE;
+  private final Integer MIN_TITLE_LENGTH = 3;
+  private final Integer MIN_TEXT_LENGTH = 10;
 
   public PostService(
       PostRepository postsRepository,
@@ -236,8 +238,6 @@ public class PostService {
 
   public NewPostResponse addNewPost(
       @RequestBody NewPostRequest newPostRequest, Principal principal) {
-    Integer MIN_TITLE_LENGTH = 3;
-    Integer MIN_TEXT_LENGTH = 10;
     NewPostResponse newPostsResponse = new NewPostResponse();
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
     ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
@@ -261,7 +261,11 @@ public class PostService {
     } else {
       post.setModerationStatus(ModerationStatus.ACCEPTED);
     }
-
+    /*TODO тут нужно разобраться:
+    *  1. Со временем сохранения постов, отстают на 3 часа
+       2. У поста, если пустой заголовок, он все равно сохраняет пост
+       3. Попробовать сделать маппер на низ
+       4. Дублирование строк update - add new. Методы 239, 286*/
     Calendar time = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     time.setTimeInMillis(newPostRequest.getTimestamp() * 1000);
     post.setTime(time);
@@ -271,6 +275,7 @@ public class PostService {
     post.setTime(time);
     post.setTitle(title);
     post.setText(text);
+    post.setViewCount(0);
     postsRepository.save(post);
     post.setTagList(lookTag(newPostRequest.getTags(), post));
     postsRepository.save(post);
@@ -280,8 +285,6 @@ public class PostService {
 
   public NewPostResponse updatePost(
       Integer id, NewPostRequest newPostRequest, Principal principal) {
-    Integer MIN_TITLE_LENGTH = 3;
-    Integer MIN_TEXT_LENGTH = 10;
     NewPostResponse newPostsResponse = new NewPostResponse();
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
     ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();

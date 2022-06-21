@@ -17,6 +17,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.Principal;
 import java.util.Objects;
 
@@ -24,6 +26,8 @@ import java.util.Objects;
 public class ProfileService {
   private final UserRepository userRepository;
   private final Integer LIMIT_SIZE_PHOTO = 5242880;
+  private String testRealPath;
+  private String testPath;
 
   public ProfileService(UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -38,16 +42,17 @@ public class ProfileService {
       Principal principal,
       HttpServletRequest request) {
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
-    // currentUser.setPhoto(store(photo, "upload/ab/cd/ef/", currentUser.getPhoto()));
     addImage(photo, request, principal);
-    return editProfile(name, email, currentUser, password, removePhoto);
+    return editProfile(name, email, currentUser, password, removePhoto, currentUser.getPhoto());
   }
 
   public void addImage(byte[] photo, HttpServletRequest request, Principal principal) {
     String path = "upload/" + principal.hashCode() + ".jpg";
     String realPath = request.getServletContext().getRealPath(path);
     System.out.println("path " + path);
+    testPath = path;
     System.out.println("realpath " + realPath);
+    testRealPath = realPath;
     File file = new File(realPath);
     ByteArrayInputStream inputStream = new ByteArrayInputStream(photo);
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -78,11 +83,17 @@ public class ProfileService {
         profileRequest.getEmail(),
         currentUser,
         profileRequest.getPassword(),
-        profileRequest.getRemovePhoto());
+        profileRequest.getRemovePhoto(),
+        profileRequest.getPhoto());
   }
 
   private ProfileResponse editProfile(
-      String name, String email, User currentUser, String password, Integer removePhoto) {
+      String name,
+      String email,
+      User currentUser,
+      String password,
+      Integer removePhoto,
+      String photo) {
     ProfileResponse profileResponse = new ProfileResponse();
     ErrorProfileDto errorProfileDto = new ErrorProfileDto();
 
@@ -112,9 +123,14 @@ public class ProfileService {
     if (Objects.nonNull(removePhoto) && removePhoto == 1) {
       // TODO remove is database userRepositoryDell(currentUser.getPhoto()); Если разберусь, что с
       // фронтом
-      currentUser.setPhoto("");
+      try {
+        //Files.delete(Path.of(photo));
+        Files.delete(Path.of(testRealPath));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      currentUser.setPhoto(null);
     }
-
     userRepository.save(currentUser);
     return profileResponse;
   }
