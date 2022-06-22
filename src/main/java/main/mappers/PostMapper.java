@@ -14,7 +14,8 @@ public interface PostMapper {
     PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
 
     @Mapping(target = "id", source = "post.id")
-    @Mapping(target = "timeStamp", source = "post.time", qualifiedByName = "convertRegDate")
+    //@Mapping(target = "timeStamp", source = "post.time", qualifiedByName = "convertRegDate")
+    @Mapping(target = "timeStamp", source = "post.time", qualifiedByName = "convertDate")
     @Mapping(target = "userDTO", source = "post.user", qualifiedByName = "toUserDTO")
     @Mapping(target = "title", source = "post.title")
     @Mapping(target = "announce", source = "post.text")
@@ -25,7 +26,8 @@ public interface PostMapper {
     PostDto toPostDTO(Post post);
 
     @Mapping(target = "id", source = "post.id")
-    @Mapping(target = "timeStamp", source = "post.time", qualifiedByName = "convertRegDate")
+    //@Mapping(target = "timeStamp", source = "post.time", qualifiedByName = "convertRegDate")
+    @Mapping(target = "timeStamp", source = "post.time", qualifiedByName = "convertDate")
     @Mapping(target = "active", expression = "java(post.getIsActiveResult())")
     @Mapping(target = "userDto", source = "post.user", qualifiedByName = "toUserDTO")
     @Mapping(target = "title", source = "post.title")

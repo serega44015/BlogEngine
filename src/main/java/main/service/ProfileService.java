@@ -50,7 +50,6 @@ public class ProfileService {
     String path = "upload/" + principal.hashCode() + ".jpg";
     String realPath = request.getServletContext().getRealPath(path);
     System.out.println("path " + path);
-    testPath = path;
     System.out.println("realpath " + realPath);
     testRealPath = realPath;
     File file = new File(realPath);

@@ -9,12 +9,11 @@ import org.mapstruct.factory.Mappers;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-21T12:59:35+0300",
+    date = "2022-06-22T16:16:46+0300",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.15 (Amazon.com Inc.)"
 )
 public class PostMapperImpl implements PostMapper {
 
-    private final DateConverter dateConverter = new DateConverter();
     private final UserMapper userMapper = Mappers.getMapper( UserMapper.class );
     private final PostCommentMapper postCommentMapper = Mappers.getMapper( PostCommentMapper.class );
 
@@ -29,7 +28,7 @@ public class PostMapperImpl implements PostMapper {
         if ( post.getId() != null ) {
             postDto.setId( post.getId() );
         }
-        postDto.setTimeStamp( dateConverter.convertRegDate( post.getTime() ) );
+        postDto.setTimeStamp( DateConverter.dateToLong( post.getTime() ) );
         postDto.setUserDTO( userMapper.toUserDTO( post.getUser() ) );
         postDto.setTitle( post.getTitle() );
         postDto.setAnnounce( post.getText() );
@@ -53,7 +52,7 @@ public class PostMapperImpl implements PostMapper {
         PostIdResponse postIdResponse = new PostIdResponse();
 
         postIdResponse.setId( post.getId() );
-        postIdResponse.setTimeStamp( dateConverter.convertRegDate( post.getTime() ) );
+        postIdResponse.setTimeStamp( DateConverter.dateToLong( post.getTime() ) );
         postIdResponse.setUserDto( userMapper.toUserDTO( post.getUser() ) );
         postIdResponse.setTitle( post.getTitle() );
         postIdResponse.setText( post.getText() );

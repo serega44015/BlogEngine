@@ -25,8 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static main.mappers.converter.DateConverter.longToDate;
 
 @Service
 public class PostService {
@@ -262,17 +265,16 @@ public class PostService {
       post.setModerationStatus(ModerationStatus.ACCEPTED);
     }
     /*TODO тут нужно разобраться:
-    *  1. Со временем сохранения постов, отстают на 3 часа
+    *  1. Со временем сохранения постов, отстают на 3 часа: +
        2. У поста, если пустой заголовок, он все равно сохраняет пост
        3. Попробовать сделать маппер на низ
-       4. Дублирование строк update - add new. Методы 239, 286*/
-    Calendar time = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    time.setTimeInMillis(newPostRequest.getTimestamp() * 1000);
-    post.setTime(time);
+       4. Дублирование строк update - add new. Методы 239, 286
+       5. newPostRequst.setTimestamp() * 1000 in to Mapper*/
     post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
     post.setModeratorId(currentUser.getIsModerator());
     post.setUser(currentUser);
-    post.setTime(time);
+    post.setTime(longToDate(newPostRequest.getTimestamp()));
+
     post.setTitle(title);
     post.setText(text);
     post.setViewCount(0);
@@ -302,7 +304,8 @@ public class PostService {
     }
 
     Post post = postsRepository.findPostById(id);
-    Calendar time = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
+
     post.setId(post.getId());
     post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
     post.setTitle(title);
@@ -311,14 +314,16 @@ public class PostService {
     post.setTagList(lookTag(newPostRequest.getTags(), post));
     post.setModeratorId(currentUser.getIsModerator());
 
-    Long calendarTime = time.getTimeInMillis();
+
     Long requestTime = newPostRequest.getTimestamp() * 1000;
-    if (requestTime > calendarTime) {
-      time.setTimeInMillis(requestTime);
+    Long date = System.currentTimeMillis();
+    if (requestTime > date) {
+      //time.setTimeInMillis(requestTime);
+      post.setTime(longToDate(requestTime));
     } else {
-      time.setTimeInMillis(calendarTime);
+      post.setTime(longToDate(date));
     }
-    post.setTime(time);
+    //post.setTime(time.getTime()); TODO для начала с созданием разобраться. Дома покрасивше сделать
 
     Boolean isAuthor = currentUser.getName().equals(post.getUser().getName());
     Boolean isModerator = currentUser.getIsModerator() == 1;
@@ -328,7 +333,7 @@ public class PostService {
     if (isModerator) {
       post.setModerationStatus(post.getModerationStatus());
     }
-    postsRepository.save(post);
+    postsRepository.save(post); //TODO ошибка, дома исправлять
     newPostsResponse.setErrors(errorNewPostDTO);
 
     return newPostsResponse;

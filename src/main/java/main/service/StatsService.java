@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 
+import static main.mappers.converter.DateConverter.dateToLong;
+
 @Service
 public class StatsService {
   private final UserRepository userRepository;
@@ -51,7 +53,8 @@ public class StatsService {
     Integer likeCount = 0;
     Integer dislikeCount = 0;
     Integer viewCount = 0;
-    Long firstPublication = posts.get(0).getTime().getTimeInMillis() / 1000;
+    //TODO Long firstPublication = posts.get(0).getTime().getTime() / 1000;
+    Long firstPublication = dateToLong(posts.stream().findFirst().get().getTime());
 
     for (Post p : posts) {
       for (PostVote pv : p.getPostVoteList()) {
