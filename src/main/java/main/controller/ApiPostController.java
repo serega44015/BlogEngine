@@ -1,9 +1,9 @@
 package main.controller;
 
 import main.dto.api.request.LikeDislikeRequest;
-import main.dto.api.request.NewPostRequest;
+import main.dto.api.request.CreatePostRequest;
 import main.dto.api.response.LikeDislikeResponse;
-import main.dto.api.response.NewPostResponse;
+import main.dto.api.response.CreatePostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
 import main.service.LikeDislikeService;
@@ -99,17 +99,17 @@ public class ApiPostController {
 
   @PostMapping
   @PreAuthorize("hasAuthority('user:write')")
-  public ResponseEntity<NewPostResponse> newPost(
-      @RequestBody NewPostRequest newPostRequest, Principal principal) {
-    return new ResponseEntity<>(postService.addNewPost(newPostRequest, principal), HttpStatus.OK);
+  public ResponseEntity<CreatePostResponse> newPost(
+      @RequestBody CreatePostRequest createPostRequest, Principal principal) {
+    return new ResponseEntity<>(postService.addNewPost(createPostRequest, principal), HttpStatus.OK);
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('user:write')")
-  public ResponseEntity<NewPostResponse> updatePost(
-      @PathVariable int id, @RequestBody NewPostRequest newPostRequest, Principal principal) {
+  public ResponseEntity<CreatePostResponse> updatePost(
+      @PathVariable int id, @RequestBody CreatePostRequest createPostRequest, Principal principal) {
     return new ResponseEntity<>(
-        postService.updatePost(id, newPostRequest, principal), HttpStatus.OK);
+        postService.updatePost(id, createPostRequest, principal), HttpStatus.OK);
   }
 
   @PostMapping("/like")

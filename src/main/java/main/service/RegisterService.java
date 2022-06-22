@@ -8,6 +8,7 @@ import main.model.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -54,7 +55,7 @@ public class RegisterService {
       user.setEmail(email);
       user.setName(name);
       user.setPassword(passwordEncoder.encode(password));
-      user.setRegTime(new Date());
+      user.setRegTime(LocalDateTime.now());
       user.setIsModerator(0);
       user.setPhoto("img");
       userRepository.save(user);

@@ -9,8 +9,8 @@ import org.mapstruct.factory.Mappers;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-22T16:16:46+0300",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.15 (Amazon.com Inc.)"
+    date = "2022-06-22T22:05:08+0300",
+    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.2 (Oracle Corporation)"
 )
 public class PostMapperImpl implements PostMapper {
 
@@ -25,16 +25,12 @@ public class PostMapperImpl implements PostMapper {
 
         PostDto postDto = new PostDto();
 
-        if ( post.getId() != null ) {
-            postDto.setId( post.getId() );
-        }
+        postDto.setId( post.getId() );
         postDto.setTimeStamp( DateConverter.dateToLong( post.getTime() ) );
         postDto.setUserDTO( userMapper.toUserDTO( post.getUser() ) );
         postDto.setTitle( post.getTitle() );
         postDto.setAnnounce( post.getText() );
-        if ( post.getViewCount() != null ) {
-            postDto.setViewCount( post.getViewCount() );
-        }
+        postDto.setViewCount( post.getViewCount() );
 
         postDto.setLikeCount( post.getLikesAmount() );
         postDto.setDislikeCount( post.getDislikesAmount() );

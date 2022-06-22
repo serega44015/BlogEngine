@@ -1,9 +1,9 @@
 package main.service;
 
-import main.dto.ErrorNewPostDto;
-import main.dto.api.request.NewPostRequest;
+import main.dto.ErrorCreatePostDto;
+import main.dto.api.request.CreatePostRequest;
 import main.dto.api.response.CalendarResponse;
-import main.dto.api.response.NewPostResponse;
+import main.dto.api.response.CreatePostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
 import main.mappers.PostMapper;
@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static main.mappers.converter.DateConverter.dateToLong;
 import static main.mappers.converter.DateConverter.longToDate;
 
 @Service
@@ -239,21 +240,22 @@ public class PostService {
     return postResponse;
   }
 
-  public NewPostResponse addNewPost(
-      @RequestBody NewPostRequest newPostRequest, Principal principal) {
-    NewPostResponse newPostsResponse = new NewPostResponse();
+  public CreatePostResponse addNewPost(
+      @RequestBody CreatePostRequest createPostRequest, Principal principal) {
+    CreatePostResponse createPostsResponse = new CreatePostResponse();
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
-    ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
+    ErrorCreatePostDto errorCreatePostDTO = new ErrorCreatePostDto();
 
-    String title = newPostRequest.getTitle();
-    String text = newPostRequest.getText();
-    newPostsResponse.setResult(false);
+    String title = createPostRequest.getTitle();
+    String text = createPostRequest.getText();
+    createPostsResponse.setResult(false);
+
     if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
-      errorNewPostDTO.setTitle("Заголовок не установлен");
+      errorCreatePostDTO.setTitle("Заголовок не установлен");
     } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
-      errorNewPostDTO.setText("Текст публикации слишком короткий");
+      errorCreatePostDTO.setText("Текст публикации слишком короткий");
     } else {
-      newPostsResponse.setResult(true);
+      createPostsResponse.setResult(true);
     }
 
     Post post = new Post();
@@ -270,60 +272,58 @@ public class PostService {
        3. Попробовать сделать маппер на низ
        4. Дублирование строк update - add new. Методы 239, 286
        5. newPostRequst.setTimestamp() * 1000 in to Mapper*/
-    post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
+    post.setIsActive(createPostRequest.getActive().equals(true) ? 1 : 0);
     post.setModeratorId(currentUser.getIsModerator());
     post.setUser(currentUser);
-    post.setTime(longToDate(newPostRequest.getTimestamp()));
+    post.setTime(longToDate(createPostRequest.getTimestamp()));
 
     post.setTitle(title);
     post.setText(text);
     post.setViewCount(0);
     postsRepository.save(post);
-    post.setTagList(lookTag(newPostRequest.getTags(), post));
+    post.setTagList(lookTag(createPostRequest.getTags(), post));
     postsRepository.save(post);
-    newPostsResponse.setErrors(errorNewPostDTO);
-    return newPostsResponse;
+    createPostsResponse.setErrors(errorCreatePostDTO);
+    return createPostsResponse;
   }
 
-  public NewPostResponse updatePost(
-      Integer id, NewPostRequest newPostRequest, Principal principal) {
-    NewPostResponse newPostsResponse = new NewPostResponse();
+  public CreatePostResponse updatePost(
+      Integer id, CreatePostRequest createPostRequest, Principal principal) {
+
+    CreatePostResponse createPostsResponse = new CreatePostResponse();
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
-    ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
+    ErrorCreatePostDto errorCreatePostDTO = new ErrorCreatePostDto();
 
-    String title = newPostRequest.getTitle();
-    String text = newPostRequest.getText();
+    String title = createPostRequest.getTitle();
+    String text = createPostRequest.getText();
 
-    newPostsResponse.setResult(false);
+    createPostsResponse.setResult(false);
     if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
-      errorNewPostDTO.setTitle("Заголовок не установлен");
+      errorCreatePostDTO.setTitle("Заголовок не установлен");
     } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
-      errorNewPostDTO.setText("Текст публикации слишком короткий");
+      errorCreatePostDTO.setText("Текст публикации слишком короткий");
     } else {
-      newPostsResponse.setResult(true);
+      createPostsResponse.setResult(true);
     }
 
     Post post = postsRepository.findPostById(id);
 
-
     post.setId(post.getId());
-    post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
+    post.setIsActive(createPostRequest.getActive().equals(true) ? 1 : 0);
     post.setTitle(title);
     post.setText(text);
     post.setUser(currentUser);
-    post.setTagList(lookTag(newPostRequest.getTags(), post));
+    post.setTagList(lookTag(createPostRequest.getTags(), post));
     post.setModeratorId(currentUser.getIsModerator());
 
+    Long requestTime = createPostRequest.getTimestamp();
+    Long date = dateToLong(LocalDateTime.now());
 
-    Long requestTime = newPostRequest.getTimestamp() * 1000;
-    Long date = System.currentTimeMillis();
     if (requestTime > date) {
-      //time.setTimeInMillis(requestTime);
       post.setTime(longToDate(requestTime));
     } else {
       post.setTime(longToDate(date));
     }
-    //post.setTime(time.getTime()); TODO для начала с созданием разобраться. Дома покрасивше сделать
 
     Boolean isAuthor = currentUser.getName().equals(post.getUser().getName());
     Boolean isModerator = currentUser.getIsModerator() == 1;
@@ -333,10 +333,14 @@ public class PostService {
     if (isModerator) {
       post.setModerationStatus(post.getModerationStatus());
     }
-    postsRepository.save(post); //TODO ошибка, дома исправлять
-    newPostsResponse.setErrors(errorNewPostDTO);
+    postsRepository.save(post);//mapper to post
+    createPostsResponse.setErrors(errorCreatePostDTO);
 
-    return newPostsResponse;
+    return createPostsResponse;
+  }
+
+  private CreatePostResponse publicationCheck() {
+    return null;
   }
 
   private List<Tag> lookTag(List<String> tags, Post post) {

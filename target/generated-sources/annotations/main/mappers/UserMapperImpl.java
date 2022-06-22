@@ -8,8 +8,8 @@ import main.model.User;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-22T16:16:47+0300",
-    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.15 (Amazon.com Inc.)"
+    date = "2022-06-22T22:05:08+0300",
+    comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.2 (Oracle Corporation)"
 )
 public class UserMapperImpl implements UserMapper {
 
@@ -37,9 +37,7 @@ public class UserMapperImpl implements UserMapper {
 
         UserCommentDto userCommentDto = new UserCommentDto();
 
-        if ( user.getId() != null ) {
-            userCommentDto.setId( user.getId() );
-        }
+        userCommentDto.setId( user.getId() );
         userCommentDto.setName( user.getName() );
         userCommentDto.setPhoto( user.getPhoto() );
 
@@ -54,9 +52,7 @@ public class UserMapperImpl implements UserMapper {
 
         UserLoginDto userLoginDto = new UserLoginDto();
 
-        if ( user.getId() != null ) {
-            userLoginDto.setId( user.getId() );
-        }
+        userLoginDto.setId( user.getId() );
         userLoginDto.setName( user.getName() );
         userLoginDto.setPhoto( user.getPhoto() );
         userLoginDto.setEmail( user.getEmail() );

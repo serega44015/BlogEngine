@@ -3,6 +3,7 @@ package main.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -24,7 +25,7 @@ public class PostVote {
   private Post post;
 
   @Column(nullable = false, columnDefinition = "DATETIME")
-  private Date time;
+  private LocalDateTime time;
 
   @Column(nullable = false, columnDefinition = "TINYINT")
   private Integer value;

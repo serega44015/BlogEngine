@@ -10,6 +10,7 @@ import main.model.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -49,7 +50,7 @@ public class LikeDislikeService {
       postVote.setPost(post);
       postVote.setValue(reaction ? LIKE : DISLIKE);
       postVote.setUserId(currentUser.getId());
-      postVote.setTime(new Date());
+      postVote.setTime(LocalDateTime.now());
     }
     postVoteRepository.save(postVote);
     likeResponse.setResult(true);

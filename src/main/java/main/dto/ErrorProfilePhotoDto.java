@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class ErrorProfilePhotoDto {
 
-    private String data;
+  private String data;
 }
