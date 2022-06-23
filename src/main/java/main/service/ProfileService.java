@@ -27,7 +27,7 @@ public class ProfileService {
   private final UserRepository userRepository;
   private final Integer LIMIT_SIZE_PHOTO = 5242880;
   private String testRealPath;
-  private String testPath;
+  private String testPath; //TODO удалить
 
   public ProfileService(UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -63,19 +63,17 @@ public class ProfileService {
       byte[] bytes = outputStream.toByteArray();
       FileUtils.writeByteArrayToFile(file, bytes);
     } catch (IOException e) {
-      System.out.println(e.getMessage());
       e.printStackTrace();
     }
 
     User user = userRepository.findByEmail(principal.getName());
     user.setPhoto(path);
     userRepository.save(user);
-    System.out.println(userRepository.findByEmail(principal.getName()).getPhoto());
   }
 
   public ProfileResponse getJsonEditProfile(ProfileRequest profileRequest, Principal principal) {
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
-    String photo = profileRequest.getPhoto(); // TODO после фронта посмотреть
+   //TODO после фронта посмотреть фото подумать
 
     return editProfile(
         profileRequest.getName(),

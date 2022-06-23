@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +24,7 @@ public class RegisterService {
   }
 
   public RegisterResponse registration(RegisterRequest registerRequest) {
+    //TODO тоже на счёт мапперов подумать
     RegisterResponse registerResponse = new RegisterResponse();
     ErrorDto errorDTO = new ErrorDto();
     User user = new User();
