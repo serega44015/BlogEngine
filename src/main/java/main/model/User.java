@@ -8,6 +8,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static main.mappers.converter.ResultValue.ONE;
+
 @Data
 @NoArgsConstructor
 @Entity
@@ -47,6 +49,6 @@ public class User {
   private List<PostComment> postCommentUser;
 
   public Role getRole() {
-    return isModerator == 1 ? Role.MODERATOR : Role.USER;
+    return isModerator == ONE ? Role.MODERATOR : Role.USER;
   }
 }

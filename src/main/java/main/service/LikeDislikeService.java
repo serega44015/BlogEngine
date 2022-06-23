@@ -39,19 +39,20 @@ public class LikeDislikeService {
     Post post = postRepository.findPostById(likeRequest.getPostId());
     PostVote postVote = postVoteRepository.findByPostAndUserId(post, currentUser.getId());
 
-    if ((postVote.getValue() == LIKE && reaction.booleanValue())
-        || (postVote.getValue() == DISLIKE && !reaction.booleanValue())) {
-      likeResponse.setResult(false);
-      return likeResponse;
-    } else if (Objects.nonNull(postVote)) {
-      postVote.setValue(postVote.getValue() == DISLIKE ? LIKE : DISLIKE);
-    } else {
+    if (Objects.isNull(postVote)) {
       postVote = new PostVote();
       postVote.setPost(post);
       postVote.setValue(reaction ? LIKE : DISLIKE);
       postVote.setUserId(currentUser.getId());
       postVote.setTime(LocalDateTime.now());
+    } else if ((postVote.getValue() == LIKE && reaction.booleanValue())
+        || (postVote.getValue() == DISLIKE && !reaction.booleanValue())) {
+      likeResponse.setResult(false);
+      return likeResponse;
+    } else {
+      postVote.setValue(postVote.getValue() == DISLIKE ? LIKE : DISLIKE);
     }
+
     postVoteRepository.save(postVote);
     likeResponse.setResult(true);
     return likeResponse;
