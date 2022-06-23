@@ -159,14 +159,7 @@ public class PostService {
   }
 
   public PostIdResponse getPostById(Integer id) {
-    Post post;
-    try {
-      post = postsRepository.findPostById(id);
-    } catch (NoSuchElementException n) {
-      n.getMessage();
-      return null;
-    }
-
+    Post post = postsRepository.findById(id).orElse(null);
     return postMapper.toPostResponseById(post);
   }
 

@@ -28,9 +28,7 @@ public class TagService {
 
   public TagResponse getTags() {
     TagResponse tagResponse = new TagResponse();
-
-    List<TagDto> tagDtoList = toDTOTags();
-    tagResponse.setTags(tagDtoList);
+    tagResponse.setTags(toDTOTags());
     return tagResponse;
   }
 
@@ -47,29 +45,30 @@ public class TagService {
 
     List<TagDto> tagDtoList = new ArrayList<>();
 
-    for (int a = 0; a < allTags.size(); a++) {
-      TagDto tagDto = new TagDto();
-      String tagsName = allTags.get(a).getName();
+    allTags.stream()
+        .forEach(
+            tag -> {
+              TagDto tagDto = new TagDto();
+              String tagsName = tag.getName();
 
-      Integer countOfTagsByName =
-          tag2PostRepository.countOfPostsWithTheName(
-              tagsName); // Количество тегов с конкретным именем в постах
-      Double dWeightHibernate =
-          Double.valueOf(countOfTagsByName)
-              / Double.valueOf(
-                  countAllPosts); // dWeightHibernate = hibernate / weights = 4 / 20 = 0.20
-      Double dWeightMax =
-          Double.valueOf(maxTag)
-              / Double.valueOf(weights); // dWeightMax = java / weights = 18 / 20 = 0.90
-      Double k = 1.0 / dWeightMax; // k = 1 / dWeightMax = 1 / 0.90 = 1.11
-      Double weightTag =
-          dWeightHibernate * k; // weightHibernate = hibernate * k = 0.20 * 1.11 = 0.22
+              Integer countOfTagsByName =
+                  tag2PostRepository.countOfPostsWithTheName(
+                      tagsName); // Количество тегов с конкретным именем в постах
+              Double dWeightHibernate =
+                  Double.valueOf(countOfTagsByName)
+                      / Double.valueOf(
+                          countAllPosts); // dWeightHibernate = hibernate / weights = 4 / 20 = 0.20
+              Double dWeightMax =
+                  Double.valueOf(maxTag)
+                      / Double.valueOf(weights); // dWeightMax = java / weights = 18 / 20 = 0.90
+              Double k = 1.0 / dWeightMax; // k = 1 / dWeightMax = 1 / 0.90 = 1.11
+              Double weightTag =
+                  dWeightHibernate * k; // weightHibernate = hibernate * k = 0.20 * 1.11 = 0.22
 
-      tagDto.setName(tagsName);
-      tagDto.setWeight(weightTag);
-      tagDtoList.add(tagDto);
-    }
-
+              tagDto.setName(tagsName);
+              tagDto.setWeight(weightTag);
+              tagDtoList.add(tagDto);
+            });
     return tagDtoList;
   }
 }

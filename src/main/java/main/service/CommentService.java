@@ -16,6 +16,8 @@ import java.security.Principal;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import static main.mappers.converter.ResultValue.ONE;
+
 @Service
 public class CommentService {
 
@@ -36,7 +38,7 @@ public class CommentService {
     CommentResponse commentResponse = new CommentResponse();
 
     if (commentRequest.getText().isEmpty()) {
-      commentResponse.setId(1);
+      commentResponse.setId(ONE);
       commentResponse.setText("Поле для текста не может быть пустым");
       commentResponse.setResult(false);
       return new ResponseEntity<>(commentResponse, HttpStatus.BAD_REQUEST);

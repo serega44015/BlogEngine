@@ -24,7 +24,6 @@ public class RegisterService {
   }
 
   public RegisterResponse registration(RegisterRequest registerRequest) {
-    //TODO тоже на счёт мапперов подумать
     RegisterResponse registerResponse = new RegisterResponse();
     ErrorDto errorDTO = new ErrorDto();
     User user = new User();

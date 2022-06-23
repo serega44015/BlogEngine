@@ -5,11 +5,12 @@ import main.dto.api.response.GlobalSettingsResponse;
 import main.model.repositories.GlobalSettingRepository;
 import org.springframework.stereotype.Service;
 
+import static main.mappers.converter.ResultValue.NO;
+import static main.mappers.converter.ResultValue.YES;
+
 @Service
 public class SettingService {
   private final GlobalSettingRepository globalSettingRepository;
-  private final String YES = "YES";
-  private final String NO = "YES";
   private final Integer[] SETTING_ID = {1, 2, 3};
 
   public SettingService(GlobalSettingRepository globalSettingRepository) {

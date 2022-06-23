@@ -107,7 +107,7 @@ public class ApiPostController {
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<OperationPostResponse> updatePost(
-      @PathVariable int id, @RequestBody CreatePostRequest createPostRequest, Principal principal) {
+      @PathVariable Integer id, @RequestBody CreatePostRequest createPostRequest, Principal principal) {
     return new ResponseEntity<>(
         postService.updatePost(id, createPostRequest, principal), HttpStatus.OK);
   }
