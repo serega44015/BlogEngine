@@ -11,6 +11,7 @@ import java.time.ZoneId;
 public class DateConverter {
   private static Long thousand = 1000L;
 
+  @Named("convertLong")
   public static LocalDateTime longToDate(Long dateLong) {
     return null == dateLong
         ? null

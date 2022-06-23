@@ -6,10 +6,7 @@ import main.model.enums.ModerationStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -59,30 +56,4 @@ public class Post {
       joinColumns = {@JoinColumn(name = "post_id")},
       inverseJoinColumns = {@JoinColumn(name = "tag_id")})
   private List<Tag> tagList;
-
-  public int getLikesAmount() {
-    return postVoteList.stream()
-        .filter(p -> p.getValue() == 1)
-        .collect(Collectors.toList())
-        .size();
-  }
-
-  public Integer getDislikesAmount() {
-    return postVoteList.stream()
-        .filter(p -> p.getValue() == -1)
-        .collect(Collectors.toList())
-        .size();
-  }
-
-  public Integer getCommentCount() {
-    return postCommentList.size();
-  }
-
-  public Boolean getIsActiveResult() {
-    return isActive == 1 ? true : false;
-  }
-
-  public List<String> getTagNameList() {
-    return tagList.stream().map(t -> t.getName()).collect(Collectors.toList());
-  }
 }

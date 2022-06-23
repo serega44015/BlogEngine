@@ -6,7 +6,6 @@ import main.model.enums.Role;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -35,7 +34,7 @@ public class User {
   @Column(nullable = false, columnDefinition = "VARCHAR(255)")
   private String password;
 
-  @Column(nullable = true, columnDefinition = "VARCHAR(255)")
+  @Column(columnDefinition = "VARCHAR(255)")
   private String code;
 
   @Column(nullable = false, columnDefinition = "TEXT")

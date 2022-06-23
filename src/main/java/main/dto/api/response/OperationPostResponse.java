@@ -4,7 +4,7 @@ import lombok.Data;
 import main.dto.ErrorCreatePostDto;
 
 @Data
-public class CreatePostResponse {
+public class OperationPostResponse {
 
   private Boolean result;
   private ErrorCreatePostDto errors;

@@ -23,7 +23,6 @@ public interface PostCommentMapper {
     @Named("toListCommentDTO")
     @Mapping(target = "id", source = "comments.id")
     @Mapping(target = "text", source = "comments.text")
-    //@Mapping(target = "timeStamp", source = "comments.time", qualifiedByName = "convertRegDate")
     @Mapping(target = "timeStamp", source = "comments.time", qualifiedByName = "convertDate")
     @Mapping(target = "user", source = "comments.user", qualifiedByName = "toUserCommentDTO")
     List<CommentDto> toListCommentDTO(List<PostComment> comments);

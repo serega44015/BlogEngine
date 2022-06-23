@@ -3,7 +3,7 @@ package main.controller;
 import main.dto.api.request.LikeDislikeRequest;
 import main.dto.api.request.CreatePostRequest;
 import main.dto.api.response.LikeDislikeResponse;
-import main.dto.api.response.CreatePostResponse;
+import main.dto.api.response.OperationPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
 import main.service.LikeDislikeService;
@@ -99,14 +99,14 @@ public class ApiPostController {
 
   @PostMapping
   @PreAuthorize("hasAuthority('user:write')")
-  public ResponseEntity<CreatePostResponse> newPost(
+  public ResponseEntity<OperationPostResponse> newPost(
       @RequestBody CreatePostRequest createPostRequest, Principal principal) {
     return new ResponseEntity<>(postService.addNewPost(createPostRequest, principal), HttpStatus.OK);
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('user:write')")
-  public ResponseEntity<CreatePostResponse> updatePost(
+  public ResponseEntity<OperationPostResponse> updatePost(
       @PathVariable int id, @RequestBody CreatePostRequest createPostRequest, Principal principal) {
     return new ResponseEntity<>(
         postService.updatePost(id, createPostRequest, principal), HttpStatus.OK);
