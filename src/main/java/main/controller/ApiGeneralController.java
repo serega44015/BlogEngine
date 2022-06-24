@@ -107,8 +107,8 @@ public class ApiGeneralController {
       consumes = {"application/json"})
   @PreAuthorize("hasAuthority('user:write')")
   public ProfileResponse editProfileJson(
-      @RequestBody ProfileRequest profileRequest, Principal principal) {
-    return profileService.getJsonEditProfile(profileRequest, principal);
+      @RequestBody ProfileRequest profileRequest, Principal principal, HttpServletRequest request) {
+    return profileService.getJsonEditProfile(profileRequest, principal, request);
   }
 
   @GetMapping("/statistics/my")

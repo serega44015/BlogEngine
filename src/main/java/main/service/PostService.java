@@ -7,6 +7,7 @@ import main.dto.api.response.OperationPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
 import main.mappers.PostMapper;
+import main.mappers.converter.ResultValue;
 import main.model.GlobalSetting;
 import main.model.Post;
 import main.model.Tag;
@@ -23,6 +24,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -73,7 +75,11 @@ public class PostService {
     return postResponse;
   }
 
-  public PostResponse getPosts(Integer offset, Integer limit, String mode) {
+  public PostResponse getPosts(Integer offset, Integer limit, String mode, HttpServletRequest request) {
+    if (loadingResultPhoto){
+      ResultValue.downloadPhoto(request);
+    }
+
     PostResponse postResponse = new PostResponse();
 
     if (mode.equals(RECENT)) {

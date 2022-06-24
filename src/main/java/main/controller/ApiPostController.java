@@ -1,11 +1,12 @@
 package main.controller;
 
-import main.dto.api.request.LikeDislikeRequest;
 import main.dto.api.request.CreatePostRequest;
+import main.dto.api.request.LikeDislikeRequest;
 import main.dto.api.response.LikeDislikeResponse;
 import main.dto.api.response.OperationPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
+import main.mappers.converter.ResultValue;
 import main.service.LikeDislikeService;
 import main.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -36,8 +38,10 @@ public class ApiPostController {
   public ResponseEntity<PostResponse> posts(
       @RequestParam(defaultValue = "0", required = false) Integer offset,
       @RequestParam(defaultValue = "10", required = false) Integer limit,
-      @RequestParam(defaultValue = "popular", required = false) String mode) {
-    return new ResponseEntity<>(postService.getPosts(offset, limit, mode), HttpStatus.OK);
+      @RequestParam(defaultValue = "popular", required = false) String mode,
+      HttpServletRequest request) {
+    return new ResponseEntity<>(
+        postService.getPosts(offset, limit, mode, request), HttpStatus.OK);
   }
 
   @GetMapping("/search")
@@ -101,13 +105,16 @@ public class ApiPostController {
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<OperationPostResponse> newPost(
       @RequestBody CreatePostRequest createPostRequest, Principal principal) {
-    return new ResponseEntity<>(postService.addNewPost(createPostRequest, principal), HttpStatus.OK);
+    return new ResponseEntity<>(
+        postService.addNewPost(createPostRequest, principal), HttpStatus.OK);
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<OperationPostResponse> updatePost(
-      @PathVariable Integer id, @RequestBody CreatePostRequest createPostRequest, Principal principal) {
+      @PathVariable Integer id,
+      @RequestBody CreatePostRequest createPostRequest,
+      Principal principal) {
     return new ResponseEntity<>(
         postService.updatePost(id, createPostRequest, principal), HttpStatus.OK);
   }
