@@ -3,7 +3,6 @@ package main.mappers.converter;
 import main.model.PostComment;
 import main.model.PostVote;
 import main.model.Tag;
-import main.model.repositories.UserRepository;
 import org.apache.commons.io.FileUtils;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
