@@ -27,7 +27,8 @@ public class ResultValue {
   public static final String PENDING = "pending";
   public static final String DECLINED = "declined";
   public static final String PUBLISHED = "published";
-  public static final String ACCEPTED = "accepted";
+  public static final String ACCEPTED = "accept";
+  public static final String NEW = "new";
   public static final String POST_PREMODERATION = "POST_PREMODERATION";
   public static final String STATISTICS_IS_PUBLIC = "STATISTICS_IS_PUBLIC";
   public static final String YES = "YES";

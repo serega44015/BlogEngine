@@ -6,7 +6,6 @@ import main.dto.api.response.LikeDislikeResponse;
 import main.dto.api.response.OperationPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
-import main.mappers.converter.ResultValue;
 import main.service.LikeDislikeService;
 import main.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +33,12 @@ public class ApiPostController {
   }
 
   @GetMapping
-  @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<PostResponse> posts(
       @RequestParam(defaultValue = "0", required = false) Integer offset,
       @RequestParam(defaultValue = "10", required = false) Integer limit,
       @RequestParam(defaultValue = "popular", required = false) String mode,
       HttpServletRequest request) {
-    return new ResponseEntity<>(
-        postService.getPosts(offset, limit, mode, request), HttpStatus.OK);
+    return new ResponseEntity<>(postService.getPosts(offset, limit, mode, request), HttpStatus.OK);
   }
 
   @GetMapping("/search")

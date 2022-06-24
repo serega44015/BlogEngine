@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 
 import static main.mappers.converter.ResultValue.ACCEPTED;
+import static main.mappers.converter.ResultValue.ONE;
 
 @Service
 public class ModerateService {
@@ -34,7 +35,7 @@ public class ModerateService {
             : ModerationStatus.DECLINED;
     post.setModerationStatus(status);
 
-    if (currentUser.getIsModerator() == 1) {
+    if (currentUser.getIsModerator() == ONE) {
       moderationResponse.setResult(true);
     } else {
       moderationResponse.setResult(false);

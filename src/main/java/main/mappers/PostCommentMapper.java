@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -32,6 +32,6 @@ public interface PostCommentMapper {
     @Mapping(target = "text", source = "commentRequest.text")
     @Mapping(target = "post", source = "post")
     @Mapping(target = "time", source = "currentTime")
-    PostComment toPostComment(CommentRequest commentRequest, Post post, User user, Calendar currentTime);
+    PostComment toPostComment(CommentRequest commentRequest, Post post, User user, LocalDateTime currentTime);
 
 }

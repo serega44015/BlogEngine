@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.ErrorCreatePostDto;
+import main.dto.api.errorDto.ErrorCreatePostDto;
 import main.dto.api.request.CreatePostRequest;
 import main.dto.api.response.CalendarResponse;
 import main.dto.api.response.OperationPostResponse;
@@ -221,9 +221,9 @@ public class PostService {
     User user = (User) authentication.getPrincipal();
     main.model.User currentUser = userRepository.findByEmail(user.getUsername());
 
-    ModerationStatus moderationStatus = ModerationStatus.NEW;
-    if (status.equals(ACCEPTED)) {
-      moderationStatus = ModerationStatus.ACCEPTED;
+    ModerationStatus moderationStatus = ModerationStatus.ACCEPTED;
+    if (status.equals(NEW)) {
+      moderationStatus = ModerationStatus.NEW;
     }
 
     if (status.equals(DECLINED)) {

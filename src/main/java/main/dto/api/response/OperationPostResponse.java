@@ -1,7 +1,7 @@
 package main.dto.api.response;
 
 import lombok.Data;
-import main.dto.ErrorCreatePostDto;
+import main.dto.api.errorDto.ErrorCreatePostDto;
 
 @Data
 public class OperationPostResponse {

@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.ErrorProfileDto;
+import main.dto.api.errorDto.ErrorProfileDto;
 import main.dto.api.request.ProfileRequest;
 import main.dto.api.response.ProfileResponse;
 import main.model.User;
@@ -22,6 +22,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static main.mappers.converter.ResultValue.ONE;
 import static main.mappers.converter.ResultValue.UPLOAD;
@@ -80,8 +82,21 @@ public class ProfileService {
     ProfileResponse profileResponse = new ProfileResponse();
     ErrorProfileDto errorProfileDto = new ErrorProfileDto();
 
+    if (Objects.isNull(name) || !isValidName(name)) {
+      errorProfileDto.setName("Имя указано неверно");
+      profileResponse.setErrors(errorProfileDto);
+      profileResponse.setResult(false);
+      return profileResponse;
+    }
+    user.setName(name);
+
     while (true) {
-      if (email.equals(user.getEmail())) {
+      if (Objects.isNull(email)) {
+        errorProfileDto.setEmail("Поле e-mail не может быть пустым");
+        profileResponse.setErrors(errorProfileDto);
+        profileResponse.setResult(false);
+        return profileResponse;
+      } else if (email.equals(user.getEmail())) {
         break;
       } else if (Objects.isNull(userRepository.findByEmail(email))) {
         user.setEmail(email);
@@ -97,10 +112,6 @@ public class ProfileService {
     if (Objects.nonNull(password)) {
       BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
       user.setPassword(passwordEncoder.encode(password));
-    }
-
-    if (Objects.nonNull(name)) {
-      user.setName(name);
     }
 
     if (Objects.nonNull(removePhoto) && removePhoto == ONE && Objects.nonNull(user.getPhoto())) {
@@ -148,5 +159,13 @@ public class ProfileService {
       e.printStackTrace();
     }
     return user;
+  }
+
+  private Boolean isValidName(String username) {
+    String USERNAME_PATTERN =
+        "^[a-zA-Zа-яА-Я0-9]([._-](?![._-])|[a-zA-Zа-яА-Я0-9]){3,18}[a-zA-Zа-яА-Я0-9]$";
+    Pattern pattern = Pattern.compile(USERNAME_PATTERN);
+    Matcher matcher = pattern.matcher(username);
+    return matcher.matches();
   }
 }

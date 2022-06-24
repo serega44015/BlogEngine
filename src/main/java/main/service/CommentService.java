@@ -1,5 +1,6 @@
 package main.service;
 
+import main.dto.api.errorDto.ErrorCommentDto;
 import main.dto.api.request.CommentRequest;
 import main.dto.api.response.CommentResponse;
 import main.mappers.PostCommentMapper;
@@ -13,23 +14,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.Calendar;
-import java.util.TimeZone;
-
-import static main.mappers.converter.ResultValue.ONE;
+import java.time.LocalDateTime;
 
 @Service
 public class CommentService {
 
   private final UserRepository userRepository;
   private final PostRepository postRepository;
+  private final PostCommentRepository postCommentRepository;
   private final PostCommentMapper postCommentMapper = PostCommentMapper.INSTANCE;
 
   public CommentService(
       UserRepository userRepository,
-      PostRepository postRepository) {
+      PostRepository postRepository,
+      PostCommentRepository postCommentRepository) {
     this.userRepository = userRepository;
     this.postRepository = postRepository;
+    this.postCommentRepository = postCommentRepository;
   }
 
   public ResponseEntity<CommentResponse> postComment(
@@ -38,8 +39,9 @@ public class CommentService {
     CommentResponse commentResponse = new CommentResponse();
 
     if (commentRequest.getText().isEmpty()) {
-      commentResponse.setId(ONE);
-      commentResponse.setText("Поле для текста не может быть пустым");
+      ErrorCommentDto errorCommentDto = new ErrorCommentDto();
+      errorCommentDto.setText("Поле для текста не может быть пустым");
+      commentResponse.setErrors(errorCommentDto);
       commentResponse.setResult(false);
       return new ResponseEntity<>(commentResponse, HttpStatus.BAD_REQUEST);
     }
@@ -47,7 +49,8 @@ public class CommentService {
     Post post = postRepository.findPostById(commentRequest.getPostId());
     PostComment postComment =
         postCommentMapper.toPostComment(
-            commentRequest, post, currentUser, Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+            commentRequest, post, currentUser, LocalDateTime.now());
+    postCommentRepository.save(postComment);
     commentResponse.setId(postComment.getId());
 
     return new ResponseEntity<>(commentResponse, HttpStatus.OK);

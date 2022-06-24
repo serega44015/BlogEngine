@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.ErrorDto;
+import main.dto.api.errorDto.ErrorDto;
 import main.dto.api.request.RegisterRequest;
 import main.dto.api.response.RegisterResponse;
 import main.model.User;
@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static main.mappers.converter.ResultValue.ZERO;
 
 @Service
 public class RegisterService {
@@ -55,8 +57,8 @@ public class RegisterService {
       user.setName(name);
       user.setPassword(passwordEncoder.encode(password));
       user.setRegTime(LocalDateTime.now());
-      user.setIsModerator(0);
-      user.setPhoto("img");
+      user.setIsModerator(ZERO);
+      user.setPhoto(null);
       userRepository.save(user);
 
       registerResponse.setResult(true);

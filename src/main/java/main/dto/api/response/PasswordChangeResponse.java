@@ -1,7 +1,7 @@
 package main.dto.api.response;
 
 import lombok.Data;
-import main.dto.ErrorPasswordChangeDto;
+import main.dto.api.errorDto.ErrorPasswordChangeDto;
 
 @Data
 public class PasswordChangeResponse {

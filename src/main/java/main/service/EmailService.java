@@ -1,7 +1,7 @@
 package main.service;
 
 import main.config.MailSender;
-import main.dto.ErrorPasswordChangeDto;
+import main.dto.api.errorDto.ErrorPasswordChangeDto;
 import main.dto.api.request.ChangePasswordRequest;
 import main.dto.api.request.RestoreRequest;
 import main.dto.api.response.PasswordChangeResponse;
