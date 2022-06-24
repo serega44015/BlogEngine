@@ -6,34 +6,21 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
 
 @Component
 public class DateConverter {
+  private static Long thousand = 1000L;
 
-    @Named("convertRegDate")
-    public long convertRegDate(Calendar calendarTime) {
-        if (calendarTime == null) {
-            return 0;
-        }
+  @Named("convertLong")
+  public static LocalDateTime longToDate(Long dateLong) {
+    return null == dateLong
+        ? null
+        : LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(dateLong * thousand), ZoneId.of("Europe/Moscow"));
+  }
 
-        long time = calendarTime.getTime().getTime() / 1000;
-        return time;
-    }
-
-    public LocalDateTime longToDate(Long dateLong) {
-        return null == dateLong ? null : LocalDateTime.ofInstant(Instant.ofEpochMilli(dateLong), ZoneId.systemDefault());
-    }
-
-    public LocalDateTime ageToBirthDate(Integer age) {
-        return null == age ? null : LocalDateTime.now().minusYears(age);
-    }
-
-
-
-
+  @Named("convertDate")
+  public static Long dateToLong(LocalDateTime localDateTime) {
+    return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / thousand;
+  }
 }
-
-
-

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+import static main.mappers.converter.ResultValue.ONE;
+
 @Service
 public class CheckService {
 
@@ -28,7 +30,7 @@ public class CheckService {
     }
 
     UserLoginDto userLoginDTO = userMapper.toUserLoginDto(user);
-    userLoginDTO.setModeration(user.getIsModerator() == 1);
+    userLoginDTO.setModeration(user.getIsModerator() == ONE);
 
     LoginResponse loginResponse = new LoginResponse();
     loginResponse.setResult(true);

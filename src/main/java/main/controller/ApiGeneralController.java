@@ -8,7 +8,6 @@ import main.dto.api.response.*;
 import main.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,7 +64,7 @@ public class ApiGeneralController {
   }
 
   @GetMapping("/tag")
-  public TagResponse tag(@PathVariable @Nullable String query) {
+  public TagResponse tag() {
     return tagService.getTags();
   }
 
@@ -108,8 +107,8 @@ public class ApiGeneralController {
       consumes = {"application/json"})
   @PreAuthorize("hasAuthority('user:write')")
   public ProfileResponse editProfileJson(
-      @RequestBody ProfileRequest profileRequest, Principal principal) {
-    return profileService.getJsonEditProfile(profileRequest, principal);
+      @RequestBody ProfileRequest profileRequest, Principal principal, HttpServletRequest request) {
+    return profileService.getJsonEditProfile(profileRequest, principal, request);
   }
 
   @GetMapping("/statistics/my")

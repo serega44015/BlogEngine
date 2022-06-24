@@ -1,7 +1,7 @@
 package main.dto.api.response;
 
 import lombok.Data;
-import main.dto.ErrorProfilePhotoDto;
+import main.dto.api.errorDto.ErrorProfilePhotoDto;
 
 @Data
 public class PhotoProfileResponse {

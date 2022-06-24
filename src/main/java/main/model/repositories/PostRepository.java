@@ -50,27 +50,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
               + "AND p.text LIKE %:query%")
   Page<Post> findPostsBySearch(Pageable pageable, @Param("query") String query);
 
-  @Query(
-      value =
-          "SELECT COUNT(p.id) FROM Post p "
-              + "INNER JOIN PostVote pv ON p.id = pv.post.id "
-              + "WHERE pv.value = 1 AND p.id = :postsId "
-              + "GROUP BY p.id")
-  Integer countOfLikesPerPost(@Param("postsId") Integer postsId);
-
-  @Query(
-      value =
-          "SELECT COUNT(p.id) FROM Post p "
-              + "INNER JOIN PostVote pv ON p.id = pv.post.id "
-              + "WHERE pv.value = -1 AND p.id = :postsId "
-              + "GROUP BY p.id")
-  Integer countOfDisLikesPerPost(@Param("postsId") Integer postsId);
-
-  @Query(
-      value =
-          "SELECT COUNT(p.id) FROM Post p INNER JOIN PostComment pc ON p.id = pc.post.id WHERE p.id = :postsId GROUP BY p.id")
-  Integer countOfCommentsPerComments(@Param("postsId") Integer postsId);
-
   @Query(value = "SELECT COUNT(p.id) FROM Post p")
   Integer countPosts();
 
@@ -102,19 +81,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
               + "AND p.time <= CURRENT_TIME "
               + "AND tgp2.tagId = :tagId")
   Page<Post> findPostsByTagId(Pageable pageable, @Param("tagId") Integer tagId);
-
-  @Query(
-      value =
-          "SELECT p FROM Post p "
-              + "LEFT JOIN User u ON u.id = p.user.id "
-              + "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 "
-              + "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 "
-              + "LEFT JOIN PostComment pc ON pc.post.id = p.id "
-              + "LEFT JOIN Tag2Post t2p ON t2p.postId = p.id "
-              + "LEFT JOIN Tag tg ON tg.id = t2p.tagId "
-              + "WHERE p.id = :id AND p.moderationStatus = 'ACCEPTED' AND p.isActive = 1 AND p.time <= CURRENT_TIME "
-              + "GROUP BY p.id")
-  Optional<Post> findPostsById(@Param("id") Integer id);
 
   Post findPostById(Integer id);
 

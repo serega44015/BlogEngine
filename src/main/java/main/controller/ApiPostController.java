@@ -1,9 +1,9 @@
 package main.controller;
 
+import main.dto.api.request.CreatePostRequest;
 import main.dto.api.request.LikeDislikeRequest;
-import main.dto.api.request.NewPostRequest;
 import main.dto.api.response.LikeDislikeResponse;
-import main.dto.api.response.NewPostResponse;
+import main.dto.api.response.OperationPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
 import main.service.LikeDislikeService;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -32,12 +33,12 @@ public class ApiPostController {
   }
 
   @GetMapping
-  @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<PostResponse> posts(
       @RequestParam(defaultValue = "0", required = false) Integer offset,
       @RequestParam(defaultValue = "10", required = false) Integer limit,
-      @RequestParam(defaultValue = "popular", required = false) String mode) {
-    return new ResponseEntity<>(postService.getPosts(offset, limit, mode), HttpStatus.OK);
+      @RequestParam(defaultValue = "popular", required = false) String mode,
+      HttpServletRequest request) {
+    return new ResponseEntity<>(postService.getPosts(offset, limit, mode, request), HttpStatus.OK);
   }
 
   @GetMapping("/search")
@@ -99,30 +100,33 @@ public class ApiPostController {
 
   @PostMapping
   @PreAuthorize("hasAuthority('user:write')")
-  public ResponseEntity<NewPostResponse> newPost(
-      @RequestBody NewPostRequest newPostRequest, Principal principal) {
-    return new ResponseEntity<>(postService.addNewPost(newPostRequest, principal), HttpStatus.OK);
+  public ResponseEntity<OperationPostResponse> newPost(
+      @RequestBody CreatePostRequest createPostRequest, Principal principal) {
+    return new ResponseEntity<>(
+        postService.addNewPost(createPostRequest, principal), HttpStatus.OK);
   }
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('user:write')")
-  public ResponseEntity<NewPostResponse> updatePost(
-      @PathVariable int id, @RequestBody NewPostRequest newPostRequest, Principal principal) {
+  public ResponseEntity<OperationPostResponse> updatePost(
+      @PathVariable Integer id,
+      @RequestBody CreatePostRequest createPostRequest,
+      Principal principal) {
     return new ResponseEntity<>(
-        postService.updatePost(id, newPostRequest, principal), HttpStatus.OK);
+        postService.updatePost(id, createPostRequest, principal), HttpStatus.OK);
   }
 
   @PostMapping("/like")
   @PreAuthorize("hasAuthority('user:write')")
   public LikeDislikeResponse likePost(
       @RequestBody LikeDislikeRequest likeRequest, Principal principal) {
-    return likeDislikeService.getLikePost(likeRequest, principal);
+    return likeDislikeService.getReactionPost(likeRequest, principal, true);
   }
 
   @PostMapping("/dislike")
   @PreAuthorize("hasAuthority('user:write')")
   public LikeDislikeResponse dislikePost(
       @RequestBody LikeDislikeRequest likeRequest, Principal principal) {
-    return likeDislikeService.getDislikePost(likeRequest, principal);
+    return likeDislikeService.getReactionPost(likeRequest, principal, false);
   }
 }

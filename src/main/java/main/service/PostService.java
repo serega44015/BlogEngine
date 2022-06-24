@@ -1,12 +1,13 @@
 package main.service;
 
-import main.dto.ErrorNewPostDto;
-import main.dto.api.request.NewPostRequest;
+import main.dto.api.errorDto.ErrorCreatePostDto;
+import main.dto.api.request.CreatePostRequest;
 import main.dto.api.response.CalendarResponse;
-import main.dto.api.response.NewPostResponse;
+import main.dto.api.response.OperationPostResponse;
 import main.dto.api.response.PostIdResponse;
 import main.dto.api.response.PostResponse;
 import main.mappers.PostMapper;
+import main.mappers.converter.ResultValue;
 import main.model.GlobalSetting;
 import main.model.Post;
 import main.model.Tag;
@@ -17,16 +18,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static main.mappers.converter.DateConverter.dateToLong;
+import static main.mappers.converter.DateConverter.longToDate;
+import static main.mappers.converter.ResultValue.*;
 
 @Service
 public class PostService {
@@ -37,14 +43,15 @@ public class PostService {
   private final Tag2PostRepository tag2PostRepository;
   private final GlobalSettingRepository globalSettingRepository;
   private final PostMapper postMapper = PostMapper.INSTANCE;
+  private final Integer MIN_TITLE_LENGTH = 3;
+  private final Integer MIN_TEXT_LENGTH = 10;
 
   public PostService(
       PostRepository postsRepository,
       UserRepository userRepository,
       TagRepository tagRepository,
       Tag2PostRepository tag2PostRepository,
-      GlobalSettingRepository globalSettingRepository,
-      AuthenticationManager authenticationManager) {
+      GlobalSettingRepository globalSettingRepository) {
     this.postsRepository = postsRepository;
     this.userRepository = userRepository;
     this.tagRepository = tagRepository;
@@ -60,7 +67,7 @@ public class PostService {
     if (query.isEmpty()) {
       posts =
           postsRepository.findAllPostsSortedByRecentOrEarly(
-              getSortedPaging(offset, limit, Sort.by("time").descending()));
+              getSortedPaging(offset, limit, Sort.by(TIME).descending()));
     } else {
       posts = postsRepository.findPostsBySearch(getPaging(offset, limit), query);
     }
@@ -68,29 +75,34 @@ public class PostService {
     return postResponse;
   }
 
-  public PostResponse getPosts(Integer offset, Integer limit, String mode) {
+  public PostResponse getPosts(
+      Integer offset, Integer limit, String mode, HttpServletRequest request) {
+    if (loadingResultPhoto) {
+      ResultValue.downloadPhoto(request);
+    }
+
     PostResponse postResponse = new PostResponse();
 
-    if (mode.equals("recent")) {
+    if (mode.equals(RECENT)) {
       Page<Post> posts =
           postsRepository.findAllPostsSortedByRecentOrEarly(
-              getSortedPaging(offset, limit, Sort.by("time").descending()));
+              getSortedPaging(offset, limit, Sort.by(TIME).descending()));
       settersPostsResponse(postResponse, posts);
     }
 
-    if (mode.equals("early")) {
+    if (mode.equals(EARLY)) {
       Page<Post> posts =
           postsRepository.findAllPostsSortedByRecentOrEarly(
-              getSortedPaging(offset, limit, Sort.by("time").ascending()));
+              getSortedPaging(offset, limit, Sort.by(TIME).ascending()));
       settersPostsResponse(postResponse, posts);
     }
 
-    if (mode.equals("popular")) {
+    if (mode.equals(POPULAR)) {
       Page<Post> posts = postsRepository.findAllPostOrderByComments(getPaging(offset, limit));
       settersPostsResponse(postResponse, posts);
     }
 
-    if (mode.equals("best")) {
+    if (mode.equals(BEST)) {
       Page<Post> posts = postsRepository.findAllPostOrderByLikes(getPaging(offset, limit));
       settersPostsResponse(postResponse, posts);
     }
@@ -154,14 +166,10 @@ public class PostService {
   }
 
   public PostIdResponse getPostById(Integer id) {
-    Post post;
-    try {
-      post = postsRepository.findPostById(id);
-    } catch (NoSuchElementException n) {
-      n.getMessage();
-      return null;
-    }
-
+    Post post = postsRepository.findById(id).orElse(null);
+    if (Objects.isNull(post)) return null;
+    post.setViewCount(post.getViewCount() + ONE);
+    postsRepository.save(post);
     return postMapper.toPostResponseById(post);
   }
 
@@ -170,9 +178,9 @@ public class PostService {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     User user = (User) authentication.getPrincipal();
     main.model.User currentUser = userRepository.findByEmail(user.getUsername());
-    Sort sort = Sort.by("time").descending();
+    Sort sort = Sort.by(TIME).descending();
 
-    if (status.equals("inactive")) {
+    if (status.equals(INACTIVE)) {
       Page<Post> posts =
           postsRepository.findStatusInactiveByPosts(
               currentUser.getId(), getSortedPaging(offset, limit, sort));
@@ -180,7 +188,7 @@ public class PostService {
       settersPostsResponse(postResponse, posts);
     }
 
-    if (status.equals("pending")) {
+    if (status.equals(PENDING)) {
       Page<Post> posts =
           postsRepository.findStatusPendingByPosts(
               currentUser.getId(), getSortedPaging(offset, limit, sort));
@@ -188,7 +196,7 @@ public class PostService {
       settersPostsResponse(postResponse, posts);
     }
 
-    if (status.equals("declined")) {
+    if (status.equals(DECLINED)) {
       Page<Post> posts =
           postsRepository.findStatusDeclinedByPosts(
               currentUser.getId(), getSortedPaging(offset, limit, sort));
@@ -196,7 +204,7 @@ public class PostService {
       settersPostsResponse(postResponse, posts);
     }
 
-    if (status.equals("published")) {
+    if (status.equals(PUBLISHED)) {
       Page<Post> posts =
           postsRepository.findStatusPublishedByPosts(
               currentUser.getId(), getSortedPaging(offset, limit, sort));
@@ -213,12 +221,12 @@ public class PostService {
     User user = (User) authentication.getPrincipal();
     main.model.User currentUser = userRepository.findByEmail(user.getUsername());
 
-    ModerationStatus moderationStatus = ModerationStatus.NEW;
-    if (status.equals("accepted")) {
-      moderationStatus = ModerationStatus.ACCEPTED;
+    ModerationStatus moderationStatus = ModerationStatus.ACCEPTED;
+    if (status.equals(NEW)) {
+      moderationStatus = ModerationStatus.NEW;
     }
 
-    if (status.equals("declined")) {
+    if (status.equals(DECLINED)) {
       moderationStatus = ModerationStatus.DECLINED;
     }
 
@@ -226,114 +234,88 @@ public class PostService {
         postsRepository.findModeratedPost(
             currentUser.getId(),
             moderationStatus,
-            getSortedPaging(offset, limit, Sort.by("time").descending()));
+            getSortedPaging(offset, limit, Sort.by(TIME).descending()));
 
     postResponse.setCount(posts.getTotalElements());
     settersPostsResponse(postResponse, posts);
-
     return postResponse;
   }
 
-  public NewPostResponse addNewPost(
-      @RequestBody NewPostRequest newPostRequest, Principal principal) {
-    Integer MIN_TITLE_LENGTH = 3;
-    Integer MIN_TEXT_LENGTH = 10;
-    NewPostResponse newPostsResponse = new NewPostResponse();
-    main.model.User currentUser = userRepository.findByEmail(principal.getName());
-    ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
+  public OperationPostResponse addNewPost(
+      @RequestBody CreatePostRequest createPostRequest, Principal principal) {
 
-    String title = newPostRequest.getTitle();
-    String text = newPostRequest.getText();
-    newPostsResponse.setResult(false);
-    if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
-      errorNewPostDTO.setTitle("Заголовок не установлен");
-    } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
-      errorNewPostDTO.setText("Текст публикации слишком короткий");
-    } else {
-      newPostsResponse.setResult(true);
+    OperationPostResponse operationPostResponse = publicationCheck(createPostRequest);
+    if (!operationPostResponse.getResult()) {
+      return operationPostResponse;
     }
-
+    main.model.User currentUser = userRepository.findByEmail(principal.getName());
     Post post = new Post();
 
-    GlobalSetting postPremoderation = globalSettingRepository.findByCode("POST_PREMODERATION");
-    if (postPremoderation.getValue().equals("YES")) {
+    GlobalSetting postPremoderation = globalSettingRepository.findByCode(POST_PREMODERATION);
+    if (postPremoderation.getValue().equals(YES)) {
       post.setModerationStatus(ModerationStatus.NEW);
     } else {
       post.setModerationStatus(ModerationStatus.ACCEPTED);
     }
 
-    Calendar time = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    time.setTimeInMillis(newPostRequest.getTimestamp() * 1000);
-    post.setTime(time);
-    post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
-    post.setModeratorId(currentUser.getIsModerator());
-    post.setUser(currentUser);
-    post.setTime(time);
-    post.setTitle(title);
-    post.setText(text);
+    post = postMapper.toAddOrUpdatePost(post, createPostRequest, currentUser);
     postsRepository.save(post);
-    post.setTagList(lookTag(newPostRequest.getTags(), post));
+    post.setTagList(lookTag(createPostRequest.getTags(), post));
     postsRepository.save(post);
-    newPostsResponse.setErrors(errorNewPostDTO);
-    return newPostsResponse;
+    return operationPostResponse;
   }
 
-  public NewPostResponse updatePost(
-      Integer id, NewPostRequest newPostRequest, Principal principal) {
-    Integer MIN_TITLE_LENGTH = 3;
-    Integer MIN_TEXT_LENGTH = 10;
-    NewPostResponse newPostsResponse = new NewPostResponse();
+  public OperationPostResponse updatePost(
+      Integer id, CreatePostRequest createPostRequest, Principal principal) {
+
+    OperationPostResponse operationPostsResponse = publicationCheck(createPostRequest);
+    if (!operationPostsResponse.getResult()) {
+      return operationPostsResponse;
+    }
+
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
-    ErrorNewPostDto errorNewPostDTO = new ErrorNewPostDto();
-
-    String title = newPostRequest.getTitle();
-    String text = newPostRequest.getText();
-
-    newPostsResponse.setResult(false);
-    if (title.length() < MIN_TITLE_LENGTH || title.isEmpty()) {
-      errorNewPostDTO.setTitle("Заголовок не установлен");
-    } else if (text.length() < MIN_TEXT_LENGTH || text.isEmpty()) {
-      errorNewPostDTO.setText("Текст публикации слишком короткий");
-    } else {
-      newPostsResponse.setResult(true);
-    }
-
     Post post = postsRepository.findPostById(id);
-    Calendar time = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-    post.setId(post.getId());
-    post.setIsActive(newPostRequest.getActive().equals(true) ? 1 : 0);
-    post.setTitle(title);
-    post.setText(text);
-    post.setUser(currentUser);
-    post.setTagList(lookTag(newPostRequest.getTags(), post));
-    post.setModeratorId(currentUser.getIsModerator());
+    post = postMapper.toAddOrUpdatePost(post, createPostRequest, currentUser);
+    post.setTagList(lookTag(createPostRequest.getTags(), post));
 
-    Long calendarTime = time.getTimeInMillis();
-    Long requestTime = newPostRequest.getTimestamp() * 1000;
-    if (requestTime > calendarTime) {
-      time.setTimeInMillis(requestTime);
-    } else {
-      time.setTimeInMillis(calendarTime);
+    Long date = dateToLong(LocalDateTime.now());
+    if (createPostRequest.getTimestamp() < date) {
+      post.setTime(longToDate(date));
     }
-    post.setTime(time);
-
-    Boolean isAuthor = currentUser.getName().equals(post.getUser().getName());
-    Boolean isModerator = currentUser.getIsModerator() == 1;
-    if (isAuthor) {
+    if (currentUser.getName().equals(post.getUser().getName())) {
       post.setModerationStatus(ModerationStatus.NEW);
     }
-    if (isModerator) {
+    if (currentUser.getIsModerator() == ONE) {
       post.setModerationStatus(post.getModerationStatus());
     }
     postsRepository.save(post);
-    newPostsResponse.setErrors(errorNewPostDTO);
+    return operationPostsResponse;
+  }
 
-    return newPostsResponse;
+  private OperationPostResponse publicationCheck(CreatePostRequest createPostRequest) {
+    OperationPostResponse operationPostsResponse = new OperationPostResponse();
+    ErrorCreatePostDto errorCreatePostDTO = new ErrorCreatePostDto();
+    operationPostsResponse.setResult(false);
+    if (createPostRequest.getTitle().length() < MIN_TITLE_LENGTH
+        || createPostRequest.getTitle().isEmpty()) {
+      errorCreatePostDTO.setTitle("Заголовок не установлен");
+      operationPostsResponse.setErrors(errorCreatePostDTO);
+      return operationPostsResponse;
+    } else if (createPostRequest.getText().length() < MIN_TEXT_LENGTH
+        || createPostRequest.getText().isEmpty()) {
+      errorCreatePostDTO.setText("Текст публикации слишком короткий");
+      operationPostsResponse.setErrors(errorCreatePostDTO);
+      return operationPostsResponse;
+    } else {
+      operationPostsResponse.setErrors(errorCreatePostDTO);
+      operationPostsResponse.setResult(true);
+      return operationPostsResponse;
+    }
   }
 
   private List<Tag> lookTag(List<String> tags, Post post) {
     List<Tag> tagList = new ArrayList<>();
-
+    tags = tags.stream().map(t -> t.toUpperCase()).distinct().collect(Collectors.toList());
     for (String tagName : tags) {
       Optional<Tag> tagOpt = tagRepository.findTagByName(tagName);
       if (tagOpt.isEmpty()) {

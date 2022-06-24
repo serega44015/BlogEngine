@@ -13,9 +13,6 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
   @Override
   List<Tag> findAll();
 
-  @Query(value = "SELECT tg.id FROM Tag tg WHERE tg.name = :tagName")
-  Integer findTagIdByName(@Param("tagName") String tagName);
-
   Tag findByName(String name);
 
   Optional<Tag> findTagByName(String name);

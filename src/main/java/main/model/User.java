@@ -5,8 +5,10 @@ import lombok.NoArgsConstructor;
 import main.model.enums.Role;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static main.mappers.converter.ResultValue.ONE;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +25,7 @@ public class User {
   private Integer isModerator;
 
   @Column(name = "reg_time", nullable = false, columnDefinition = "DATETIME")
-  private Date regTime;
+  private LocalDateTime regTime;
 
   @Column(nullable = false, columnDefinition = "VARCHAR(255)")
   private String name;
@@ -34,7 +36,7 @@ public class User {
   @Column(nullable = false, columnDefinition = "VARCHAR(255)")
   private String password;
 
-  @Column(nullable = true, columnDefinition = "VARCHAR(255)")
+  @Column(columnDefinition = "VARCHAR(255)")
   private String code;
 
   @Column(nullable = false, columnDefinition = "TEXT")
@@ -47,6 +49,6 @@ public class User {
   private List<PostComment> postCommentUser;
 
   public Role getRole() {
-    return isModerator == 1 ? Role.MODERATOR : Role.USER;
+    return isModerator == ONE ? Role.MODERATOR : Role.USER;
   }
 }

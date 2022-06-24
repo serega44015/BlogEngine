@@ -1,9 +1,9 @@
-package main.dto;
+package main.dto.api.errorDto;
 
 import lombok.Data;
 
 @Data
 public class ErrorProfilePhotoDto {
 
-    private String data;
+  private String data;
 }

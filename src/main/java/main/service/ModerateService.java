@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 
+import static main.mappers.converter.ResultValue.ACCEPTED;
+import static main.mappers.converter.ResultValue.ONE;
+
 @Service
 public class ModerateService {
 
@@ -27,12 +30,12 @@ public class ModerateService {
     Post post = postRepository.findPostById(moderationRequest.getPostId());
 
     ModerationStatus status =
-        moderationRequest.getDecision().equals("accept")
+        moderationRequest.getDecision().equals(ACCEPTED)
             ? ModerationStatus.ACCEPTED
             : ModerationStatus.DECLINED;
     post.setModerationStatus(status);
 
-    if (currentUser.getIsModerator() == 1) {
+    if (currentUser.getIsModerator() == ONE) {
       moderationResponse.setResult(true);
     } else {
       moderationResponse.setResult(false);

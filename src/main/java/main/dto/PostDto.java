@@ -6,18 +6,18 @@ import lombok.Data;
 @Data
 public class PostDto {
 
-  private int id;
+  private Integer id;
 
   @JsonProperty("timestamp")
-  private long timeStamp;
+  private Long timeStamp;
 
   @JsonProperty("user")
   private UserDto userDTO;
 
   private String title;
   private String announce;
-  private int likeCount;
-  private int dislikeCount;
-  private int commentCount;
-  private int viewCount;
+  private Integer likeCount;
+  private Integer dislikeCount;
+  private Integer commentCount;
+  private Integer viewCount;
 }

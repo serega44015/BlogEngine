@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 
+import static main.mappers.converter.DateConverter.dateToLong;
+import static main.mappers.converter.ResultValue.*;
+
 @Service
 public class StatsService {
   private final UserRepository userRepository;
@@ -37,9 +40,9 @@ public class StatsService {
   public ResponseEntity<StatisticResponse> getAllStatistics(Principal principal) {
     main.model.User currentUser = userRepository.findByEmail(principal.getName());
     StatisticResponse statisticResponse = getStatistics(postRepository.findAll());
-    String showStatistics = globalSettingRepository.findByCode("STATISTICS_IS_PUBLIC").getValue();
+    String showStatistics = globalSettingRepository.findByCode(STATISTICS_IS_PUBLIC).getValue();
 
-    if (currentUser.getIsModerator() == 0 && showStatistics.equals("NO")) {
+    if (currentUser.getIsModerator() == ZERO && showStatistics.equals(NO)) {
       return new ResponseEntity<>(statisticResponse, HttpStatus.UNAUTHORIZED);
     }
     return new ResponseEntity<>(statisticResponse, HttpStatus.OK);
@@ -48,17 +51,18 @@ public class StatsService {
   private StatisticResponse getStatistics(List<Post> posts) {
     StatisticResponse statisticResponse = new StatisticResponse();
     Integer postCount = posts.size();
-    Integer likeCount = 0;
-    Integer dislikeCount = 0;
-    Integer viewCount = 0;
-    Long firstPublication = posts.get(0).getTime().getTimeInMillis() / 1000;
+    Integer likeCount = ZERO;
+    Integer dislikeCount = ZERO;
+    Integer viewCount = ZERO;
+
+    Long firstPublication = dateToLong(posts.stream().findFirst().get().getTime());
 
     for (Post p : posts) {
       for (PostVote pv : p.getPostVoteList()) {
-        if (pv.getValue() == 1) {
+        if (pv.getValue() == ONE) {
           likeCount++;
         }
-        if (pv.getValue() == -1) {
+        if (pv.getValue() == -ONE) {
           dislikeCount++;
         }
       }

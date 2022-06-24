@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class NewPostRequest {
+public class CreatePostRequest {
 
   private Long timestamp;
   private Boolean active;

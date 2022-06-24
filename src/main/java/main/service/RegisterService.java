@@ -1,6 +1,6 @@
 package main.service;
 
-import main.dto.ErrorDto;
+import main.dto.api.errorDto.ErrorDto;
 import main.dto.api.request.RegisterRequest;
 import main.dto.api.response.RegisterResponse;
 import main.model.User;
@@ -8,10 +8,12 @@ import main.model.repositories.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static main.mappers.converter.ResultValue.ZERO;
 
 @Service
 public class RegisterService {
@@ -54,9 +56,9 @@ public class RegisterService {
       user.setEmail(email);
       user.setName(name);
       user.setPassword(passwordEncoder.encode(password));
-      user.setRegTime(new Date());
-      user.setIsModerator(0);
-      user.setPhoto("img");
+      user.setRegTime(LocalDateTime.now());
+      user.setIsModerator(ZERO);
+      user.setPhoto(null);
       userRepository.save(user);
 
       registerResponse.setResult(true);
