@@ -29,7 +29,7 @@ import static main.mappers.converter.ResultValue.UPLOAD;
 @Service
 public class ProfileService {
   private final UserRepository userRepository;
-  private final Integer LIMIT_SIZE_PHOTO = 5242880; // TODO удалить
+  private final Integer LIMIT_SIZE_PHOTO = 5242880;
 
   public ProfileService(UserRepository userRepository) {
     this.userRepository = userRepository;

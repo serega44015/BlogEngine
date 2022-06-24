@@ -75,8 +75,9 @@ public class PostService {
     return postResponse;
   }
 
-  public PostResponse getPosts(Integer offset, Integer limit, String mode, HttpServletRequest request) {
-    if (loadingResultPhoto){
+  public PostResponse getPosts(
+      Integer offset, Integer limit, String mode, HttpServletRequest request) {
+    if (loadingResultPhoto) {
       ResultValue.downloadPhoto(request);
     }
 
@@ -166,6 +167,9 @@ public class PostService {
 
   public PostIdResponse getPostById(Integer id) {
     Post post = postsRepository.findById(id).orElse(null);
+    if (Objects.isNull(post)) return null;
+    post.setViewCount(post.getViewCount() + ONE);
+    postsRepository.save(post);
     return postMapper.toPostResponseById(post);
   }
 
@@ -311,7 +315,7 @@ public class PostService {
 
   private List<Tag> lookTag(List<String> tags, Post post) {
     List<Tag> tagList = new ArrayList<>();
-
+    tags = tags.stream().map(t -> t.toUpperCase()).distinct().collect(Collectors.toList());
     for (String tagName : tags) {
       Optional<Tag> tagOpt = tagRepository.findTagByName(tagName);
       if (tagOpt.isEmpty()) {
