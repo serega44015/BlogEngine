@@ -140,7 +140,7 @@ public class PostService {
 
   public PostResponse getPostByDate(Integer offset, Integer limit, String date) {
     PostResponse postResponse = new PostResponse();
-    Page<Post> posts = postsRepository.findPostsByDate(getPaging(offset, limit), date);
+    Page<Post> posts = postsRepository.findPostsByDate(getPaging(offset, limit), "%" + date + "%");
     settersPostsResponse(postResponse, posts);
     return postResponse;
   }
