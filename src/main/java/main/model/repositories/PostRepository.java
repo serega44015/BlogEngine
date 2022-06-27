@@ -60,15 +60,15 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
   List<String> getDateFromPosts();
 
   @Query(
-      value = "SELECT count(posts.time) FROM site.posts WHERE posts.time LIKE :date",
+      value = "SELECT count(time) FROM posts WHERE time LIKE :date",
       nativeQuery = true)
   Integer countPostsFromDate(@Param("date") String date);
 
   @Query(
       value =
-          "SELECT * FROM site.posts LEFT JOIN site.users ON posts.user_id = users.id "
+          "SELECT * FROM posts LEFT JOIN users ON posts.user_id = users.id "
               + "WHERE posts.moderation_status = 'ACCEPTED' and posts.is_active = 1 "
-              + "and posts.time <= current_time() and DATE(site.posts.time) = :date",
+              + "and posts.time <= current_time() and posts.time LIKE :date",
       nativeQuery = true)
   Page<Post> findPostsByDate(Pageable pageable, @Param("date") String date);
 
