@@ -13,7 +13,7 @@ import main.model.User;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-27T21:14:16+0300",
+    date = "2022-06-27T21:48:42+0300",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.2 (Oracle Corporation)"
 )
 public class PostCommentMapperImpl implements PostCommentMapper {
