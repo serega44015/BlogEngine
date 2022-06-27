@@ -73,7 +73,6 @@ public class ApiPostController {
     if (Objects.isNull(postIdResponse)) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
     return new ResponseEntity<>(postIdResponse, HttpStatus.OK);
   }
 
@@ -83,7 +82,6 @@ public class ApiPostController {
       @RequestParam(defaultValue = "0", required = false) Integer offset,
       @RequestParam(defaultValue = "10", required = false) Integer limit,
       @RequestParam(defaultValue = "status", required = false) String status) {
-
     return new ResponseEntity<>(postService.getMyPosts(offset, limit, status), HttpStatus.OK);
   }
 
@@ -93,7 +91,6 @@ public class ApiPostController {
       @RequestParam(defaultValue = "0", required = false) Integer offset,
       @RequestParam(defaultValue = "10", required = false) Integer limit,
       @RequestParam(defaultValue = "status", required = false) String status) {
-
     return new ResponseEntity<>(
         postService.getModerationPost(offset, limit, status), HttpStatus.OK);
   }
