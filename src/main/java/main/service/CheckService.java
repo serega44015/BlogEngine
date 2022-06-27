@@ -28,7 +28,6 @@ public class CheckService {
     if (Objects.isNull(user)) {
       throw new UsernameNotFoundException("user" + email + " not found");
     }
-
     UserLoginDto userLoginDTO = userMapper.toUserLoginDto(user);
     userLoginDTO.setModeration(user.getIsModerator() == ONE);
 

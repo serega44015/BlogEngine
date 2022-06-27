@@ -60,12 +60,9 @@ public class RegisterService {
       user.setIsModerator(ZERO);
       user.setPhoto(null);
       userRepository.save(user);
-
       registerResponse.setResult(true);
     }
-
     registerResponse.setErrorDTO(errorDTO);
-
     return registerResponse;
   }
 

@@ -45,14 +45,11 @@ public class CommentService {
       commentResponse.setResult(false);
       return new ResponseEntity<>(commentResponse, HttpStatus.BAD_REQUEST);
     }
-
     Post post = postRepository.findPostById(commentRequest.getPostId());
     PostComment postComment =
-        postCommentMapper.toPostComment(
-            commentRequest, post, currentUser, LocalDateTime.now());
+        postCommentMapper.toPostComment(commentRequest, post, currentUser, LocalDateTime.now());
     postCommentRepository.save(postComment);
     commentResponse.setId(postComment.getId());
-
     return new ResponseEntity<>(commentResponse, HttpStatus.OK);
   }
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class GlobalSettingsResponse {
   @JsonProperty("MULTIUSER_MODE")
-  private Boolean multimuserMode;
+  private Boolean multiuserMode;
 
   @JsonProperty("POST_PREMODERATION")
   private Boolean postPremoderation;

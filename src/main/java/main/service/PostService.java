@@ -60,10 +60,9 @@ public class PostService {
   }
 
   public PostResponse getPostBySearch(Integer offset, Integer limit, String query) {
-
     PostResponse postResponse = new PostResponse();
-
     Page<Post> posts;
+
     if (query.isEmpty()) {
       posts =
           postsRepository.findAllPostsSortedByRecentOrEarly(
@@ -106,7 +105,6 @@ public class PostService {
       Page<Post> posts = postsRepository.findAllPostOrderByLikes(getPaging(offset, limit));
       settersPostsResponse(postResponse, posts);
     }
-
     return postResponse;
   }
 
@@ -116,28 +114,18 @@ public class PostService {
   }
 
   public Pageable getPaging(Integer offset, Integer limit) {
-    // limit = itemPerPage
-    // offset - это отступ от начала, с какого поста мы смотреть будем
-    Pageable paging;
     Integer pageNumber = offset / limit;
-    paging = PageRequest.of(pageNumber, limit);
-
-    return paging;
+    return PageRequest.of(pageNumber, limit);
   }
 
   public Pageable getSortedPaging(Integer offset, Integer limit, Sort sort) {
-    Pageable sortedPaging;
     Integer pageNumber = offset / limit;
-    sortedPaging = PageRequest.of(pageNumber, limit, sort);
-
-    return sortedPaging;
+    return PageRequest.of(pageNumber, limit, sort);
   }
 
   public CalendarResponse getPostsByYear() {
-
     CalendarResponse calendarResponse = new CalendarResponse();
     TreeSet<Integer> years = postsRepository.getSetYearsByAllPosts();
-
     Map<String, Integer> posts =
         postsRepository.getDateFromPosts().stream()
             .distinct()
@@ -211,7 +199,6 @@ public class PostService {
       postResponse.setCount(posts.getTotalElements());
       settersPostsResponse(postResponse, posts);
     }
-
     return postResponse;
   }
 
@@ -330,7 +317,6 @@ public class PostService {
         tag2PostRepository.save(tag2Post);
       }
     }
-
     return tagList;
   }
 }

@@ -21,7 +21,7 @@ public class SettingService {
 
     GlobalSettingsResponse settingResponse = new GlobalSettingsResponse();
     if (globalSettingRepository.findById(SETTING_ID[0]).get().getValue().equals(YES)) {
-      settingResponse.setMultimuserMode(true);
+      settingResponse.setMultiuserMode(true);
     }
     if (globalSettingRepository.findById(SETTING_ID[1]).get().getValue().equals(YES)) {
       settingResponse.setPostPremoderation(true);

@@ -41,7 +41,6 @@ public class EmailService {
       response.setResult(false);
       return response;
     }
-
     user.setCode(UUID.randomUUID().toString());
     userRepository.save(user);
 
@@ -53,7 +52,6 @@ public class EmailService {
 
     mailSender.sends(user.getEmail(), "Restore Password", message);
     response.setResult(true);
-
     return response;
   }
 
@@ -62,7 +60,6 @@ public class EmailService {
     ErrorPasswordChangeDto errorPasswordChangeDto = new ErrorPasswordChangeDto();
     BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     passwordChangeResponse.setResult(true);
-
     User user = userRepository.findByCode(changePasswordRequest.getCode());
 
     if (Objects.isNull(user)) {
@@ -77,7 +74,7 @@ public class EmailService {
         user.setPassword(encoder.encode(changePasswordRequest.getPassword()));
       } else {
         passwordChangeResponse.setResult(false);
-        errorPasswordChangeDto.setPassword("Пароль короче " +  PASSWORD_MIN_LENGTH + " символов");
+        errorPasswordChangeDto.setPassword("Пароль короче " + PASSWORD_MIN_LENGTH + " символов");
       }
 
       CaptchaCode captchaCode =

@@ -40,7 +40,6 @@ public class ModerateService {
     } else {
       moderationResponse.setResult(false);
     }
-
     postRepository.save(post);
     return moderationResponse;
   }

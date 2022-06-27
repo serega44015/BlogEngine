@@ -36,8 +36,6 @@ public class CaptchaService {
 
     CaptchaResponse captchaResponse = new CaptchaResponse();
     CaptchaCode captchaCodes = new CaptchaCode();
-
-    LocalDateTime time = LocalDateTime.now();
     Cage cage = new GCage();
 
     String captchaCode = cage.getTokenGenerator().next();
@@ -53,14 +51,13 @@ public class CaptchaService {
     String encodedCaptcha = DatatypeConverter.printBase64Binary(captcha);
     String image = "data:image/png;base64, " + encodedCaptcha;
 
-    captchaCodes.setTime(time);
+    captchaCodes.setTime(LocalDateTime.now());
     captchaCodes.setCode(captchaCode);
     captchaCodes.setSecretCode(secretCode);
     captchaRepository.save(captchaCodes);
 
     captchaResponse.setSecret(captchaCode);
     captchaResponse.setImage(image);
-
     return captchaResponse;
   }
 }

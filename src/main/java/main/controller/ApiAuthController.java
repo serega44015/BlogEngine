@@ -71,7 +71,6 @@ public class ApiAuthController {
                 loginRequest.getEmail(), loginRequest.getPassword()));
     SecurityContextHolder.getContext().setAuthentication(auth);
     User user = (User) auth.getPrincipal();
-
     return ResponseEntity.ok(checkService.getLoginResponse(user.getUsername()));
   }
 
