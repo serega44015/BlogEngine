@@ -88,7 +88,10 @@ public class ProfileService {
       profileResponse.setResult(false);
       return profileResponse;
     }
-    user.setName(name);
+
+    if (Objects.nonNull(name) && isValidName(name)) {
+      user.setName(name);
+    }
 
     while (true) {
       if (Objects.isNull(email)) {

@@ -22,6 +22,6 @@ public class GlobalSetting {
   @Column(nullable = false, columnDefinition = "VARCHAR(255)")
   private String name;
 
-  @Column(nullable = false, columnDefinition = "VARCHAR(255)")
+  @Column(columnDefinition = "VARCHAR(255)")
   private String value;
 }
