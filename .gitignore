@@ -10,7 +10,6 @@ blog-engine.iml
 *.ctxt
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
-
 # Package Files #
 *.jar
 *.war
@@ -33,6 +32,12 @@ hs_err_pid*
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/compiler.xml
+.idea/**/encodings.xml
+.idea/**/jarRepositories.xml
+.idea/**/misc.xml
+.idea/**/modules.xml
+.idea/**/vcs.xml
 
 # Generated files
 .idea/**/contentModel.xml
