@@ -60,7 +60,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
   List<String> getDateFromPosts();
 
   @Query(
-      value = "SELECT count(time) FROM posts WHERE time LIKE :date",
+      value = "SELECT count(time) FROM posts WHERE time LIKE :date AND moderation_status = 'ACCEPTED'",
       nativeQuery = true)
   Integer countPostsFromDate(@Param("date") String date);
 
