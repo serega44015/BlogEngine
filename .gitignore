@@ -5,10 +5,9 @@
 ### Java ###
 # Compiled class file
 *.class
-
+blog-engine.iml
 # BlueJ files
 *.ctxt
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -193,10 +192,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-#For CarNumberGenerator
-/**/res/**
-
-#For VoteAnalyzer
-/**/res/**
-# End of https://www.gitignore.io/api/java,linux,macos,maven,windows,jetbrains
