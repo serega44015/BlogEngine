@@ -5,6 +5,7 @@ import main.dto.api.response.GlobalSettingsResponse;
 import main.model.repositories.GlobalSettingRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import static main.mappers.converter.ResultValue.NO;
 import static main.mappers.converter.ResultValue.YES;
 
@@ -18,22 +19,32 @@ public class SettingService {
   }
 
   public GlobalSettingsResponse getSettings() {
-
     GlobalSettingsResponse settingResponse = new GlobalSettingsResponse();
-    if (globalSettingRepository.findById(SETTING_ID[0]).get().getValue().equals(YES)) {
+    String multiuserMode = globalSettingRepository.findById(SETTING_ID[0]).get().getValue();
+    String postPremoderation = globalSettingRepository.findById(SETTING_ID[1]).get().getValue();
+    String statisticsIsPublic = globalSettingRepository.findById(SETTING_ID[2]).get().getValue();
+
+    if (Objects.isNull(multiuserMode) || multiuserMode.equals(NO)) {
+      settingResponse.setMultiuserMode(false);
+    } else {
       settingResponse.setMultiuserMode(true);
     }
-    if (globalSettingRepository.findById(SETTING_ID[1]).get().getValue().equals(YES)) {
+
+    if (Objects.isNull(postPremoderation) || postPremoderation.equals(NO)) {
+      settingResponse.setPostPremoderation(false);
+    } else {
       settingResponse.setPostPremoderation(true);
     }
-    if (globalSettingRepository.findById(SETTING_ID[2]).get().getValue().equals(YES)) {
+
+    if (Objects.isNull(statisticsIsPublic) || statisticsIsPublic.equals(NO)) {
+      settingResponse.setStatisticsIsPublic(false);
+    } else {
       settingResponse.setStatisticsIsPublic(true);
     }
     return settingResponse;
   }
 
   public void putSetting(SettingsRequest settingRequest) {
-
     globalSettingRepository
         .findAll()
         .forEach(
@@ -42,20 +53,22 @@ public class SettingService {
                 globalSetting.setValue(booleanToString(settingRequest.getMultiuserMode()));
               }
               if (globalSetting.getId() == SETTING_ID[1]) {
-                globalSetting.setValue(booleanToString(settingRequest.getMultiuserMode()));
+                globalSetting.setValue(booleanToString(settingRequest.getPostPremoderation()));
               }
               if (globalSetting.getId() == SETTING_ID[2]) {
-                globalSetting.setValue(booleanToString(settingRequest.getMultiuserMode()));
+                globalSetting.setValue(booleanToString(settingRequest.getStatisticsIsPublic()));
               }
               globalSettingRepository.save(globalSetting);
             });
   }
 
   private String booleanToString(Boolean result) {
-    if (result) {
-      return NO;
-    } else {
+    if (Objects.isNull(result)) {
+      return null;
+    } else if (result) {
       return YES;
+    } else {
+      return NO;
     }
   }
 }
