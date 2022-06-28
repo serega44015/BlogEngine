@@ -8,7 +8,7 @@ server.port: ${PORT:8080}
 blog.title: QuietCorner
 blog.subtitle: Blog
 blog.phone: +7 915 871-59-39
-blog.email: s.khoroshkov@mail.ru
+blog.email: s.khoroshkov@gmail.ru
 blog.copyright: Alternative
 blog.copyrightFrom: 2021
 spring:

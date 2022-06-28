@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 
 import static main.mappers.converter.DateConverter.dateToLong;
 import static main.mappers.converter.ResultValue.*;
@@ -54,19 +55,22 @@ public class StatsService {
     Integer likeCount = ZERO;
     Integer dislikeCount = ZERO;
     Integer viewCount = ZERO;
+    Long firstPublication = ZERO.longValue();
 
-    Long firstPublication = dateToLong(posts.stream().findFirst().get().getTime());
+    if (Objects.nonNull(posts) && !posts.isEmpty()) {
+      firstPublication = dateToLong(posts.stream().findFirst().get().getTime());
 
-    for (Post p : posts) {
-      for (PostVote pv : p.getPostVoteList()) {
-        if (pv.getValue() == ONE) {
-          likeCount++;
+      for (Post p : posts) {
+        for (PostVote pv : p.getPostVoteList()) {
+          if (pv.getValue() == ONE) {
+            likeCount++;
+          }
+          if (pv.getValue() == -ONE) {
+            dislikeCount++;
+          }
         }
-        if (pv.getValue() == -ONE) {
-          dislikeCount++;
-        }
+        viewCount = viewCount + p.getViewCount();
       }
-      viewCount = viewCount + p.getViewCount();
     }
 
     statisticResponse.setPostsCount(postCount);
