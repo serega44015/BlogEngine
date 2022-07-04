@@ -37,6 +37,7 @@ public class ModerateService {
 
     if (currentUser.getIsModerator() == ONE) {
       moderationResponse.setResult(true);
+      post.setModeratorId(currentUser.getId());
     } else {
       moderationResponse.setResult(false);
     }

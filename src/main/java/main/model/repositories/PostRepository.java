@@ -131,8 +131,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
           + "LEFT JOIN PostVote pv1 ON pv1.post.id = p.id AND pv1.value = 1 "
           + "LEFT JOIN PostVote pv2 ON pv2.post.id = p.id AND pv2.value = -1 "
           + "LEFT JOIN PostComment pc ON pc.post.id = p.id "
-          + "WHERE p.isActive = 1 AND p.moderationStatus = :status AND p.moderatorId = :id "
-          + "GROUP BY p.id")
-  Page<Post> findModeratedPost(
-      @Param("id") int id, @Param("status") ModerationStatus status, Pageable pageable);
+          + "WHERE p.isActive = 1 AND p.moderationStatus = :status")
+  Page<Post> findModeratedPost(@Param("status") ModerationStatus status, Pageable pageable);
 }

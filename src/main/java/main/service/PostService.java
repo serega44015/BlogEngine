@@ -219,10 +219,8 @@ public class PostService {
 
     Page<Post> posts =
         postsRepository.findModeratedPost(
-            currentUser.getId(),
             moderationStatus,
             getSortedPaging(offset, limit, Sort.by(TIME).descending()));
-
     postResponse.setCount(posts.getTotalElements());
     settersPostsResponse(postResponse, posts);
     return postResponse;
