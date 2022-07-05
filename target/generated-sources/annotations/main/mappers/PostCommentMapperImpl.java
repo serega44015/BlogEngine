@@ -13,7 +13,7 @@ import main.model.User;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-28T11:44:04+0300",
+    date = "2022-07-05T14:20:12+0300",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.15 (Amazon.com Inc.)"
 )
 public class PostCommentMapperImpl implements PostCommentMapper {
@@ -33,8 +33,8 @@ public class PostCommentMapperImpl implements PostCommentMapper {
     }
 
     @Override
-    public PostComment toPostComment(CommentRequest commentRequest, Post post, User user, LocalDateTime currentTime) {
-        if ( commentRequest == null && post == null && user == null && currentTime == null ) {
+    public PostComment toPostComment(CommentRequest commentRequest, Post post, User userComment, LocalDateTime currentTime) {
+        if ( commentRequest == null && post == null && userComment == null && currentTime == null ) {
             return null;
         }
 
@@ -46,7 +46,9 @@ public class PostCommentMapperImpl implements PostCommentMapper {
         }
         if ( post != null ) {
             postComment.setPost( post );
-            postComment.setUser( post.getUser() );
+        }
+        if ( userComment != null ) {
+            postComment.setUser( userComment );
         }
         if ( currentTime != null ) {
             postComment.setTime( currentTime );

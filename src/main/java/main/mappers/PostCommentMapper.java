@@ -31,6 +31,7 @@ public interface PostCommentMapper {
   @Mapping(target = "text", source = "commentRequest.text")
   @Mapping(target = "post", source = "post")
   @Mapping(target = "time", source = "currentTime")
+  @Mapping(target = "user", source = "userComment")
   PostComment toPostComment(
-      CommentRequest commentRequest, Post post, User user, LocalDateTime currentTime);
+      CommentRequest commentRequest, Post post, User userComment, LocalDateTime currentTime);
 }
