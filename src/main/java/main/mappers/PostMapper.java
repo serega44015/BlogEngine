@@ -47,7 +47,7 @@ public interface PostMapper {
   @Mapping(
       target = "comments",
       source = "post.postCommentList",
-      qualifiedByName = "toListCommentDTO")
+      qualifiedByName = "toCommentDTO")
   @Mapping(target = "tags", source = "post.tagList", qualifiedByName = "tagNameList")
   PostIdResponse toPostResponseById(Post post);
 
