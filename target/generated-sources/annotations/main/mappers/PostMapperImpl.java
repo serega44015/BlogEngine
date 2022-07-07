@@ -3,6 +3,7 @@ package main.mappers;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.processing.Generated;
+import main.dto.CommentDto;
 import main.dto.PostDto;
 import main.dto.api.request.CreatePostRequest;
 import main.dto.api.response.PostIdResponse;
@@ -17,7 +18,7 @@ import org.mapstruct.factory.Mappers;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2022-06-28T11:44:04+0300",
+    date = "2022-07-07T15:42:32+0300",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.15 (Amazon.com Inc.)"
 )
 public class PostMapperImpl implements PostMapper {
@@ -63,7 +64,7 @@ public class PostMapperImpl implements PostMapper {
         postIdResponse.setText( post.getText() );
         postIdResponse.setLikeCount( resultValue.likesAmount( post.getPostVoteList() ) );
         postIdResponse.setDislikeCount( resultValue.dislikesAmount( post.getPostVoteList() ) );
-        postIdResponse.setComments( postCommentMapper.toListCommentDTO( post.getPostCommentList() ) );
+        postIdResponse.setComments( postCommentListToCommentDtoList( post.getPostCommentList() ) );
         postIdResponse.setTags( resultValue.tagNameList( post.getTagList() ) );
         postIdResponse.setViewCount( post.getViewCount() );
 
@@ -112,5 +113,18 @@ public class PostMapperImpl implements PostMapper {
         }
 
         return post1;
+    }
+
+    protected List<CommentDto> postCommentListToCommentDtoList(List<PostComment> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        List<CommentDto> list1 = new ArrayList<CommentDto>( list.size() );
+        for ( PostComment postComment : list ) {
+            list1.add( postCommentMapper.toCommentDTO( postComment ) );
+        }
+
+        return list1;
     }
 }

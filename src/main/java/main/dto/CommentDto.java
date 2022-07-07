@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class CommentDto {
 
-    private int id;
+    private Integer id;
 
     @JsonProperty("timestamp")
-    private long timeStamp;
+    private Long timeStamp;
 
     private String text;
     private UserCommentDto user;
