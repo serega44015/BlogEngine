@@ -81,7 +81,6 @@ public class ProfileService {
       HttpServletRequest request) {
     ProfileResponse profileResponse = new ProfileResponse();
     ErrorProfileDto errorProfileDto = new ErrorProfileDto();
-
     if (Objects.isNull(name) || !isValidName(name)) {
       errorProfileDto.setName("Имя указано неверно");
       profileResponse.setErrors(errorProfileDto);
@@ -166,7 +165,7 @@ public class ProfileService {
 
   private Boolean isValidName(String username) {
     String USERNAME_PATTERN =
-        "^[a-zA-Zа-яА-Я0-9]([._-](?![._-])|[a-zA-Zа-яА-Я0-9]){3,18}[a-zA-Zа-яА-Я0-9]$";
+        "^[a-zA-Zа-яА-Я0-9]([._-](?![._-])|[a-zA-Zа-яА-Я0-9]){0,18}[a-zA-Zа-яА-Я0-9]$";
     Pattern pattern = Pattern.compile(USERNAME_PATTERN);
     Matcher matcher = pattern.matcher(username);
     return matcher.matches();
