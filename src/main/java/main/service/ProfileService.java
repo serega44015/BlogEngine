@@ -81,7 +81,6 @@ public class ProfileService {
       HttpServletRequest request) {
     ProfileResponse profileResponse = new ProfileResponse();
     ErrorProfileDto errorProfileDto = new ErrorProfileDto();
-    System.out.println(name);
     if (Objects.isNull(name) || !isValidName(name)) {
       errorProfileDto.setName("Имя указано неверно");
       profileResponse.setErrors(errorProfileDto);
