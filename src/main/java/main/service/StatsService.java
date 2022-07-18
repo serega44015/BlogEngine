@@ -39,12 +39,19 @@ public class StatsService {
   }
 
   public ResponseEntity<StatisticResponse> getAllStatistics(Principal principal) {
-    main.model.User currentUser = userRepository.findByEmail(principal.getName());
+    main.model.User currentUser;
+    try {
+      currentUser = userRepository.findByEmail(principal.getName());
+    } catch (NullPointerException ex) {
+      currentUser = null;
+    }
+
     StatisticResponse statisticResponse = getStatistics(postRepository.findAll());
     String showStatistics = globalSettingRepository.findByCode(STATISTICS_IS_PUBLIC).getValue();
-
-    if (currentUser.getIsModerator() == ZERO && showStatistics.equals(NO)) {
-      return new ResponseEntity<>(statisticResponse, HttpStatus.UNAUTHORIZED);
+    if (Objects.nonNull(currentUser)) {
+      if (currentUser.getIsModerator() == ZERO && showStatistics.equals(NO)) {
+        return new ResponseEntity<>(statisticResponse, HttpStatus.UNAUTHORIZED);
+      }
     }
     return new ResponseEntity<>(statisticResponse, HttpStatus.OK);
   }
@@ -72,7 +79,6 @@ public class StatsService {
         viewCount = viewCount + p.getViewCount();
       }
     }
-
     statisticResponse.setPostsCount(postCount);
     statisticResponse.setLikesCount(likeCount);
     statisticResponse.setDislikesCount(dislikeCount);

@@ -119,7 +119,6 @@ public class ApiGeneralController {
   }
 
   @GetMapping("/statistics/all")
-  @PreAuthorize("hasAuthority('user:write')")
   public ResponseEntity<StatisticResponse> allStats(Principal principal) {
     return statsService.getAllStatistics(principal);
   }
